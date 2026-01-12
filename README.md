@@ -17,7 +17,7 @@
 4. Research traditions proximity / compound metrics and tools
 5. Build exploratory UI with clusters visualization, adaptable threshold and freeform proximity / parallels query
 6. Make the research UI publicly available online
-7. Integrate traditional indexes (ATU, Berezkin?) for interactive research and scaling
+7. Integrate traditional indexes (ATU, Berezkin?) for interactive research and scaling?
 8. Initiate worldwide community corpora & computational methods project?
 9. Create and maintain **awesome-computational-mythology**?
 10. Try AE / VAE / SAE?
