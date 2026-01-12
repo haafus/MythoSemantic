@@ -15,7 +15,8 @@
 2. Build exploratory UI with clusters visualization, adaptable threshold and freeform proximity/parallels query
 3. Try AE / VAE / SAE?
 4. Try hierarchical chunking / embeddings?
-5. ...
+5. Research motifs operationalization via traditional / common indexes
+6. ...
 
 ### Potential Sources
 
