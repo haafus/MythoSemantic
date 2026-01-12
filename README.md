@@ -9,7 +9,7 @@
 5. Display colored semantic space
 6. Extract ontology with Wikontic
 
-### To Try
+### Experiments
 
 1. Relate to common motif indexes (or query by them)
 2. Research motives operationalization / scale via traditional / common indexes
