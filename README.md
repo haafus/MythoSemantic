@@ -9,7 +9,7 @@
 5. Display colored semantic space
 6. Extract ontology with Wikontic
 
-### Experiments
+### Experiments / Roadmap
 
 1. Relate unsupervised results to traditional motif indexes
 2. Query index by traditional motives and freeform text
