@@ -16,12 +16,13 @@
 3. Research traditional motives operationalization
 4. Research traditions proximity / compound metrics and tools
 5. Build exploratory UI with clusters visualization, adaptable threshold and freeform proximity / parallels query
-6. Try AE / VAE / SAE?
-7. Try hierarchical chunking / embeddings?
-8. Research narrative and network extraction methods?
-9. Create and maintain **awesome-computational-mythology**?
-10. Initiate worldwide community corpora & methods project?
-11. ...
+6. Integrate traditional indexes (ATU?) for interactive research and scaling
+7. Try AE / VAE / SAE?
+8. Try hierarchical chunking / embeddings?
+9. Research narrative and network extraction methods?
+10. Create and maintain **awesome-computational-mythology**?
+11. Initiate worldwide community corpora & methods project?
+12. ...
 
 ### Potential Data Sources
 
