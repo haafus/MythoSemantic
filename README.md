@@ -14,11 +14,12 @@
 1. Relate to common motif indexes (or query by them)
 2. Research motives operationalization / scale via traditional / common indexes
 3. Build exploratory UI with clusters visualization, adaptable threshold and freeform proximity/parallels query
-4. Try AE / VAE / SAE?
-5. Try hierarchical chunking / embeddings?
-6. Research narrative and network extraction methods?
-7. Create and maintain **awesome-computational-mythology**?
-8. ...
+4. Research traditions proximity / compound metrics and tools
+5. Try AE / VAE / SAE?
+6. Try hierarchical chunking / embeddings?
+7. Research narrative and network extraction methods?
+8. Create and maintain **awesome-computational-mythology**?
+9. ...
 
 ### Potential Data Sources
 
