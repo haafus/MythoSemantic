@@ -16,7 +16,8 @@
 3. Try AE / VAE / SAE?
 4. Try hierarchical chunking / embeddings?
 5. Research motives operationalization / scale via traditional / common indexes
-6. ...
+6. Research narrative extraction methods
+7. ...
 
 ### Potential Sources
 
