@@ -29,9 +29,11 @@
 
 1. DeepMind, Aeneas / Ithaca: https://predictingthepast.com
 2. Max Planck Evo Anthro: https://www.eva.mpg.de/linguistic-and-cultural-evolution/index/
-3. Oxford - Institute of Cognitive & Evolutionary Anthropology (Harvey Whitehouse): https://www.anthro.ox.ac.uk/cognitive-evolutionary-anthropology-0
+3. Oxford - Institute of Cognitive & Evolutionary Anthropology (Harvey Whitehouse):
+   https://www.anthro.ox.ac.uk/cognitive-evolutionary-anthropology-0
 4. Cambridge - DH / CST bridge: https://www.cdh.cam.ac.uk, https://www.cst.cam.ac.uk
-5. Durham University - Cultural evolution & folklore tradition (Jamshid Tehrani): https://www.durham.ac.uk/research/institutes-and-centres/cultural-evolution/
+5. Durham University - Cultural evolution & folklore tradition (Jamshid Tehrani):
+   https://www.durham.ac.uk/research/institutes-and-centres/cultural-evolution/
 6. Stanford - Literary Lab (Franco Moretti): https://litlab.stanford.edu
 7. Ecole Normale Superieure / CNRS - Structural mythology tradition (Julien d'Huy)
 8. IACM (Michael Witzel - Harvard, Natalya Yanchevskaya - Princeton, Steve Farmer): https://www.compmyth.org
