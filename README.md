@@ -12,11 +12,12 @@
 ### To Try
 
 1. Relate to common motif indexes (or query by them)
-2. Build exploratory UI with clusters visualization, adaptable threshold and freeform proximity/parallels query
-3. Try AE / VAE / SAE?
-4. Try hierarchical chunking / embeddings?
-5. Research motives operationalization / scale via traditional / common indexes
-6. Research narrative extraction methods
+2. Research motives operationalization / scale via traditional / common indexes
+3. Build exploratory UI with clusters visualization, adaptable threshold and freeform proximity/parallels query
+   
+4. Try AE / VAE / SAE?
+5. Try hierarchical chunking / embeddings?
+6. Research narrative extraction methods?
 7. Create and maintain **awesome-computational-mythology**?
 8. ...
 
