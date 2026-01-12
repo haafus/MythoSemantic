@@ -43,12 +43,11 @@
 
 ### Potential Submission Targets
 
-1. Workshop on Digital Methods For Mythological Research (dm4myth): https://dm4myth.github.io
-2. Computational Humanities Research (CHR) Conferece/Journal: https://computational-humanities-research.org/
-3. Digital Scholarship in the Humanities (DSH): https://academic.oup.com/dsh
-4. Journal of Cultural Analytics (CA): https://culturalanalytics.org/
-5. International Association for Comparative Mythology Conference (IACM): https://www.compmyth.org/conferences/
-6. Journal/Conference of Computational Literary Studies (JCLS): https://jcls.io
-7. Digital Humanities Quarterly (DHQ): https://dhq.digitalhumanities.org
-8. ACL Workshop, SIG on Humanities (SIGHUM): https://sighum.wordpress.com
-
+1. Journal/Conference: Computational Humanities Research (CHR): https://computational-humanities-research.org/
+2. Journal: Digital Scholarship in the Humanities (DSH): https://academic.oup.com/dsh
+3. Journal: Cultural Analytics (CA): https://culturalanalytics.org/
+4. Journal/Conference: Computational Literary Studies (JCLS): https://jcls.io
+5. Journal/Conference: International Association for Comparative Mythology (IACM): https://www.compmyth.org/conferences/
+6. Journal: Digital Humanities Quarterly (DHQ): https://dhq.digitalhumanities.org
+7. Workshop: ACL SIG on Humanities (SIGHUM): https://sighum.wordpress.com
+8. Workshop: Digital Methods For Mythological Research (dm4myth): https://dm4myth.github.io
