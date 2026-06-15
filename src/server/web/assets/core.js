@@ -28,25 +28,6 @@ export const HTML_ONLY_METHODS = new Set([
     "tradition_distribution",
 ]);
 
-export const CLUSTERING_ALGORITHMS = [
-    ["birch", "BIRCH"],
-    ["gmm", "Gaussian Mixture"],
-    ["hdbscan", "HDBSCAN"],
-    ["kmeans", "K-Means"],
-    ["meanshift", "Meanshift"],
-    ["optics", "Optics"],
-    ["spectral", "Spectral"],
-];
-
-export const METRIC_NAMES = {
-    silhouette_score: "Silhouette",
-    adjusted_rand_score: "ARI",
-    normalized_mutual_info: "NMI",
-    v_measure: "V-measure",
-    n_clusters_found: "Clusters",
-    noise_ratio: "Noise Ratio",
-};
-
 export function parseHash() {
     const raw = (window.location.hash || "#/").slice(1) || "/";
     const splitAt = raw.indexOf("?");
@@ -62,7 +43,6 @@ export function normalizeRoute(path) {
     if (path === "/") return "/corpus";
     if (path === "/sources") return "/corpus";
     if (path === "/similarity") return "/embeddings_analysis";
-    if (path === "/clusterisation") return "/cluster_analysis";
     return path;
 }
 
@@ -72,7 +52,6 @@ function routeClass(path) {
     if (path === "/corpus") return "route-corpus";
     if (path === "/geography") return "route-geography";
     if (path === "/embeddings_analysis") return "route-embeddings";
-    if (path === "/cluster_analysis") return "route-cluster";
     if (path === "/searchSimilarities") return "route-search";
     return "route-corpus";
 }

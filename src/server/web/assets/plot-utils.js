@@ -41,7 +41,7 @@ function fitPlotFrame(iframe) {
 }
 
 export function resizeEmbeddedPlots() {
-    document.querySelectorAll("iframe.plot-iframe, .cluster-page .plot-body iframe").forEach((iframe) => {
+    document.querySelectorAll("iframe.plot-iframe").forEach((iframe) => {
         fitPlotFrame(iframe);
     });
     if (window.Plotly?.Plots?.resize) {

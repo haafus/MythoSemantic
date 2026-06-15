@@ -3,7 +3,6 @@ import {
     api,
     buildCorpusApiUrl,
     cleanupRoute,
-    CLUSTERING_ALGORITHMS,
     corpusTraditionKey,
     ensureCorpusDocuments,
     ensureModels,
@@ -13,7 +12,6 @@ import {
     formatNumber,
     groupDocuments,
     HTML_ONLY_METHODS,
-    METRIC_NAMES,
     normalizePreviewText,
     normalizeRoute,
     parseHash,
@@ -46,7 +44,6 @@ function render() {
     if (path === "/corpus") return renderCorpus();
     if (path === "/geography") return renderGeography();
     if (path === "/embeddings_analysis") return renderEmbeddingsAnalysis();
-    if (path === "/cluster_analysis") return renderClusterAnalysis();
     if (path === "/searchSimilarities") return renderSearchSimilarities(parsed.params);
     if (["/ages", "/realms", "/beings"].includes(path)) return renderFutureDomain(path.slice(1));
 
@@ -1343,138 +1340,6 @@ async function displaySearchModalPointInfo(pointId, chunkIndex = null) {
         });
     } catch (error) {
         setSearchResults(`<div class="search-empty">Load error: ${escapeHtml(error.message)}</div>`);
-    }
-}
-
-async function renderClusterAnalysis() {
-    document.title = "Clustering Analysis";
-    app.innerHTML = `
-        <main class="cluster-page container">
-            <div class="controls-panel">
-                <div class="form-group">
-                    <label>Model:</label>
-                    <select id="global-model-select"><option value="">Loading models...</option></select>
-                </div>
-                <div class="form-group">
-                    <label>Algorithm:</label>
-                    <select id="clustering-select">
-                        ${CLUSTERING_ALGORITHMS.map(([value, label]) => `<option value="${value}">${label}</option>`).join("")}
-                    </select>
-                </div>
-                <button class="btn btn-primary" type="button" id="cluster-refresh">Refresh Data</button>
-            </div>
-
-            <div class="metrics-grid" id="metrics-grid" style="display: none;"></div>
-
-            <div id="content-container">
-                <div class="plot-grid" id="plots-grid" style="display: none;">
-                    <div class="plot-card">
-                        <div class="plot-header">Cluster Visualization (UMAP)</div>
-                        <div class="plot-body"><div class="cluster-plot" id="clusters-plot"></div></div>
-                    </div>
-                    <div class="plot-card">
-                        <div class="plot-header">Tradition Correspondence Matrix</div>
-                        <div class="plot-body"><div class="cluster-plot" id="confusion-plot"></div></div>
-                    </div>
-                </div>
-                <div class="loading-state" id="loading-state">
-                    Select a model and algorithm to display data...
-                </div>
-            </div>
-        </main>
-    `;
-
-    const modelSelect = document.getElementById("global-model-select");
-    const clusterSelect = document.getElementById("clustering-select");
-    const refresh = document.getElementById("cluster-refresh");
-
-    try {
-        await ensureModels();
-        modelSelect.innerHTML = renderModelOptions();
-        modelSelect.value = state.selectedModel;
-        modelSelect.addEventListener("change", triggerClusterUpdate);
-        clusterSelect.addEventListener("change", triggerClusterUpdate);
-        refresh.addEventListener("click", triggerClusterUpdate);
-        triggerClusterUpdate();
-    } catch {
-        modelSelect.innerHTML = '<option value="">Load error</option>';
-    }
-}
-
-function getMetricScoreClass(value, name) {
-    if (value === null || value === undefined) return "";
-    if (name === "silhouette_score") return value >= 0.5 ? "val-good" : (value >= 0.25 ? "val-warn" : "val-bad");
-    if (["adjusted_rand_score", "normalized_mutual_info", "v_measure"].includes(name)) {
-        return value >= 0.7 ? "val-good" : (value >= 0.4 ? "val-warn" : "val-bad");
-    }
-    return "";
-}
-
-async function triggerClusterUpdate() {
-    const modelSelect = document.getElementById("global-model-select");
-    const clusterSelect = document.getElementById("clustering-select");
-    const metricsGrid = document.getElementById("metrics-grid");
-    const plotsGrid = document.getElementById("plots-grid");
-    const loadingState = document.getElementById("loading-state");
-    const clustersPlot = document.getElementById("clusters-plot");
-    const confusionPlot = document.getElementById("confusion-plot");
-    if (!modelSelect || !clusterSelect || !modelSelect.value) return;
-
-    persistSelectedModel(modelSelect.value);
-    const algorithm = clusterSelect.value;
-
-    plotsGrid.style.display = "none";
-    metricsGrid.style.display = "none";
-    loadingState.style.display = "block";
-    loadingState.textContent = "Loading clusters and metrics...";
-    if (clustersPlot) clustersPlot.innerHTML = "";
-    if (confusionPlot) confusionPlot.innerHTML = "";
-
-    try {
-        const savedPlots = await api(`/api/clustering/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(algorithm)}/plots`);
-        const metrics = await api(`/api/clustering/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(algorithm)}/metrics`);
-
-        const metricsHtml = Object.keys(METRIC_NAMES).map((key) => {
-            const value = metrics[key];
-            if (value === undefined || value === null) return "";
-            const formatted = key === "noise_ratio"
-                ? `${(Number(value) * 100).toFixed(1)}%`
-                : (typeof value === "number" && key !== "n_clusters_found" ? value.toFixed(3) : value);
-            const cssClass = getMetricScoreClass(value, key);
-            return `
-                <div class="metric-card">
-                    <div class="metric-value ${cssClass}">${escapeHtml(formatted)}</div>
-                    <div class="metric-label">${escapeHtml(METRIC_NAMES[key] || key)}</div>
-                </div>
-            `;
-        }).join("");
-
-        metricsGrid.innerHTML = metricsHtml;
-        metricsGrid.style.display = metricsHtml.trim() ? "grid" : "none";
-
-        if (!savedPlots.clusters?.exists && !savedPlots.confusion_matrix?.exists) {
-            throw new Error("Clustering files were not found. Generate them through the CLI.");
-        }
-
-        loadingState.style.display = "none";
-        plotsGrid.style.display = "grid";
-
-        const renderTasks = [];
-        if (savedPlots.clusters?.exists && savedPlots.clusters.url) {
-            renderTasks.push(renderSavedPlotInto(clustersPlot, savedPlots.clusters.url, {title: `Embedding clustering (${algorithm})`}));
-        } else if (clustersPlot) {
-            clustersPlot.innerHTML = '<div class="plot-loading">Cluster plot was not generated.</div>';
-        }
-
-        if (savedPlots.confusion_matrix?.exists && savedPlots.confusion_matrix.url) {
-            renderTasks.push(renderSavedPlotInto(confusionPlot, savedPlots.confusion_matrix.url, {title: "Tradition correspondence matrix"}));
-        } else if (confusionPlot) {
-            confusionPlot.innerHTML = '<div class="plot-loading">Correspondence matrix was not generated.</div>';
-        }
-
-        await Promise.all(renderTasks);
-    } catch (error) {
-        loadingState.innerHTML = escapeHtml(error.message || "Clustering files were not found. Generate them through the CLI.");
     }
 }
 

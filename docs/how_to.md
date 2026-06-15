@@ -173,39 +173,6 @@ mytho projection --model "BAAI/bge-m3"
 mytho projection --model "BAAI/bge-m3" --no-plots
 ```
 
-## clustering
-
-Модуль кластеризации эмбеддингов и сравнения алгоритмов.
-
-Основные файлы:
-- `src/clustering/models.py` содержит KMeans, HDBSCAN из sklearn, Spectral, Birch, GMM, MeanShift, OPTICS.
-- `src/clustering/metrics.py` считает метрики кластеризации.
-- `src/clustering/visualization.py` строит HTML-графики и матрицы.
-- `src/clustering/run_clustering.py` содержит логику запуска анализа.
-
-Возможности:
-- Кластеризовать эмбеддинги одной или всех моделей.
-- Сохранить метрики и labels в `outputs/analysis/<model>/clustering/`.
-- Построить `clusters_*.html`, `confusion_matrix_*.html`, `metrics_dashboard.html`.
-
-Запустить все алгоритмы для всех доступных моделей:
-
-```bash
-mytho cluster
-```
-
-Запустить один алгоритм для одной модели:
-
-```bash
-mytho cluster --model "BAAI/bge-m3" --single-model --algorithm kmeans
-```
-
-Запустить без визуализаций:
-
-```bash
-mytho cluster --single-model --algorithm kmeans --no-viz
-```
-
 ## graphs
 
 Модуль извлечения персонажей, отношений, мест и времени через LLM и генерации графов.

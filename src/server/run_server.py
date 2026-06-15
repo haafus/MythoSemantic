@@ -4,7 +4,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, ORJSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from server.api import clustering, corpus, geography, models, similarity
+from server.api import corpus, geography, models, similarity
 from settings import settings
 
 
@@ -21,7 +21,6 @@ def create_app() -> FastAPI:
     app.include_router(corpus.router)
     app.include_router(geography.router)
     app.include_router(similarity.router)
-    app.include_router(clustering.router)
 
     if settings.assets_dir.exists():
         app.mount("/assets", StaticFiles(directory=str(settings.assets_dir)), name="assets")

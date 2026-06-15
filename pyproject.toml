@@ -75,7 +75,6 @@ include = [
     "corpus*",
     "projection*",
     "embedding*",
-    "clustering*",
     "graphs*",
     "server*",
 ]

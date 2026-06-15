@@ -79,52 +79,6 @@ def projection(model: str | None, no_plots: bool):
 
 
 # ---------------------------------------------------------------------------
-# clustering
-# ---------------------------------------------------------------------------
-@mytho.command()
-@click.option("--model", "-m", default=None, help="Embedding model name.")
-@click.option(
-    "--algorithm", "-a", "clustering_model", default="kmeans",
-    help="Clustering algorithm (kmeans, spectral, birch, gmm).",
-)
-@click.option("--single-model", is_flag=True, help="Run only the selected algorithm.")
-@click.option("--no-viz", is_flag=True, help="Skip visualization generation.")
-@click.option("--output-dir", default="outputs/analysis", help="Output base directory.")
-@click.option("--models-list", multiple=True, help="Explicit list of algorithms to run.")
-def cluster(model, clustering_model, single_model, no_viz, output_dir, models_list):
-    """Run clustering analysis on embeddings."""
-    from clustering.run_clustering import run_all_clustering_models, run_clustering_analysis
-    from projection.analyzer import EmbeddingAnalyzer
-
-    analyzer = EmbeddingAnalyzer()
-    if not analyzer.available_models:
-        click.echo(click.style("No available embedding models in the database.", fg="red"), err=True)
-        sys.exit(1)
-
-    models_to_process = [model] if model else analyzer.available_models
-
-    for current_model in models_to_process:
-        click.echo(f"Clustering: {current_model}")
-        if single_model:
-            run_clustering_analysis(
-                model_name=current_model,
-                clustering_model=clustering_model,
-                generate_visualizations=not no_viz,
-                output_base_dir=output_dir,
-                _analyzer=analyzer,
-            )
-        else:
-            run_all_clustering_models(
-                model_name=current_model,
-                models_to_run=list(models_list) or None,
-                output_base_dir=output_dir,
-                _analyzer=analyzer,
-            )
-
-    click.echo(click.style("Clustering completed.", fg="green"))
-
-
-# ---------------------------------------------------------------------------
 # graphs
 # ---------------------------------------------------------------------------
 @mytho.command()
@@ -165,15 +119,13 @@ def server(host: str | None, port: int | None):
 @click.option("--skip-corpus", is_flag=True, help="Skip corpus download.")
 @click.option("--skip-embeddings", is_flag=True, help="Skip embedding generation.")
 @click.option("--skip-projection", is_flag=True, help="Skip projection generation.")
-@click.option("--skip-clustering", is_flag=True, help="Skip clustering analysis.")
 @click.option("--skip-graphs", is_flag=True, help="Skip graph extraction.")
-def pipeline(model, skip_corpus, skip_embeddings, skip_projection, skip_clustering, skip_graphs):
+def pipeline(model, skip_corpus, skip_embeddings, skip_projection, skip_graphs):
     """Run the full analysis pipeline end-to-end."""
     steps = [
         ("Corpus", skip_corpus, _pipeline_corpus, {}),
         ("Embeddings", skip_embeddings, _pipeline_embeddings, {"model": model}),
         ("Projection", skip_projection, _pipeline_projection, {"model": model}),
-        ("Clustering", skip_clustering, _pipeline_clustering, {"model": model}),
         ("Graphs", skip_graphs, _pipeline_graphs, {}),
     ]
 
@@ -208,17 +160,6 @@ def _pipeline_projection(model: str | None):
     from projection.run_analysis import analyze_embeddings
 
     analyze_embeddings(model_name=model)
-
-
-def _pipeline_clustering(model: str | None):
-    from clustering.run_clustering import run_all_clustering_models
-    from projection.analyzer import EmbeddingAnalyzer
-
-    analyzer = EmbeddingAnalyzer(model_name=model)
-    if analyzer.available_models:
-        models = [model] if model else analyzer.available_models
-        for m in models:
-            run_all_clustering_models(model_name=m, _analyzer=analyzer)
 
 
 def _pipeline_graphs():

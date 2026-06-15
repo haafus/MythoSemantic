@@ -520,8 +520,7 @@ body.has-main-navbar.route-corpus > .main-navbar + #app > .corpus-page.container
 }
 
 .corpus-page .btn,
-.analysis-page .btn,
-.cluster-page .btn {
+.analysis-page .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -545,8 +544,7 @@ body.has-main-navbar.route-corpus > .main-navbar + #app > .corpus-page.container
 }
 
 .corpus-page .btn-primary,
-.analysis-page .btn-primary,
-.cluster-page .btn-primary {
+.analysis-page .btn-primary {
     background: #111;
     color: #fff;
 }
@@ -556,8 +554,7 @@ body.has-main-navbar.route-corpus > .main-navbar + #app > .corpus-page.container
 }
 
 .corpus-page .btn-outline,
-.analysis-page .btn-outline,
-.cluster-page .btn-outline {
+.analysis-page .btn-outline {
     border-color: #dee2e6;
     background: transparent;
     color: #495057;
@@ -701,8 +698,7 @@ body.route-geography {
     font-size: 14px;
 }
 
-body.route-embeddings,
-body.route-cluster {
+body.route-embeddings {
     min-height: 100vh;
     background-color: #faf9f5;
     color: #212529;
@@ -715,14 +711,7 @@ body.route-cluster {
     margin: 0 auto;
 }
 
-.cluster-page.container {
-    width: min(100%, 1560px);
-    max-width: none;
-    margin: 0 auto;
-}
-
-.analysis-page .controls-panel,
-.cluster-page .controls-panel {
+.analysis-page .controls-panel {
     background: #fff;
     border-radius: 8px;
     border: 1px solid #dee2e6;
@@ -735,26 +724,19 @@ body.route-cluster {
     flex-wrap: wrap;
 }
 
-.cluster-page .controls-panel {
-    gap: 30px;
-}
-
-.analysis-page .form-group,
-.cluster-page .form-group {
+.analysis-page .form-group {
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-.analysis-page .form-group label,
-.cluster-page .form-group label {
+.analysis-page .form-group label {
     font-size: 14px;
     font-weight: 500;
     color: #495057;
 }
 
-.analysis-page select,
-.cluster-page select {
+.analysis-page select {
     border: 1px solid #ced4da;
     border-radius: 6px;
     padding: 8px 12px;
@@ -767,12 +749,7 @@ body.route-cluster {
     cursor: pointer;
 }
 
-.cluster-page select {
-    min-width: 220px;
-}
-
-.analysis-page select:focus,
-.cluster-page select:focus {
+.analysis-page select:focus {
     border-color: #111;
 }
 
@@ -1315,99 +1292,6 @@ body.route-cluster {
     font-style: italic;
 }
 
-.cluster-page .metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 14px;
-    margin-bottom: 20px;
-}
-
-.cluster-page .metric-card {
-    background: #fff;
-    border-radius: 8px;
-    border: 1px solid #dee2e6;
-    padding: 16px;
-    text-align: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-}
-
-.cluster-page .metric-value {
-    font-size: 26px;
-    font-weight: 600;
-    color: #111;
-    line-height: 1.2;
-}
-
-.cluster-page .metric-label {
-    font-size: 13px;
-    color: #6c757d;
-    margin-top: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.cluster-page .val-good { color: #2b8a3e; }
-.cluster-page .val-warn { color: #e67700; }
-.cluster-page .val-bad { color: #c92a2a; }
-
-.cluster-page .plot-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
-}
-
-.cluster-page .plot-card {
-    background: #fff;
-    border-radius: 8px;
-    border: 1px solid #dee2e6;
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-}
-
-.cluster-page .plot-header {
-    padding: 12px 16px;
-    border-bottom: 1px solid #dee2e6;
-    font-weight: 600;
-    color: #111;
-    font-size: 15px;
-}
-
-.cluster-page .plot-body {
-    height: clamp(560px, 66vh, 760px);
-    min-height: 520px;
-    padding: 0;
-    background: #fff;
-}
-
-.cluster-page .cluster-plot {
-    width: 100%;
-    height: 100%;
-    min-height: 0;
-}
-
-.cluster-page .plot-loading {
-    display: grid;
-    height: 100%;
-    place-items: center;
-    color: #6c757d;
-    font-size: 14px;
-}
-
-.cluster-page .plot-body iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    display: block;
-    background: #fff;
-}
-
-.cluster-page .loading-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: #6c757d;
-    font-size: 15px;
-}
-
 body.route-search {
     background: #f5f4f2;
     padding: 20px;
@@ -1591,9 +1475,6 @@ body.route-search {
         max-height: 500px;
     }
 
-    .cluster-page .plot-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
 }
 
 @media (max-width: 980px) {
@@ -1645,7 +1526,6 @@ body.route-search {
 }
 
 @media (max-width: 768px) {
-    .cluster-page .plot-grid { grid-template-columns: 1fr; }
     .search-page .search-form { flex-direction: column; }
 }
 

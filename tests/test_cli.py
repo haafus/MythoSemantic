@@ -13,7 +13,7 @@ class TestMythoTopLevel:
 
     def test_lists_all_commands(self):
         result = runner.invoke(mytho, ["--help"])
-        for cmd in ["corpus", "embeddings", "cluster", "projection", "graphs", "server", "pipeline"]:
+        for cmd in ["corpus", "embeddings", "projection", "graphs", "server", "pipeline"]:
             assert cmd in result.output
 
 
@@ -39,14 +39,6 @@ class TestGraphsCommand:
         assert "--force" in result.output
 
 
-class TestClusterCommand:
-    def test_help(self):
-        result = runner.invoke(mytho, ["cluster", "--help"])
-        assert result.exit_code == 0
-        assert "--algorithm" in result.output
-        assert "--single-model" in result.output
-
-
 class TestServerCommand:
     def test_help(self):
         result = runner.invoke(mytho, ["server", "--help"])
@@ -62,5 +54,4 @@ class TestPipelineCommand:
         assert "--skip-corpus" in result.output
         assert "--skip-embeddings" in result.output
         assert "--skip-projection" in result.output
-        assert "--skip-clustering" in result.output
         assert "--skip-graphs" in result.output
