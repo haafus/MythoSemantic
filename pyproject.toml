@@ -61,7 +61,7 @@ all = [
 mytho = "cli:mytho"
 
 [tool.setuptools]
-py-modules = ["settings", "main", "cli"]
+py-modules = ["settings", "main", "cli", "llm_processing"]
 
 [tool.setuptools.package-dir]
 "" = "src"

@@ -45,7 +45,7 @@ def generate_motif_summaries(
     data: list[dict],
     output_dir: Path,
 ) -> list[str]:
-    from graphs.llm_processing import LLMProcessor
+    from llm_processing import LLMProcessor
 
     cfg = settings.graphs
     llm = LLMProcessor(

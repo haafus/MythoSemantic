@@ -5,10 +5,10 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from json_utils import load_json, save_json
+from llm_processing import LLMProcessor
 from settings import settings
 
 from .graph_generator import generate_and_save_graph
-from .llm_processing import LLMProcessor
 
 logger = logging.getLogger(__name__)
 
