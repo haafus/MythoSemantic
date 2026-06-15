@@ -9,21 +9,8 @@ from settings import settings
 
 from .builder import EmbeddingBuilder
 from .chroma_manager import collection_name_for_model, delete_collection
-from .corpus_iterator import iter_corpus_files
 
 logger = logging.getLogger(__name__)
-
-
-def _expected_chunk_count(corpus_dir, chunking_strategies, chunking_name: str) -> int:
-    chunker = chunking_strategies[chunking_name]
-    total = 0
-    for file_info in iter_corpus_files(corpus_dir):
-        try:
-            text = file_info["path"].read_text(encoding="utf-8")
-            total += len([c for c in chunker(text) if c.strip()])
-        except Exception:
-            pass
-    return total
 
 
 def build_embeddings(
@@ -54,8 +41,6 @@ def build_embeddings(
     logger.info(f"   Source: {settings.corpus_dir}")
     logger.info(f"   Chroma DB: {settings.chroma_dir}")
 
-    expected = None
-
     try:
         for model in models_to_run:
             collection_name = collection_name_for_model(model)
@@ -67,14 +52,8 @@ def build_embeddings(
                     collection = builder.chroma_client.get_collection(name=collection_name)
                     count = collection.count()
                     if count > 0:
-                        if expected is None:
-                            expected = _expected_chunk_count(
-                                builder.corpus_dir, builder.chunking_strategies, CHUNKING
-                            )
-                        if count >= expected:
-                            logger.info(f"   Skipping {model}: collection complete ({count} chunks)")
-                            continue
-                        logger.info(f"   Resuming {model}: {count}/{expected} chunks, continuing...")
+                        logger.info(f"   Skipping {model}: collection already has {count} chunks (use --force to regenerate)")
+                        continue
                 except Exception:
                     pass
 
