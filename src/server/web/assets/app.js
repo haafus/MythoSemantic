@@ -373,31 +373,13 @@ function normalizeTraditions(raw) {
 async function loadTraditionInfo() {
     if (state.traditionInfo) return state.traditionInfo;
 
-    const urls = [
-        "/corpus_chunked/traditions_info.json",
-        "/corpus/traditions_info.json",
-    ];
-
-    for (const url of urls) {
-        try {
-            const response = await fetch(url, {cache: "no-store"});
-            if (response.ok) {
-                state.traditionInfo = await response.json();
-                return state.traditionInfo;
-            }
-        } catch {
-            // Try the next source.
-        }
-    }
-
     try {
         const data = await api("/api/geography/traditions");
         state.traditionInfo = data.traditions || {};
-        return state.traditionInfo;
     } catch {
         state.traditionInfo = {};
-        return state.traditionInfo;
     }
+    return state.traditionInfo;
 }
 
 async function fetchTraditions() {
