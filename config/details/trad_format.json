@@ -1,0 +1,234 @@
+[
+  {
+    "tradition": "Greek mythology",
+    "language_family": "Indo-European (Hellenic)",
+    "approx_recorded": "c. 800–500 BCE",
+    "location": "Greece",
+    "coordinates": "37.9838, 23.7275",
+    "major_texts": [
+      "Iliad",
+      "Odyssey",
+      "Theogony",
+      "Works and Days",
+      "Greek tragedies"
+    ],
+    "corpus_urls": [
+      "http://www.perseus.tufts.edu",
+      "https://www.gutenberg.org",
+      "https://archive.org"
+    ],
+    "estimated_corpus_size": "3000+ texts"
+  },
+  {
+    "tradition": "Roman mythology",
+    "language_family": "Indo-European (Italic)",
+    "approx_recorded": "c. 300 BCE – 200 CE",
+    "location": "Rome, Italy",
+    "coordinates": "41.9028, 12.4964",
+    "major_texts": [
+      "Aeneid",
+      "Metamorphoses",
+      "Fasti"
+    ],
+    "corpus_urls": [
+      "http://www.perseus.tufts.edu",
+      "https://www.gutenberg.org"
+    ],
+    "estimated_corpus_size": "1000+ texts"
+  },
+  {
+    "tradition": "Norse mythology",
+    "language_family": "Indo-European (Germanic)",
+    "approx_recorded": "c. 1200–1300 CE",
+    "location": "Reykjavik, Iceland",
+    "coordinates": "64.1466, -21.9426",
+    "major_texts": [
+      "Poetic Edda",
+      "Prose Edda",
+      "Volsunga Saga"
+    ],
+    "corpus_urls": [
+      "https://www.sacred-texts.com",
+      "https://www.gutenberg.org",
+      "https://archive.org"
+    ],
+    "estimated_corpus_size": "200–300 texts"
+  },
+  {
+    "tradition": "Vedic mythology",
+    "language_family": "Indo-European (Indo-Aryan)",
+    "approx_recorded": "c. 1500–500 BCE",
+    "location": "Punjab region",
+    "coordinates": "31.1471, 75.3412",
+    "major_texts": [
+      "Rigveda",
+      "Samaveda",
+      "Yajurveda",
+      "Atharvaveda"
+    ],
+    "corpus_urls": [
+      "https://gretil.sub.uni-goettingen.de",
+      "https://www.sanskritlibrary.org"
+    ],
+    "estimated_corpus_size": "1500+ texts"
+  },
+  {
+    "tradition": "Hindu (Puranic) mythology",
+    "language_family": "Indo-European (Indo-Aryan)",
+    "approx_recorded": "c. 300 BCE – 1200 CE",
+    "location": "Varanasi, India",
+    "coordinates": "25.3176, 82.9739",
+    "major_texts": [
+      "Mahabharata",
+      "Ramayana",
+      "Vishnu Purana",
+      "Shiva Purana",
+      "Bhagavata Purana"
+    ],
+    "corpus_urls": [
+      "https://gretil.sub.uni-goettingen.de",
+      "https://www.sanskritlibrary.org",
+      "https://archive.org"
+    ],
+    "estimated_corpus_size": "2000+ texts"
+  },
+  {
+    "tradition": "Mesopotamian mythology",
+    "language_family": "Semitic / Sumerian isolate",
+    "approx_recorded": "c. 2100–1200 BCE",
+    "location": "Ur, Iraq",
+    "coordinates": "30.9617, 46.1030",
+    "major_texts": [
+      "Epic of Gilgamesh",
+      "Enuma Elish",
+      "Atrahasis",
+      "Inanna myths"
+    ],
+    "corpus_urls": [
+      "https://etcsl.orinst.ox.ac.uk"
+    ],
+    "estimated_corpus_size": "400+ texts"
+  },
+  {
+    "tradition": "Egyptian mythology",
+    "language_family": "Afroasiatic (Egyptian)",
+    "approx_recorded": "c. 2600 BCE – 400 CE",
+    "location": "Luxor, Egypt",
+    "coordinates": "25.6872, 32.6396",
+    "major_texts": [
+      "Pyramid Texts",
+      "Coffin Texts",
+      "Book of the Dead"
+    ],
+    "corpus_urls": [
+      "https://thesaurus-linguae-aegyptiae.de"
+    ],
+    "estimated_corpus_size": "2000+ inscriptions"
+  },
+  {
+    "tradition": "Chinese mythology",
+    "language_family": "Sino-Tibetan",
+    "approx_recorded": "c. 700 BCE – 200 CE",
+    "location": "Xi'an, China",
+    "coordinates": "34.3416, 108.9398",
+    "major_texts": [
+      "Shan Hai Jing",
+      "Huainanzi",
+      "Classic of Mountains and Seas"
+    ],
+    "corpus_urls": [
+      "https://ctext.org"
+    ],
+    "estimated_corpus_size": "3000+ classical texts"
+  },
+  {
+    "tradition": "Japanese mythology",
+    "language_family": "Japonic",
+    "approx_recorded": "712–720 CE",
+    "location": "Nara, Japan",
+    "coordinates": "34.6851, 135.8048",
+    "major_texts": [
+      "Kojiki",
+      "Nihon Shoki"
+    ],
+    "corpus_urls": [
+      "https://www.nijl.ac.jp"
+    ],
+    "estimated_corpus_size": "100+ texts"
+  },
+  {
+    "tradition": "Mayan mythology",
+    "language_family": "Mayan",
+    "approx_recorded": "c. 1550 CE",
+    "location": "Quiché, Guatemala",
+    "coordinates": "15.0300, -91.1500",
+    "major_texts": [
+      "Popol Vuh"
+    ],
+    "corpus_urls": [
+      "https://www.sacred-texts.com",
+      "https://archive.org"
+    ],
+    "estimated_corpus_size": "50–100 texts"
+  },
+  {
+    "tradition": "Aztec mythology",
+    "language_family": "Uto-Aztecan (Nahuan)",
+    "approx_recorded": "c. 1500–1600 CE",
+    "location": "Mexico City, Mexico",
+    "coordinates": "19.4326, -99.1332",
+    "major_texts": [
+      "Codex Borgia",
+      "Codex Chimalpopoca",
+      "Florentine Codex"
+    ],
+    "corpus_urls": [
+      "https://archive.org"
+    ],
+    "estimated_corpus_size": "100+ texts"
+  },
+  {
+    "tradition": "Yoruba mythology",
+    "language_family": "Niger-Congo",
+    "approx_recorded": "c. 1800–1900 CE",
+    "location": "Ile-Ife, Nigeria",
+    "coordinates": "7.4824, 4.5603",
+    "major_texts": [
+      "Odu Ifa corpus"
+    ],
+    "corpus_urls": [
+      "https://archive.org",
+      "https://www.sacred-texts.com"
+    ],
+    "estimated_corpus_size": "256 canonical Ifa verses + variants"
+  },
+  {
+    "tradition": "Polynesian mythology",
+    "language_family": "Austronesian",
+    "approx_recorded": "c. 1700–1900 CE",
+    "location": "Tahiti",
+    "coordinates": "-17.6509, -149.4260",
+    "major_texts": [
+      "Maori myth cycles",
+      "Hawaiian creation chants"
+    ],
+    "corpus_urls": [
+      "https://archive.org"
+    ],
+    "estimated_corpus_size": "200+ texts"
+  },
+  {
+    "tradition": "Australian Aboriginal mythology",
+    "language_family": "Pama–Nyungan and others",
+    "approx_recorded": "c. 1800–1900 CE",
+    "location": "Uluru, Australia",
+    "coordinates": "-25.3444, 131.0369",
+    "major_texts": [
+      "Dreamtime myth cycles"
+    ],
+    "corpus_urls": [
+      "https://www.oralliterature.org"
+    ],
+    "estimated_corpus_size": "1000+ recorded narratives"
+  }
+]
