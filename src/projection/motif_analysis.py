@@ -70,10 +70,11 @@ def generate_motif_summaries(
             continue
 
         summary = llm.ask_text(SUMMARY_PROMPT, text[:4000])
-
-        cache[key] = summary
         summaries.append(summary)
         new_count += 1
+
+        if summary:
+            cache[key] = summary
 
         if new_count % 50 == 0:
             _save_cache(cache_file, cache)
