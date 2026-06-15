@@ -70,6 +70,13 @@ class EmbeddingBuilder:
     def set_model(self, model_name: str) -> None:
         self._models.set_model(model_name)
 
+    def expected_chunk_count(self) -> int:
+        total = 0
+        for file_info in iter_corpus_files(self.corpus_dir):
+            content = Path(file_info["path"]).read_text(encoding="utf-8")
+            total += len(self._chunk_text(content))
+        return total
+
     # --- Chunking ----------------------------------------------------------
 
     def set_chunking_strategy(self, strategy_name: str) -> None:
