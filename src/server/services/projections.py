@@ -9,11 +9,13 @@ from server.services.models import get_model_output_dir, key_to_model, model_to_
 
 SAVED_HTML_METHOD_FILES = {
     "umap": "umap_2d_traditions.html",
+    "residual_umap": "residual_umap_2d.html",
+    "residual_normalized_umap": "residual_normalized_umap_2d.html",
     "distance_heatmap": "distance_heatmap.html",
     "tradition_distribution": "tradition_distribution.html",
 }
 
-INTERACTIVE_SAVED_HTML_METHODS = {"umap"}
+INTERACTIVE_SAVED_HTML_METHODS = {"umap", "residual_umap", "residual_normalized_umap"}
 
 PLOTLY_DTYPE_FORMATS = {
     "f4": "f",

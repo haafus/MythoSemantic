@@ -7,6 +7,7 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from sklearn.metrics.pairwise import cosine_distances
+from sklearn.preprocessing import Normalizer
 
 from settings import settings
 
@@ -81,29 +82,35 @@ def _cartesian_axis(title: str, tickangle: int = 0, showticklabels: bool = True)
     )
 
 
-def plot_interactive_2d(
+def _compute_tradition_residuals(data: list[dict], embeddings: np.ndarray) -> np.ndarray:
+    traditions = [item.get("tradition", "unknown") for item in data]
+    unique_traditions = set(traditions)
+    centroids = {}
+    for trad in unique_traditions:
+        mask = [i for i, t in enumerate(traditions) if t == trad]
+        centroids[trad] = embeddings[mask].mean(axis=0)
+    residuals = np.empty_like(embeddings)
+    for i, trad in enumerate(traditions):
+        residuals[i] = embeddings[i] - centroids[trad]
+    return residuals
+
+
+def _plot_umap_scatter(
     data: list[dict],
+    embeddings: np.ndarray,
+    title_prefix: str,
+    filename: str,
+    axis_prefix: str,
     save_html: bool = True,
     output_dir: Path | None = None,
     model_name: str | None = None,
     reducer_kwargs: dict[str, Any] | None = None,
 ) -> go.Figure | None:
-    if not data:
-        logger.warning("No data for visualization.")
-        return None
-
     if output_dir is None:
         output_dir = settings.analysis_dir
     output_dir.mkdir(parents=True, exist_ok=True)
-    reducer_kwargs = reducer_kwargs or {}
 
-    try:
-        embeddings = np.stack([item["embedding"] for item in data])
-    except Exception:
-        logger.exception("Failed to stack embeddings")
-        return None
-
-    embedding_2d = _reduce_dimensions_safe(embeddings, n_components=2, reducer_kwargs=reducer_kwargs)
+    embedding_2d = _reduce_dimensions_safe(embeddings, n_components=2, reducer_kwargs=reducer_kwargs or {})
     if embedding_2d is None:
         return None
 
@@ -139,7 +146,7 @@ def plot_interactive_2d(
             )
         )
 
-    title = "UMAP visualization by tradition"
+    title = title_prefix
     if model_name:
         title += f" - {model_name}"
 
@@ -161,16 +168,94 @@ def plot_interactive_2d(
         margin=dict(l=50, r=50, t=80, b=100),
         plot_bgcolor="rgba(240,240,240,0.5)",
         paper_bgcolor="white",
-        xaxis=_cartesian_axis("UMAP component 1"),
-        yaxis=_cartesian_axis("UMAP component 2"),
+        xaxis=_cartesian_axis(f"{axis_prefix} component 1"),
+        yaxis=_cartesian_axis(f"{axis_prefix} component 2"),
     )
 
     if save_html and output_dir:
-        html_path = output_dir / "umap_2d_traditions.html"
+        html_path = output_dir / filename
         fig.write_html(str(html_path), include_plotlyjs="cdn", full_html=True)
         logger.info(f"Saved: {html_path}")
 
     return fig
+
+
+def plot_interactive_2d(
+    data: list[dict],
+    save_html: bool = True,
+    output_dir: Path | None = None,
+    model_name: str | None = None,
+    reducer_kwargs: dict[str, Any] | None = None,
+) -> go.Figure | None:
+    if not data:
+        logger.warning("No data for visualization.")
+        return None
+    try:
+        embeddings = np.stack([item["embedding"] for item in data])
+    except Exception:
+        logger.exception("Failed to stack embeddings")
+        return None
+    return _plot_umap_scatter(
+        data, embeddings,
+        title_prefix="UMAP visualization by tradition",
+        filename="umap_2d_traditions.html",
+        axis_prefix="UMAP",
+        save_html=save_html, output_dir=output_dir,
+        model_name=model_name, reducer_kwargs=reducer_kwargs,
+    )
+
+
+def plot_residual_umap(
+    data: list[dict],
+    save_html: bool = True,
+    output_dir: Path | None = None,
+    model_name: str | None = None,
+    reducer_kwargs: dict[str, Any] | None = None,
+) -> go.Figure | None:
+    if not data:
+        logger.warning("No data for visualization.")
+        return None
+    try:
+        embeddings = np.stack([item["embedding"] for item in data])
+    except Exception:
+        logger.exception("Failed to stack embeddings")
+        return None
+    residuals = _compute_tradition_residuals(data, embeddings)
+    return _plot_umap_scatter(
+        data, residuals,
+        title_prefix="Residual UMAP (tradition centroid removed)",
+        filename="residual_umap_2d.html",
+        axis_prefix="Residual UMAP",
+        save_html=save_html, output_dir=output_dir,
+        model_name=model_name, reducer_kwargs=reducer_kwargs,
+    )
+
+
+def plot_residual_normalized_umap(
+    data: list[dict],
+    save_html: bool = True,
+    output_dir: Path | None = None,
+    model_name: str | None = None,
+    reducer_kwargs: dict[str, Any] | None = None,
+) -> go.Figure | None:
+    if not data:
+        logger.warning("No data for visualization.")
+        return None
+    try:
+        embeddings = np.stack([item["embedding"] for item in data])
+    except Exception:
+        logger.exception("Failed to stack embeddings")
+        return None
+    residuals = _compute_tradition_residuals(data, embeddings)
+    residuals = Normalizer(norm="l2").fit_transform(residuals)
+    return _plot_umap_scatter(
+        data, residuals,
+        title_prefix="Residual Normalized UMAP (tradition centroid removed, L2-normalized)",
+        filename="residual_normalized_umap_2d.html",
+        axis_prefix="Residual Normalized UMAP",
+        save_html=save_html, output_dir=output_dir,
+        model_name=model_name, reducer_kwargs=reducer_kwargs,
+    )
 
 
 def plot_distance_heatmap(

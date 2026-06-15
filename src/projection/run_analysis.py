@@ -8,6 +8,8 @@ from .visualization import (
     add_click_handler_to_html,
     plot_distance_heatmap,
     plot_interactive_2d,
+    plot_residual_normalized_umap,
+    plot_residual_umap,
     plot_tradition_distribution,
 )
 
@@ -75,6 +77,28 @@ def _generate_all_plots(analyzer: EmbeddingAnalyzer) -> None:
         )
     except Exception:
         logger.exception("Error creating UMAP plot")
+
+    logger.info("Generating Residual UMAP projection...")
+    try:
+        plot_residual_umap(
+            data,
+            output_dir=analyzer.output_dir,
+            model_name=analyzer.model_name,
+            reducer_kwargs={"n_neighbors": cfg.umap_n_neighbors, "min_dist": cfg.umap_min_dist},
+        )
+    except Exception:
+        logger.exception("Error creating Residual UMAP plot")
+
+    logger.info("Generating Residual Normalized UMAP projection...")
+    try:
+        plot_residual_normalized_umap(
+            data,
+            output_dir=analyzer.output_dir,
+            model_name=analyzer.model_name,
+            reducer_kwargs={"n_neighbors": cfg.umap_n_neighbors, "min_dist": cfg.umap_min_dist},
+        )
+    except Exception:
+        logger.exception("Error creating Residual Normalized UMAP plot")
 
     logger.info("  - Distance heatmap...")
     try:
