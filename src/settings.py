@@ -89,6 +89,7 @@ class Settings(BaseSettings):
     logs_dir: Path = Path("outputs/logs")
     graphs_dir: Path = Path("outputs/graphs")
     corpus_config_file: Path = Path("config/corpus.json")
+    traditions_config_file: Path = Path("config/traditions.json")
 
     log_level: str = "INFO"
 

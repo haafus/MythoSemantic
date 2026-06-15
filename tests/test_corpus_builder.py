@@ -20,7 +20,7 @@ if not hasattr(fu_mod, "UserAgent"):
 
 from datetime import datetime
 
-from corpus.builder import _build_failure_metadata, _build_metadata, _item_tid, _update_traditions_info
+from corpus.builder import _build_failure_metadata, _build_metadata, _item_tid, _update_traditions
 
 
 class TestItemTid:
@@ -95,114 +95,68 @@ class TestBuildFailureMetadata:
         assert "404" in meta["description"]
 
 
-class TestUpdateTraditionsInfo:
-    def _setup(self, tmp_path, monkeypatch, items):
+class TestUpdateTraditions:
+    def _setup(self, tmp_path, monkeypatch, *, books=None, traditions=None):
         from settings import settings
 
-        dl_file = tmp_path / "corpus.json"
-        dl_file.write_text(json.dumps(items))
         corpus_dir = tmp_path / "corpus"
         corpus_dir.mkdir()
 
+        dl_file = tmp_path / "corpus.json"
+        dl_file.write_text(json.dumps(books or []))
+
+        trad_file = tmp_path / "traditions.json"
+        trad_file.write_text(json.dumps(traditions or {}))
+
         monkeypatch.setattr(settings, "corpus_config_file", dl_file)
+        monkeypatch.setattr(settings, "traditions_config_file", trad_file)
         monkeypatch.setattr(settings, "corpus_dir", corpus_dir)
         return corpus_dir
 
-    def test_creates_new_file(self, tmp_path, monkeypatch):
-        items = [
-            {"title": "Iliad", "tradition": "Greek"},
-            {"title": "Odyssey", "tradition": "Greek"},
-            {"title": "Edda", "tradition": "Norse"},
-        ]
-        corpus_dir = self._setup(tmp_path, monkeypatch, items)
+    def test_merges_config_with_color(self, tmp_path, monkeypatch):
+        traditions = {"Greek": {"description": "Ancient Greek mythology", "coordinates": [37.9, 23.7]}}
+        books = [{"title": "Iliad", "tradition": "Greek"}]
+        corpus_dir = self._setup(tmp_path, monkeypatch, books=books, traditions=traditions)
 
-        _update_traditions_info(force=False)
-
-        data = json.loads((corpus_dir / "traditions.json").read_text())
-        assert "Greek" in data
-        assert "Norse" in data
-        assert data["Greek"]["description"] == ""
-        assert data["Greek"]["color"].startswith("#")
-
-    def test_preserves_existing_descriptions(self, tmp_path, monkeypatch):
-        items = [
-            {"title": "Iliad", "tradition": "Greek"},
-            {"title": "Odyssey", "tradition": "Greek"},
-        ]
-        corpus_dir = self._setup(tmp_path, monkeypatch, items)
-
-        existing = {
-            "Greek": {
-                "description": "Ancient Greek mythology",
-                "coordinates": [37.9, 23.7],
-                "color": "#123456",
-            }
-        }
-        (corpus_dir / "traditions.json").write_text(json.dumps(existing))
-
-        _update_traditions_info(force=False)
+        _update_traditions(force=False)
 
         data = json.loads((corpus_dir / "traditions.json").read_text())
         assert data["Greek"]["description"] == "Ancient Greek mythology"
+        assert data["Greek"]["coordinates"] == [37.9, 23.7]
+        assert data["Greek"]["color"].startswith("#")
 
-    def test_force_creates_backup(self, tmp_path, monkeypatch):
-        corpus_dir = self._setup(tmp_path, monkeypatch, [])
+    def test_creates_stub_for_unknown_tradition(self, tmp_path, monkeypatch):
+        books = [{"title": "Edda", "tradition": "Norse"}]
+        corpus_dir = self._setup(tmp_path, monkeypatch, books=books)
 
-        existing = {"Greek": {"description": "old data", "color": "#000"}}
-        (corpus_dir / "traditions.json").write_text(json.dumps(existing))
-
-        _update_traditions_info(force=True)
-
-        backup = json.loads((corpus_dir / "traditions_backup.json").read_text())
-        assert backup["Greek"]["description"] == "old data"
-
-    def test_includes_all_traditions(self, tmp_path, monkeypatch):
-        items = [
-            {"title": "Iliad", "tradition": "Greek"},
-            {"title": "Edda", "tradition": "Norse"},
-        ]
-        corpus_dir = self._setup(tmp_path, monkeypatch, items)
-
-        _update_traditions_info(force=False)
+        _update_traditions(force=False)
 
         data = json.loads((corpus_dir / "traditions.json").read_text())
-        assert "Greek" in data
+        assert "Norse" in data
+        assert data["Norse"]["description"] == ""
+        assert data["Norse"]["color"].startswith("#")
+
+    def test_includes_traditions_from_both_sources(self, tmp_path, monkeypatch):
+        traditions = {"Celtic": {"description": "Celtic myths", "coordinates": [53.1, -7.7]}}
+        books = [{"title": "Edda", "tradition": "Norse"}]
+        corpus_dir = self._setup(tmp_path, monkeypatch, books=books, traditions=traditions)
+
+        _update_traditions(force=False)
+
+        data = json.loads((corpus_dir / "traditions.json").read_text())
+        assert "Celtic" in data
         assert "Norse" in data
 
-    def test_no_download_list(self, tmp_path, monkeypatch):
+    def test_no_sources(self, tmp_path, monkeypatch):
         from settings import settings
 
         corpus_dir = tmp_path / "corpus"
         corpus_dir.mkdir()
         monkeypatch.setattr(settings, "corpus_config_file", tmp_path / "nonexistent.json")
+        monkeypatch.setattr(settings, "traditions_config_file", tmp_path / "nonexistent2.json")
         monkeypatch.setattr(settings, "corpus_dir", corpus_dir)
 
-        _update_traditions_info(force=False)
+        _update_traditions(force=False)
 
         data = json.loads((corpus_dir / "traditions.json").read_text())
         assert data == {}
-
-    def test_adds_missing_color(self, tmp_path, monkeypatch):
-        items = [{"title": "Edda", "tradition": "Norse"}]
-        corpus_dir = self._setup(tmp_path, monkeypatch, items)
-
-        existing = {"Norse": {"description": "Norse myths"}}
-        (corpus_dir / "traditions.json").write_text(json.dumps(existing))
-
-        _update_traditions_info(force=False)
-
-        data = json.loads((corpus_dir / "traditions.json").read_text())
-        assert data["Norse"]["color"].startswith("#")
-        assert data["Norse"]["description"] == "Norse myths"
-
-    def test_creates_tradition_from_id_only_item(self, tmp_path, monkeypatch):
-        items = [
-            {"id": "book_42", "tradition": "Egyptian"},
-        ]
-        corpus_dir = self._setup(tmp_path, monkeypatch, items)
-
-        _update_traditions_info(force=False)
-
-        data = json.loads((corpus_dir / "traditions.json").read_text())
-        assert "Egyptian" in data
-        assert data["Egyptian"]["color"].startswith("#")

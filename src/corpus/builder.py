@@ -161,49 +161,33 @@ def process_single_item(item: dict, force: bool, metadata: list[dict]):
             metadata.append(_build_failure_metadata(item, color=color, error=str(e)))
 
 
-def _update_traditions_info(force: bool) -> None:
-    traditions: set[str] = set()
+def _update_traditions(force: bool) -> None:
+    config_path = Path(settings.traditions_config_file)
+    output_path = settings.corpus_dir / "traditions.json"
+
+    static: dict = {}
+    if config_path.exists():
+        try:
+            with open(config_path, encoding="utf-8") as f:
+                static = json.load(f)
+        except Exception:
+            logger.exception("Error reading %s", config_path)
+
+    corpus_traditions: set[str] = set()
     if Path(settings.corpus_config_file).exists():
         with open(settings.corpus_config_file, encoding="utf-8") as f:
             for item in json.load(f):
                 if "tradition" in item:
-                    traditions.add(item["tradition"])
+                    corpus_traditions.add(item["tradition"])
 
-    info_file_path = settings.corpus_dir / "traditions.json"
-    existing_info: dict = {}
+    result: dict = {}
+    for trad in sorted(corpus_traditions | set(static.keys())):
+        info = static.get(trad, {"description": "", "coordinates": []})
+        info["color"] = get_tradition_color(trad)
+        result[trad] = info
 
-    if info_file_path.exists():
-        if force:
-            backup_path = settings.corpus_dir / "traditions_backup.json"
-            shutil.copy2(info_file_path, backup_path)
-            logger.warning(f"force=True: old reference file saved as {backup_path.name}, creating a clean template.")
-        else:
-            try:
-                with open(info_file_path, encoding="utf-8") as f:
-                    existing_info = json.load(f)
-            except Exception:
-                logger.exception("Error reading traditions.json")
-
-    changed = False
-    for trad in sorted(traditions):
-        color = get_tradition_color(trad)
-
-        if trad not in existing_info:
-            existing_info[trad] = {
-                "description": "",
-                "coordinates": [],
-                "color": color,
-            }
-            changed = True
-        elif "color" not in existing_info[trad]:
-            existing_info[trad]["color"] = color
-            changed = True
-
-    with open(info_file_path, "w", encoding="utf-8") as f:
-        json.dump(existing_info, f, ensure_ascii=False, indent=2)
-
-    if changed and not force:
-        logger.info("traditions.json updated.")
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(result, f, ensure_ascii=False, indent=2)
 
 
 def build_corpus(force: bool = False):
@@ -212,7 +196,7 @@ def build_corpus(force: bool = False):
 
     download_list = load_download_list(force)
 
-    _update_traditions_info(force)
+    _update_traditions(force)
 
     logger.info(f"Starting multithreaded build (items: {len(download_list)})")
 
