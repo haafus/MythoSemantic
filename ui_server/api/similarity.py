@@ -7,7 +7,7 @@ from uuid import uuid4
 
 from fastapi import APIRouter, HTTPException, Query
 
-from ui_server.schemas import SearchRequest
+from ui_server.schemas import SearchRequest, SearchWarmupRequest
 from ui_server.services.embedding_index import embedding_index_service
 from ui_server.services.projections import get_projection_data, get_saved_html_plot
 
@@ -15,9 +15,12 @@ router = APIRouter(prefix="/api/similarity", tags=["similarity"])
 logger = logging.getLogger(__name__)
 
 _search_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="semantic-search")
+_warmup_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="semantic-warmup")
 _search_jobs: Dict[str, Dict] = {}
 _search_jobs_lock = threading.Lock()
 _SEARCH_JOB_TTL_SECONDS = 60 * 30
+_warmup_status: Dict[str, Dict] = {}
+_warmup_lock = threading.Lock()
 
 
 @router.get("/projections/{model_key}/{method}")
@@ -54,9 +57,16 @@ def point_neighbors(
     point_id: str,
     n: int = Query(10, ge=1, le=100),
     chunk_index: Optional[int] = Query(None),
+    exclude_same_tradition: bool = Query(False),
 ):
     try:
-        neighbors = embedding_index_service.get_neighbors(model_key, point_id, n, chunk_index)
+        neighbors = embedding_index_service.get_neighbors(
+            model_key,
+            point_id,
+            n,
+            chunk_index,
+            exclude_same_tradition=exclude_same_tradition,
+        )
     except KeyError as exc:
         raise HTTPException(status_code=404, detail="Point not found") from exc
     return {"point_id": point_id, "neighbors": neighbors}
@@ -101,6 +111,26 @@ def _run_search_job(job_id: str, model: str, query: str, top_k: int) -> None:
         )
 
 
+def _run_warmup_job(model: str) -> None:
+    with _warmup_lock:
+        _warmup_status[model] = {"model": model, "status": "running", "started_at": time.time()}
+
+    try:
+        embedding_index_service.warmup(model)
+        status = {"model": model, "status": "complete", "finished_at": time.time()}
+    except Exception as exc:
+        logger.exception("Semantic search warmup failed")
+        status = {
+            "model": model,
+            "status": "failed",
+            "error": str(exc) or exc.__class__.__name__,
+            "finished_at": time.time(),
+        }
+
+    with _warmup_lock:
+        _warmup_status[model] = status
+
+
 @router.post("/search/jobs")
 def start_search_job(request: SearchRequest):
     job_id = uuid4().hex
@@ -121,6 +151,20 @@ def start_search_job(request: SearchRequest):
 
     _search_executor.submit(_run_search_job, job_id, request.model, request.query, request.top_k)
     return job
+
+
+@router.post("/search/warmup")
+def warmup_search(request: SearchWarmupRequest):
+    with _warmup_lock:
+        current = _warmup_status.get(request.model)
+        if current and current.get("status") in {"queued", "running", "complete"}:
+            return dict(current)
+
+        status = {"model": request.model, "status": "queued", "submitted_at": time.time()}
+        _warmup_status[request.model] = status
+
+    _warmup_executor.submit(_run_warmup_job, request.model)
+    return status
 
 
 @router.get("/search/jobs/{job_id}")

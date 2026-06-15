@@ -5,101 +5,88 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="22dfc77f-98d5-44fb-8000-3bf35d3376e1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/distance_heatmap.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/BAAI_bge-m3/distance_heatmap.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/methods_comparison.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/BAAI_bge-m3/methods_comparison.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/model_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/BAAI_bge-m3/model_info.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/pca_2d_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/BAAI_bge-m3/pca_2d_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/tradition_distribution.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/BAAI_bge-m3/tradition_distribution.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/tsne_2d_perplexity-30_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/BAAI_bge-m3/tsne_2d_perplexity-30_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/tsne_2d_perplexity-50_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/BAAI_bge-m3/tsne_2d_perplexity-50_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/tsne_2d_perplexity-5_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/BAAI_bge-m3/tsne_2d_perplexity-5_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/tsne_hyperparameters_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/BAAI_bge-m3/tsne_hyperparameters_dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/umap_2d_n_neighbors-15_min_dist-0.1_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/BAAI_bge-m3/umap_2d_n_neighbors-15_min_dist-0.1_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/umap_2d_n_neighbors-15_min_dist-0.5_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/BAAI_bge-m3/umap_2d_n_neighbors-15_min_dist-0.5_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/umap_2d_n_neighbors-15_min_dist-0.8_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/BAAI_bge-m3/umap_2d_n_neighbors-15_min_dist-0.8_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/umap_2d_n_neighbors-50_min_dist-0.1_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/BAAI_bge-m3/umap_2d_n_neighbors-50_min_dist-0.1_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/umap_2d_n_neighbors-5_min_dist-0.1_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/BAAI_bge-m3/umap_2d_n_neighbors-5_min_dist-0.1_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/umap_hyperparameters_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/BAAI_bge-m3/umap_hyperparameters_dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/umap_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/BAAI_bge-m3/umap_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/distance_heatmap.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/distance_heatmap.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/methods_comparison.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/methods_comparison.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/model_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/model_info.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/pca_2d_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/pca_2d_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/tradition_distribution.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/tradition_distribution.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/tsne_2d_perplexity-30_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/tsne_2d_perplexity-30_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/tsne_2d_perplexity-50_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/tsne_2d_perplexity-50_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/tsne_2d_perplexity-5_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/tsne_2d_perplexity-5_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/tsne_hyperparameters_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/tsne_hyperparameters_dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/umap_2d_n_neighbors-15_min_dist-0.1_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/umap_2d_n_neighbors-15_min_dist-0.1_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/umap_2d_n_neighbors-15_min_dist-0.5_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/umap_2d_n_neighbors-15_min_dist-0.5_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/umap_2d_n_neighbors-15_min_dist-0.8_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/umap_2d_n_neighbors-15_min_dist-0.8_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/umap_2d_n_neighbors-50_min_dist-0.1_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/umap_2d_n_neighbors-50_min_dist-0.1_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/umap_2d_n_neighbors-5_min_dist-0.1_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/umap_2d_n_neighbors-5_min_dist-0.1_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/umap_hyperparameters_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/umap_hyperparameters_dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/umap_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/umap_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/distance_heatmap.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/distance_heatmap.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/methods_comparison.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/methods_comparison.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/model_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/model_info.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/pca_2d_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/pca_2d_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/tradition_distribution.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/tradition_distribution.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/tsne_2d_perplexity-30_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/tsne_2d_perplexity-30_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/tsne_2d_perplexity-50_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/tsne_2d_perplexity-50_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/tsne_2d_perplexity-5_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/tsne_2d_perplexity-5_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/tsne_hyperparameters_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/tsne_hyperparameters_dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/umap_2d_n_neighbors-15_min_dist-0.1_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/umap_2d_n_neighbors-15_min_dist-0.1_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/umap_2d_n_neighbors-15_min_dist-0.5_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/umap_2d_n_neighbors-15_min_dist-0.5_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/umap_2d_n_neighbors-15_min_dist-0.8_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/umap_2d_n_neighbors-15_min_dist-0.8_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/umap_2d_n_neighbors-50_min_dist-0.1_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/umap_2d_n_neighbors-50_min_dist-0.1_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/umap_2d_n_neighbors-5_min_dist-0.1_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/umap_2d_n_neighbors-5_min_dist-0.1_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/umap_hyperparameters_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/umap_hyperparameters_dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/umap_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/umap_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/distance_heatmap.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/distance_heatmap.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/methods_comparison.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/methods_comparison.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/model_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/model_info.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/pca_2d_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/pca_2d_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/tradition_distribution.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/tradition_distribution.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/tsne_2d_perplexity-30_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/tsne_2d_perplexity-30_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/tsne_2d_perplexity-50_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/tsne_2d_perplexity-50_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/tsne_2d_perplexity-5_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/tsne_2d_perplexity-5_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/tsne_hyperparameters_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/tsne_hyperparameters_dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/umap_2d_n_neighbors-15_min_dist-0.1_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/umap_2d_n_neighbors-15_min_dist-0.1_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/umap_2d_n_neighbors-15_min_dist-0.5_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/umap_2d_n_neighbors-15_min_dist-0.5_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/umap_2d_n_neighbors-15_min_dist-0.8_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/umap_2d_n_neighbors-15_min_dist-0.8_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/umap_2d_n_neighbors-50_min_dist-0.1_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/umap_2d_n_neighbors-50_min_dist-0.1_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/umap_2d_n_neighbors-5_min_dist-0.1_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/umap_2d_n_neighbors-5_min_dist-0.1_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/umap_hyperparameters_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/umap_hyperparameters_dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/distance_heatmap.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/distance_heatmap.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/methods_comparison.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/methods_comparison.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/model_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/model_info.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/pca_2d_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/pca_2d_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/tradition_distribution.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/tradition_distribution.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/tsne_2d_perplexity-30_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/tsne_2d_perplexity-30_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/tsne_2d_perplexity-50_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/tsne_2d_perplexity-50_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/tsne_2d_perplexity-5_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/tsne_2d_perplexity-5_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/tsne_hyperparameters_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/tsne_hyperparameters_dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_2d_n_neighbors-15_min_dist-0.1_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_2d_n_neighbors-15_min_dist-0.1_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_2d_n_neighbors-15_min_dist-0.5_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_2d_n_neighbors-15_min_dist-0.5_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_2d_n_neighbors-15_min_dist-0.8_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_2d_n_neighbors-15_min_dist-0.8_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_2d_n_neighbors-50_min_dist-0.1_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_2d_n_neighbors-50_min_dist-0.1_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_2d_n_neighbors-5_min_dist-0.1_traditions.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_2d_n_neighbors-5_min_dist-0.1_traditions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_hyperparameters_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_hyperparameters_dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/embedding_analyzer/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/embedding_analyzer/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/embedding_analyzer/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/embedding_analyzer/config.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/embedding_analyzer/visualization.py" beforeDir="false" afterPath="$PROJECT_DIR$/embedding_analyzer/visualization.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/embeddings_builder/build_embeddings.py" beforeDir="false" afterPath="$PROJECT_DIR$/embeddings_builder/build_embeddings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/analyzer.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/analyzer.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Abrahamic/Christianity/The_King_James_Version_of_the_Bible/The_King_James_Version_of_the_Bible.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Abrahamic/Christianity/The_King_James_Version_of_the_Bible/The_King_James_Version_of_the_Bible.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Abrahamic/Islam/The_Koran/The_Koran.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Abrahamic/Islam/The_Koran/The_Koran.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/African/Bantu/Bantu_Beliefs_and_Magic/Bantu_Beliefs_and_Magic.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/African/West_African/West_African_Folk-Tales/West_African_Folk-Tales.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/African/West_African/West_African_Folk-Tales/West_African_Folk-Tales.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Ainu/ainu_folk_tales/ainu_folk_tales.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/American_Indigenous/Aztec,_Maya,_and_Inca/The_Myths_of_Mexico_and_Peru/The_Myths_of_Mexico_and_Peru.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Ancient_Egyptian/ancient_egyptian_legends_murray/ancient_egyptian_legends_murray.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Ancient_Egyptian/egyptian_book_of_the_dead/egyptian_book_of_the_dead.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Ancient_Egyptian/legends_of_the_gods_budge/legends_of_the_gods_budge.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Anglo-Saxon/codex_junius_old_english/codex_junius_old_english.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Australian/australian_aboriginal_myths/australian_aboriginal_myths.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Aztec/rig_veda_americanus_aztec/rig_veda_americanus_aztec.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Buddhism/buddhist_psalms_shinran/buddhist_psalms_shinran.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Buddhism/dhammapada_max_muller/dhammapada_max_muller.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Buddhist/Japanese_Buddhism/Buddhist_Psalms/Buddhist_Psalms.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Buddhist/Japanese_Buddhism/Buddhist_Psalms/Buddhist_Psalms.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Celtic/mabinogion_guest/mabinogion_guest.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Chinese/Chinese/Myths_and_Legends_of_China/Myths_and_Legends_of_China.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Chinese/Chinese/Myths_and_Legends_of_China/Myths_and_Legends_of_China.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Chinese/Confucianism/The_Analects_of_Confucius/The_Analects_of_Confucius.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Chinese/Confucianism/The_Analects_of_Confucius/The_Analects_of_Confucius.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Chinese/Taoism/The_Tao_Teh_King/The_Tao_Teh_King.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Chinese/Taoism/The_Tao_Teh_King/The_Tao_Teh_King.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/augustine_confessions_trans/augustine_confessions_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/bible_kjv_old_testament/bible_kjv_old_testament.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/the_holy_bible/the_holy_bible.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Confucianism/analects_confucius_legge/analects_confucius_legge.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Finno-Ugric/Finnish/Kalevala_The_Epic_Poem_of_Finland/Kalevala_The_Epic_Poem_of_Finland.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Finno-Ugric/Finnish/Kalevala_The_Epic_Poem_of_Finland/Kalevala_The_Epic_Poem_of_Finland.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Hindu/vikram_and_vampire_burton/vikram_and_vampire_burton.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Hinduism/hindu_law_yajnavalkya/hindu_law_yajnavalkya.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Hinduism/upanishads_paramananda/upanishads_paramananda.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Indian/Buddhism/The_Dhammapada/The_Dhammapada.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Indian/Buddhism/The_Dhammapada/The_Dhammapada.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Indian/Hinduism/The_Bhagavad_Gita/The_Bhagavad_Gita.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Indian/Hinduism/The_Bhagavad_Gita/The_Bhagavad_Gita.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Indian/Hinduism/The_Mahabharata/The_Mahabharata.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Indian/Hinduism/The_Mahabharata/The_Mahabharata.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Indian/Hinduism/The_Ramayan_of_Valmiki/The_Ramayan_of_Valmiki.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Indian/Hinduism/The_Ramayan_of_Valmiki/The_Ramayan_of_Valmiki.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Indian/Hinduism/The_Upanishads/The_Upanishads.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Indian/Hinduism/The_Upanishads/The_Upanishads.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Indigenous_Australian/Australian/Myths_of_the_Australian_Aborigines/Myths_of_the_Australian_Aborigines.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Indigenous_Australian/Australian/Myths_of_the_Australian_Aborigines/Myths_of_the_Australian_Aborigines.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Indigenous_Australian/Australian_Aboriginal/Australian_Legendary_Tales/Australian_Legendary_Tales.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Indigenous_Australian/Australian_Aboriginal/Australian_Legendary_Tales/Australian_Legendary_Tales.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Indo-European/Anglo-Saxon/Beowulf/Beowulf.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Indo-European/Anglo-Saxon/Beowulf/Beowulf.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Indo-European/Celtic/The_Mabinogion/The_Mabinogion.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Indo-European/Celtic/The_Mabinogion/The_Mabinogion.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Indo-European/Germanic/The_Nibelungenlied/The_Nibelungenlied.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Indo-European/Germanic/The_Nibelungenlied/The_Nibelungenlied.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Indo-European/Greek/The_Iliad/The_Iliad.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Indo-European/Greek/The_Iliad/The_Iliad.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Indo-European/Greek/The_Odyssey/The_Odyssey.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Indo-European/Greek/The_Odyssey/The_Odyssey.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Indo-European/Norse/The_Poetic_Edda/The_Poetic_Edda.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Indo-European/Norse/The_Poetic_Edda/The_Poetic_Edda.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Indo-European/Roman/The_Aeneid/The_Aeneid.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Indo-European/Roman/The_Aeneid/The_Aeneid.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Islam/quran_english_pickthall/quran_english_pickthall.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Japanese/Shinto/Shinto_The_Way_of_the_Gods/Shinto_The_Way_of_the_Gods.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Japanese/japanese_myths_legends/japanese_myths_legends.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Judaism/josephus_antiquities_trans/josephus_antiquities_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Judaism/josephus_wars_trans/josephus_wars_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Judaism/sayings_of_the_jewish_fathers_trans/sayings_of_the_jewish_fathers_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Maori/maori_religion_shortland/maori_religion_shortland.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Maya/popol_vuh_spence/popol_vuh_spence.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Mesoamerican/Maya/The_Popol_Vuh/The_Popol_Vuh.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Mesoamerican/Maya/The_Popol_Vuh/The_Popol_Vuh.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Mesopotamian/Babylonian/The_Babylonian_Legends_of_the_Creation/The_Babylonian_Legends_of_the_Creation.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Mesopotamian/Babylonian/The_Babylonian_Legends_of_the_Creation/The_Babylonian_Legends_of_the_Creation.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Mesopotamian/Babylonian/The_Code_of_Hammurabi/The_Code_of_Hammurabi.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Mesopotamian/Babylonian/The_Code_of_Hammurabi/The_Code_of_Hammurabi.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Mesopotamian/gilgamesh_budge/gilgamesh_budge.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Multiple_asian/sacred_books_of_the_east_max_muller/sacred_books_of_the_east_max_muller.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Near_Eastern/Ancient_Egyptian/The_Book_of_the_Dead/The_Book_of_the_Dead.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Near_Eastern/Ancient_Egyptian/The_Book_of_the_Dead/The_Book_of_the_Dead.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Near_Eastern/Mesopotamian/An_Old_Babylonian_Version_of_the_Gilgamesh_Epic/An_Old_Babylonian_Version_of_the_Gilgamesh_Epic.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Norse/poetic_edda_bellows/poetic_edda_bellows.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Norse/prose_edda_anderson/prose_edda_anderson.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Polynesian/Maori/Te_Tohunga/Te_Tohunga.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Polynesian/Maori/Te_Tohunga/Te_Tohunga.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Polynesian/Polynesian/Legends_of_Ma-ui_a_Demi_God_of_Polynesia/Legends_of_Ma-ui_a_Demi_God_of_Polynesia.txt" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/Polynesian/Polynesian/Legends_of_Ma-ui_a_Demi_God_of_Polynesia/Legends_of_Ma-ui_a_Demi_God_of_Polynesia.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Shinto/shinto_cult_terry/shinto_cult_terry.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Slavic/russian_folk_tales/russian_folk_tales.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Taoism/dao_de_jing_legge/dao_de_jing_legge.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Taoism/taoism_books_listing/taoism_books_listing.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/West_African/west_african_folk_tales/west_african_folk_tales.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Zoroastrianism/the_parsis_zoroastrianism/the_parsis_zoroastrianism.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/corpus_catalog.csv" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/corpus_catalog.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/corpus_metadata.json" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/corpus_metadata.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/processed_urls.json" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/processed_urls.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/traditions_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/traditions_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logs/corpus.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/corpus.log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui_server/api/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui_server/api/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sources_backup/changelog.txt" beforeDir="false" afterPath="$PROJECT_DIR$/sources_backup/changelog.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui_server/api/similarity.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui_server/api/similarity.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui_server/run_server.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui_server/run_server.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui_server/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui_server/schemas.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui_server/services/embedding_index.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui_server/services/embedding_index.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui_server/services/projections.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui_server/services/projections.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui_server/web/assets/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/ui_server/web/assets/app.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui_server/web/assets/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/ui_server/web/assets/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui_server/web/assets/core.js" beforeDir="false" afterPath="$PROJECT_DIR$/ui_server/web/assets/core.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui_server/web/assets/plot-utils.js" beforeDir="false" afterPath="$PROJECT_DIR$/ui_server/web/assets/plot-utils.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui_server/web/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/ui_server/web/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -139,7 +126,8 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;fix__bugs&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
 }</component>
   <component name="RecentsManager">
@@ -225,7 +213,7 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.9 (MythoSemantic)" />
+      <option name="SDK_NAME" value="Python 3.12 (mythoscope)" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />

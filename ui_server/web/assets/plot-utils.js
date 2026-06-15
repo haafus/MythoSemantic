@@ -33,7 +33,7 @@ function fitPlotFrame(iframe) {
         });
 
         doc.querySelectorAll(".modebar-container").forEach((element) => {
-            element.style.display = "none";
+            element.style.display = "";
         });
     } catch {
         // Same-origin frames are adjusted; other frames keep their original layout.
@@ -83,7 +83,8 @@ export async function renderSavedPlotInto(target, url, options = {}) {
         await Plotly.newPlot(target, spec.data, layout, {
             responsive: true,
             displaylogo: false,
-            displayModeBar: false,
+            displayModeBar: true,
+            scrollZoom: true,
         });
         target.dataset.plotly = "1";
     } catch (error) {

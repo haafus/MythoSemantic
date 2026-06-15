@@ -1,4 +1,4 @@
-import clean_gutenberg
+from clean_gutenberg import clean_gutenberg_texts
 from UI import start_home_page
 from corpus_builder.build_corpus import build_and_save_corpus
 from embedding_analyzer import analyze_embeddings
@@ -12,5 +12,4 @@ from ui_server.run_server import create_app, run_server
 app = create_app()
 
 if __name__ == "__main__":
-    #analyze_embeddings()
     run_server()

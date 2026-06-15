@@ -15,6 +15,10 @@ class SearchRequest(BaseModel):
     top_k: int = Field(default=20, ge=1, le=100)
 
 
+class SearchWarmupRequest(BaseModel):
+    model: str
+
+
 class SearchResult(BaseModel):
     id: str
     tradition: str

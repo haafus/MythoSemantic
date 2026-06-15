@@ -1010,3 +1010,100 @@ All visualizations for sentence-transformers/paraphrase-multilingual-MiniLM-L12-
 2026-05-23 06:31:33,934 - embeddings_clustering.visualization - INFO - Visualization saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/optics/clusters_optics.html
 2026-05-23 06:31:33,955 - embeddings_clustering.visualization - INFO - Confusion matrix saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/optics/confusion_matrix_optics.html
 2026-05-23 06:31:33,979 - embeddings_clustering.visualization - INFO - Metrics dashboard saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/comparison/metrics_dashboard.html
+2026-06-10 05:58:41,900 - root - INFO - Starting corpus build...
+2026-06-10 05:58:41,906 - corpus_builder - INFO - traditions_info.json updated (colors added or book lists refreshed).
+2026-06-10 05:58:41,906 - corpus_builder - INFO - Starting multithreaded build (items: 28)
+2026-06-10 05:58:41,907 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/10/pg10.txt
+2026-06-10 05:58:41,913 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/7440/pg7440.txt
+2026-06-10 05:58:41,919 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/4094/pg4094.txt
+2026-06-10 05:58:41,926 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/3283/pg3283.txt
+2026-06-10 05:58:41,933 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/24869/pg24869.txt
+2026-06-10 05:58:41,940 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/2017/pg2017.txt
+2026-06-10 05:58:41,948 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/216/pg216.txt
+2026-06-10 05:58:41,955 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/15250/pg15250.txt
+2026-06-10 05:58:41,962 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/7015/pg7015.txt
+2026-06-10 05:58:41,970 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/7145/pg7145.txt
+2026-06-10 05:58:57,604 - corpus_builder - INFO - The Tao Teh King: available (words: 13939, sentences: 937, color: #82E91E)
+2026-06-10 05:58:57,604 - corpus_builder - INFO - Saved successfully: The_Tao_Teh_King.txt (words: 13939, color: #82E91E)
+2026-06-10 05:58:57,611 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/9914/pg9914.txt
+2026-06-10 05:58:57,619 - corpus_builder - INFO - The Book of the Dead: available (words: 16059, sentences: 626, color: #0A28DF)
+2026-06-10 05:58:57,619 - corpus_builder - INFO - Saved successfully: The_Book_of_the_Dead.txt (words: 16059, color: #0A28DF)
+2026-06-10 05:58:57,620 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/2199/pg2199.txt
+2026-06-10 05:58:57,656 - corpus_builder - INFO - The Dhammapada: available (words: 15444, sentences: 1060, color: #120D4A)
+2026-06-10 05:58:57,656 - corpus_builder - INFO - Saved successfully: The_Dhammapada.txt (words: 15444, color: #120D4A)
+2026-06-10 05:58:57,656 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/73533/pg73533.txt
+2026-06-10 05:58:57,827 - corpus_builder - INFO - The Upanishads: available (words: 20981, sentences: 1012, color: #2AED29)
+2026-06-10 05:58:57,827 - corpus_builder - INFO - Saved successfully: The_Upanishads.txt (words: 20981, color: #2AED29)
+2026-06-10 05:58:57,827 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/5186/pg5186.txt
+2026-06-10 05:58:57,918 - corpus_builder - INFO - Buddhist Psalms: available (words: 19260, sentences: 1069, color: #FD2FE0)
+2026-06-10 05:58:57,918 - corpus_builder - INFO - Saved successfully: Buddhist_Psalms.txt (words: 19260, color: #FD2FE0)
+2026-06-10 05:58:57,918 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/5160/pg5160.txt
+2026-06-10 05:58:58,042 - corpus_builder - INFO - The Analects of Confucius: available (words: 38577, sentences: 2664, color: #E4763D)
+2026-06-10 05:58:58,053 - corpus_builder - INFO - Saved successfully: The_Analects_of_Confucius.txt (words: 38577, color: #E4763D)
+2026-06-10 05:58:58,054 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/7321/pg7321.txt
+2026-06-10 05:58:58,121 - corpus_builder - INFO - The Babylonian Legends of the Creation: available (words: 22014, sentences: 1627, color: #D52964)
+2026-06-10 05:58:58,145 - corpus_builder - INFO - Saved successfully: The_Babylonian_Legends_of_the_Creation.txt (words: 22014, color: #D52964)
+2026-06-10 05:58:58,145 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/66923/pg66923.txt
+2026-06-10 05:58:58,332 - corpus_builder - INFO - Myths and Legends of China: available (words: 126056, sentences: 4803, color: #770F02)
+2026-06-10 05:58:58,332 - corpus_builder - INFO - Saved successfully: Myths_and_Legends_of_China.txt (words: 126056, color: #770F02)
+2026-06-10 05:58:58,333 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/3833/pg3833.txt
+2026-06-10 05:58:59,185 - corpus_builder - INFO - The Iliad: available (words: 157591, sentences: 4391, color: #ED7F55)
+2026-06-10 05:58:59,216 - corpus_builder - INFO - Saved successfully: The_Iliad.txt (words: 157591, color: #ED7F55)
+2026-06-10 05:58:59,242 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/54610/pg54610.txt
+2026-06-10 05:58:59,444 - corpus_builder - INFO - West African Folk-Tales: available (words: 31323, sentences: 1871, color: #4E9A6D)
+2026-06-10 05:58:59,453 - corpus_builder - INFO - Saved successfully: West_African_Folk-Tales.txt (words: 31323, color: #4E9A6D)
+2026-06-10 05:58:59,579 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/32601/pg32601.txt
+2026-06-10 05:58:59,627 - corpus_builder - INFO - The Poetic Edda: available (words: 157109, sentences: 9895, color: #BFD144)
+2026-06-10 05:58:59,627 - corpus_builder - INFO - Saved successfully: The_Poetic_Edda.txt (words: 157109, color: #BFD144)
+2026-06-10 05:58:59,628 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/56550/pg56550.txt
+2026-06-10 05:58:59,675 - corpus_builder - INFO - Australian Legendary Tales: available (words: 36799, sentences: 1821, color: #FA9A22)
+2026-06-10 05:58:59,722 - corpus_builder - INFO - Saved successfully: Australian_Legendary_Tales.txt (words: 36799, color: #FA9A22)
+2026-06-10 05:58:59,723 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/ebooks/71940.txt.utf-8
+2026-06-10 05:58:59,962 - corpus_builder - INFO - The Mabinogion: available (words: 111364, sentences: 4054, color: #456D9A)
+2026-06-10 05:58:59,963 - corpus_builder - INFO - Saved successfully: The_Mabinogion.txt (words: 111364, color: #456D9A)
+2026-06-10 05:59:00,046 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/1727/pg1727.txt
+2026-06-10 05:59:00,080 - corpus_builder - INFO - Kalevala The Epic Poem of Finland: available (words: 146097, sentences: 3208, color: #4C8190)
+2026-06-10 05:59:00,096 - corpus_builder - INFO - Saved successfully: Kalevala_The_Epic_Poem_of_Finland.txt (words: 146097, color: #4C8190)
+2026-06-10 05:59:00,176 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/2388/pg2388.txt
+2026-06-10 05:59:00,317 - corpus_builder - INFO - The Nibelungenlied: available (words: 116458, sentences: 4947, color: #1E710B)
+2026-06-10 05:59:00,318 - corpus_builder - INFO - Saved successfully: The_Nibelungenlied.txt (words: 116458, color: #1E710B)
+2026-06-10 05:59:00,318 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/16328/pg16328.txt
+2026-06-10 05:59:01,099 - corpus_builder - INFO - The Popol Vuh: available (words: 16092, sentences: 673, color: #A97A95)
+2026-06-10 05:59:01,286 - corpus_builder - INFO - Saved successfully: The_Popol_Vuh.txt (words: 16092, color: #A97A95)
+2026-06-10 05:59:01,350 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/228/pg228.txt
+2026-06-10 05:59:01,398 - corpus_builder - INFO - Te Tohunga: available (words: 33316, sentences: 1194, color: #151FE1)
+2026-06-10 05:59:01,399 - corpus_builder - INFO - Saved successfully: Te_Tohunga.txt (words: 33316, color: #151FE1)
+2026-06-10 05:59:01,414 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/17150/pg17150.txt
+2026-06-10 05:59:01,600 - corpus_builder - INFO - Legends of Ma-ui a Demi God of Polynesia: available (words: 45526, sentences: 2200, color: #8E05FF)
+2026-06-10 05:59:01,615 - corpus_builder - INFO - Saved successfully: Legends_of_Ma-ui_a_Demi_God_of_Polynesia.txt (words: 45526, color: #8E05FF)
+2026-06-10 05:59:01,647 - corpus_builder - INFO - Downloading: https://www.gutenberg.org/cache/epub/15474/pg15474.txt
+2026-06-10 05:59:01,711 - corpus_builder - INFO - The Koran: available (words: 434567, sentences: 20548, color: #3F490A)
+2026-06-10 05:59:01,795 - corpus_builder - INFO - Saved successfully: The_Koran.txt (words: 434567, color: #3F490A)
+2026-06-10 05:59:01,800 - corpus_builder - INFO - The Bhagavad Gita: available (words: 24016, sentences: 1300, color: #2AED29)
+2026-06-10 05:59:01,800 - corpus_builder - INFO - Saved successfully: The_Bhagavad_Gita.txt (words: 24016, color: #2AED29)
+2026-06-10 05:59:02,055 - corpus_builder - INFO - Beowulf: available (words: 44900, sentences: 1861, color: #262220)
+2026-06-10 05:59:02,069 - corpus_builder - INFO - Saved successfully: Beowulf.txt (words: 44900, color: #262220)
+2026-06-10 05:59:02,070 - corpus_builder - INFO - The Ramayan of Valmiki: available (words: 412903, sentences: 18998, color: #2AED29)
+2026-06-10 05:59:02,070 - corpus_builder - INFO - Saved successfully: The_Ramayan_of_Valmiki.txt (words: 412903, color: #2AED29)
+2026-06-10 05:59:02,072 - corpus_builder - INFO - The Odyssey: available (words: 133756, sentences: 3738, color: #ED7F55)
+2026-06-10 05:59:02,118 - corpus_builder - INFO - Saved successfully: The_Odyssey.txt (words: 133756, color: #ED7F55)
+2026-06-10 05:59:02,992 - corpus_builder - INFO - Myths of the Australian Aborigines: available (words: 141607, sentences: 5235, color: #B8A3AB)
+2026-06-10 05:59:03,008 - corpus_builder - INFO - Saved successfully: Myths_of_the_Australian_Aborigines.txt (words: 141607, color: #B8A3AB)
+2026-06-10 05:59:03,118 - corpus_builder - INFO - The Code of Hammurabi: available (words: 21152, sentences: 1650, color: #D52964)
+2026-06-10 05:59:03,154 - corpus_builder - INFO - Saved successfully: The_Code_of_Hammurabi.txt (words: 21152, color: #D52964)
+2026-06-10 05:59:03,275 - corpus_builder - INFO - The Aeneid: available (words: 116763, sentences: 4164, color: #47F5A7)
+2026-06-10 05:59:03,275 - corpus_builder - INFO - Saved successfully: The_Aeneid.txt (words: 116763, color: #47F5A7)
+2026-06-10 05:59:04,146 - corpus_builder - INFO - The King James Version of the Bible: available (words: 857542, sentences: 29892, color: #B0AFC9)
+2026-06-10 05:59:04,146 - corpus_builder - INFO - Saved successfully: The_King_James_Version_of_the_Bible.txt (words: 857542, color: #B0AFC9)
+2026-06-10 05:59:05,399 - corpus_builder - INFO - The Mahabharata: available (words: 642393, sentences: 27196, color: #2AED29)
+2026-06-10 05:59:05,399 - corpus_builder - INFO - Saved successfully: The_Mahabharata.txt (words: 642393, color: #2AED29)
+2026-06-10 05:59:05,404 - corpus_builder - INFO - Corpus build complete.
+2026-06-10 05:59:05,405 - corpus_builder - INFO - Total records: 28
+2026-06-10 05:59:05,405 - corpus_builder - INFO - Available: 28
+2026-06-10 05:59:05,405 - corpus_builder - INFO - Unavailable: 0
+2026-06-10 05:59:05,405 - corpus_builder - INFO - 
+Overall statistics for available texts:
+2026-06-10 05:59:05,405 - corpus_builder - INFO -   Total words: 3953604
+2026-06-10 05:59:05,405 - corpus_builder - INFO -   Total sentences: 162634
+2026-06-10 05:59:05,405 - corpus_builder - INFO -   Average words per text: 141200.1
+2026-06-10 05:59:05,405 - root - INFO - Corpus build completed successfully.

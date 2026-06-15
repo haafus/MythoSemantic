@@ -29,6 +29,9 @@ import {
     resizeEmbeddedPlots,
 } from "./plot-utils.js";
 
+const NEAREST_NEIGHBOR_COUNT = 5;
+const CROSS_TRADITION_NEIGHBOR_COUNT = 10;
+
 function render() {
     cleanupRoute();
 
@@ -557,7 +560,10 @@ async function renderEmbeddingsAnalysis() {
 
                 <div class="sidebar">
                     <div class="card">
-                        <div class="card-header"><h3 class="card-title">Point Information</h3></div>
+                        <div class="card-header">
+                            <h3 class="card-title">Point Information</h3>
+                            <button class="btn btn-outline point-info-modal-btn" id="open-point-info-modal" type="button" hidden>Open in modal</button>
+                        </div>
                         <div class="card-body info-content empty" id="infoContent">
                             Click any point in the chart to see information
                         </div>
@@ -590,6 +596,16 @@ async function renderEmbeddingsAnalysis() {
                         <button class="btn" id="close-search-modal" type="button">Close</button>
                     </div>
                     <div class="search-results" id="searchResults"></div>
+                </div>
+            </div>
+
+            <div id="neighborsModal">
+                <div class="modal-content-reader neighbors-modal-content">
+                    <div class="card-header">
+                        <strong id="neighborsModalTitle">Point Information</strong>
+                        <button class="btn" id="close-neighbors-modal" type="button">Close</button>
+                    </div>
+                    <div class="neighbors-modal-results" id="neighborsModalResults"></div>
                 </div>
             </div>
         </main>
@@ -626,8 +642,12 @@ function bindEmbeddingsControls() {
 
     modelSelect.addEventListener("change", triggerModelChange);
     vizSelect.addEventListener("change", loadVisualization);
+    searchText.addEventListener("focus", () => {
+        scheduleSearchWarmup(state.selectedModel);
+    });
     searchText.addEventListener("input", () => {
         searchBtn.disabled = searchText.value.trim().length === 0 || !state.selectedModel;
+        if (searchText.value.trim()) scheduleSearchWarmup(state.selectedModel);
     });
     searchBtn.addEventListener("click", performAnalysisSearch);
 
@@ -637,6 +657,7 @@ function bindEmbeddingsControls() {
         document.getElementById("readerModal").style.display = "none";
     });
     document.getElementById("close-search-modal").addEventListener("click", closeSearchModal);
+    document.getElementById("close-neighbors-modal").addEventListener("click", closePointInfoModal);
 
     state.keydownHandler = (event) => {
         if (event.key === "Escape" && plotContainer && plotContainer.classList.contains("fullscreen")) {
@@ -682,6 +703,20 @@ function updateStatus(text, type = "loaded") {
     if (!status) return;
     status.textContent = text;
     status.className = `status-badge ${type}`;
+}
+
+function scheduleSearchWarmup(model) {
+    if (!model || state.warmedSearchModels.has(model)) return;
+
+    state.warmedSearchModels.add(model);
+    window.setTimeout(() => {
+        api("/api/similarity/search/warmup", {
+            method: "POST",
+            body: JSON.stringify({model}),
+        }).catch(() => {
+            state.warmedSearchModels.delete(model);
+        });
+    }, 700);
 }
 
 function toggleFullscreen() {
@@ -752,13 +787,21 @@ async function renderProjectionPlot(data) {
     scatterPlot.style.display = "block";
 
     await loadTraditionInfo();
-    const traditions = [...new Set(points.map((point) => point.tradition || "Unknown"))];
+    const groupedPoints = new Map();
+    points.forEach((point) => {
+        const tradition = point.tradition || "Unknown";
+        if (!groupedPoints.has(tradition)) groupedPoints.set(tradition, []);
+        groupedPoints.get(tradition).push(point);
+    });
+
+    const traditions = [...groupedPoints.keys()];
     const colorMap = getColorMap(traditions);
     const showLegend = scatterPlot.clientWidth >= 720;
 
     const traces = traditions.map((tradition) => {
-        const pts = points.filter((point) => (point.tradition || "Unknown") === tradition);
+        const pts = groupedPoints.get(tradition) || [];
         return {
+            type: "scattergl",
             x: pts.map((point) => point.x),
             y: pts.map((point) => point.y),
             mode: "markers",
@@ -818,7 +861,12 @@ async function renderProjectionPlot(data) {
         },
     };
 
-    await Plotly.newPlot(scatterPlot, traces, layout, {responsive: true, displaylogo: false, displayModeBar: false});
+    await Plotly.newPlot(scatterPlot, traces, layout, {
+        responsive: true,
+        displaylogo: false,
+        displayModeBar: true,
+        scrollZoom: true,
+    });
     scatterPlot.style.display = "block";
     scatterPlot.dataset.plotly = "1";
     bindProjectionTooltip(scatterPlot);
@@ -969,11 +1017,79 @@ function chunkTextHtml(item, query = "") {
     return highlightText(text, query);
 }
 
+function renderNeighborCards(neighbors, emptyText) {
+    if (!neighbors.length) {
+        return `<div class="neighbor-empty">${escapeHtml(emptyText)}</div>`;
+    }
+
+    return neighbors.map((neighbor) => `
+        <div class="neighbor-item" data-neighbor-id="${escapeAttribute(neighbor.id)}" data-neighbor-chunk="${escapeAttribute(neighbor.chunk_index)}">
+            <span class="badge" style="background:#dee2e6; color:#212529">${escapeHtml(neighbor.tradition)}</span>
+            <div class="neighbor-meta">${escapeHtml(chunkMetaLine(neighbor))}</div>
+            <div class="neighbor-text">${escapeHtml(neighbor.text || neighbor.text_preview || "")}</div>
+            <div class="neighbor-stats">Similarity: ${(Number(neighbor.similarity_score || 0) * 100).toFixed(1)}%</div>
+        </div>
+    `).join("");
+}
+
+function bindNeighborCards(container, options = {}) {
+    if (!container) return;
+    container.querySelectorAll(".neighbor-item").forEach((item) => {
+        item.addEventListener("click", () => {
+            if (options.closeModal) closePointInfoModal();
+            displayPointInfo(item.dataset.neighborId, item.dataset.neighborChunk);
+        });
+    });
+}
+
+function openPointInfoModal(point, neighbors, crossTraditionNeighbors) {
+    const modal = document.getElementById("neighborsModal");
+    const modalTitle = document.getElementById("neighborsModalTitle");
+    const results = document.getElementById("neighborsModalResults");
+    if (!modal || !modalTitle || !results) return;
+
+    modalTitle.textContent = "Point Information";
+    results.innerHTML = `
+        <div class="neighbors-modal-detail">
+            <span class="badge">${escapeHtml(point.tradition)}</span>
+            <div class="search-result-meta">${escapeHtml(chunkMetaLine(point))}</div>
+            <div class="neighbors-modal-text"><strong>ID:</strong> ${escapeHtml(point.id)}<br><br>${escapeHtml(point.text)}</div>
+        </div>
+        <div class="neighbors-modal-summary">
+            <strong>Nearest neighbors</strong>
+            <span>${escapeHtml(NEAREST_NEIGHBOR_COUNT)} results</span>
+        </div>
+        <div class="neighbors-modal-list">
+            ${renderNeighborCards(neighbors, "No nearest chunks found.")}
+        </div>
+        <div class="neighbors-modal-summary">
+            <strong>${escapeHtml(CROSS_TRADITION_NEIGHBOR_COUNT)} nearest from other traditions</strong>
+            <span>${escapeHtml(point.tradition || "Unknown")} excluded</span>
+        </div>
+        <div class="neighbors-modal-list">
+            ${renderNeighborCards(crossTraditionNeighbors, "No cross-tradition neighbors found.")}
+        </div>
+    `;
+    modal.style.display = "block";
+    bindNeighborCards(results, {closeModal: true});
+}
+
+function closePointInfoModal() {
+    const modal = document.getElementById("neighborsModal");
+    if (modal) modal.style.display = "none";
+}
+
 async function displayPointInfo(pointId, chunkIndex = null) {
     if (!state.selectedModel || !pointId) return;
 
     const infoContent = document.getElementById("infoContent");
     if (!infoContent) return;
+
+    const modalButton = document.getElementById("open-point-info-modal");
+    if (modalButton) {
+        modalButton.hidden = true;
+        modalButton.onclick = null;
+    }
 
     infoContent.innerHTML = '<div style="text-align:center; color:#6c757d">Loading...</div>';
     infoContent.classList.remove("empty");
@@ -982,39 +1098,38 @@ async function displayPointInfo(pointId, chunkIndex = null) {
         const pointQuery = chunkIndex !== null && chunkIndex !== undefined && chunkIndex !== ""
             ? `?chunk_index=${encodeURIComponent(chunkIndex)}`
             : "";
-        const neighborsQuery = new URLSearchParams({n: "5"});
+        const neighborsQuery = new URLSearchParams({n: String(NEAREST_NEIGHBOR_COUNT)});
         if (chunkIndex !== null && chunkIndex !== undefined && chunkIndex !== "") {
             neighborsQuery.set("chunk_index", String(chunkIndex));
         }
+        const crossTraditionQuery = new URLSearchParams(neighborsQuery);
+        crossTraditionQuery.set("n", String(CROSS_TRADITION_NEIGHBOR_COUNT));
+        crossTraditionQuery.set("exclude_same_tradition", "true");
 
-        const [point, neighborsData] = await Promise.all([
+        const [point, neighborsData, crossTraditionData] = await Promise.all([
             api(`/api/similarity/points/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(pointId)}${pointQuery}`),
             api(`/api/similarity/points/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(pointId)}/neighbors?${neighborsQuery.toString()}`),
+            api(`/api/similarity/points/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(pointId)}/neighbors?${crossTraditionQuery.toString()}`),
         ]);
 
         const neighbors = Array.isArray(neighborsData.neighbors) ? neighborsData.neighbors : [];
+        const crossTraditionNeighbors = Array.isArray(crossTraditionData.neighbors) ? crossTraditionData.neighbors : [];
         let html = `
             <div class="badge">${escapeHtml(point.tradition)}</div>
             <div class="search-result-meta">${escapeHtml(chunkMetaLine(point))}</div>
             <div class="text-preview"><strong>ID:</strong> ${escapeHtml(point.id)}<br><br>${escapeHtml(point.text)}</div>
             <h4 style="margin: 16px 0 8px; font-size:14px; color:#111;">Nearest neighbors:</h4>
+            ${renderNeighborCards(neighbors, "No nearest chunks found.")}
+            <h4 style="margin: 18px 0 8px; font-size:14px; color:#111;">Nearest from other traditions:</h4>
+            ${renderNeighborCards(crossTraditionNeighbors, "No cross-tradition neighbors found.")}
         `;
 
-        if (neighbors.length > 0) {
-            html += neighbors.map((neighbor) => `
-                <div class="neighbor-item" data-neighbor-id="${escapeAttribute(neighbor.id)}" data-neighbor-chunk="${escapeAttribute(neighbor.chunk_index)}">
-                    <span class="badge" style="background:#dee2e6; color:#212529">${escapeHtml(neighbor.tradition)}</span>
-                    <div class="neighbor-meta">${escapeHtml(chunkMetaLine(neighbor))}</div>
-                    <div class="neighbor-text">${escapeHtml(neighbor.text || neighbor.text_preview || "")}</div>
-                    <div class="neighbor-stats">Similarity: ${(Number(neighbor.similarity_score || 0) * 100).toFixed(1)}%</div>
-                </div>
-            `).join("");
-        }
-
         infoContent.innerHTML = html;
-        infoContent.querySelectorAll(".neighbor-item").forEach((item) => {
-            item.addEventListener("click", () => displayPointInfo(item.dataset.neighborId, item.dataset.neighborChunk));
-        });
+        bindNeighborCards(infoContent);
+        if (modalButton) {
+            modalButton.hidden = false;
+            modalButton.onclick = () => openPointInfoModal(point, neighbors, crossTraditionNeighbors);
+        }
     } catch (error) {
         infoContent.innerHTML = `<div style="color:#d32f2f">Error: ${escapeHtml(error.message)}</div>`;
     }
@@ -1541,9 +1656,16 @@ async function renderSearchSimilarities(params) {
 
     modelSelect.addEventListener("change", () => {
         persistSelectedModel(modelSelect.value);
+        if (searchInput.value.trim()) scheduleSearchWarmup(modelSelect.value);
         if (searchInput.value.trim()) performSearchPageSearch();
     });
     searchBtn.addEventListener("click", performSearchPageSearch);
+    searchInput.addEventListener("focus", () => {
+        scheduleSearchWarmup(modelSelect.value);
+    });
+    searchInput.addEventListener("input", () => {
+        if (searchInput.value.trim()) scheduleSearchWarmup(modelSelect.value);
+    });
     searchInput.addEventListener("keypress", (event) => {
         if (event.key === "Enter") performSearchPageSearch();
     });
