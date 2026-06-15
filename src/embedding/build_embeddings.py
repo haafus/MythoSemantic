@@ -58,10 +58,9 @@ def build_embeddings(
 
     try:
         for model in models_to_run:
-            logger.info(f"   Model: {model}")
-            logger.info(f"   Model batch size: {BATCH_SIZE}")
-
             builder.set_model(model)
+            logger.info(f"   Model: {model}")
+            logger.info(f"   Model batch size: {builder.batch_size}")
             logger.info(f"Collection: {collection_name_for_model(model)}")
             builder.save_all_corpus_to_chroma()
 
