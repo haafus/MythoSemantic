@@ -121,8 +121,6 @@ class TestUpdateTraditionsInfo:
         data = json.loads((corpus_dir / "traditions.json").read_text())
         assert "Greek" in data
         assert "Norse" in data
-        assert sorted(data["Greek"]["books"]) == ["Iliad", "Odyssey"]
-        assert data["Norse"]["books"] == ["Edda"]
         assert data["Greek"]["description"] == ""
         assert data["Greek"]["color"].startswith("#")
 
@@ -138,7 +136,6 @@ class TestUpdateTraditionsInfo:
                 "description": "Ancient Greek mythology",
                 "coordinates": [37.9, 23.7],
                 "color": "#123456",
-                "books": ["Iliad"],
             }
         }
         (corpus_dir / "traditions.json").write_text(json.dumps(existing))
@@ -147,12 +144,11 @@ class TestUpdateTraditionsInfo:
 
         data = json.loads((corpus_dir / "traditions.json").read_text())
         assert data["Greek"]["description"] == "Ancient Greek mythology"
-        assert sorted(data["Greek"]["books"]) == ["Iliad", "Odyssey"]
 
     def test_force_creates_backup(self, tmp_path, monkeypatch):
         corpus_dir = self._setup(tmp_path, monkeypatch, [])
 
-        existing = {"Greek": {"description": "old data", "color": "#000", "books": []}}
+        existing = {"Greek": {"description": "old data", "color": "#000"}}
         (corpus_dir / "traditions.json").write_text(json.dumps(existing))
 
         _update_traditions_info(force=True)
@@ -190,7 +186,7 @@ class TestUpdateTraditionsInfo:
         items = [{"title": "Edda", "tradition": "Norse"}]
         corpus_dir = self._setup(tmp_path, monkeypatch, items)
 
-        existing = {"Norse": {"description": "Norse myths", "books": ["Edda"]}}
+        existing = {"Norse": {"description": "Norse myths"}}
         (corpus_dir / "traditions.json").write_text(json.dumps(existing))
 
         _update_traditions_info(force=False)
@@ -199,7 +195,7 @@ class TestUpdateTraditionsInfo:
         assert data["Norse"]["color"].startswith("#")
         assert data["Norse"]["description"] == "Norse myths"
 
-    def test_uses_item_tid_for_books(self, tmp_path, monkeypatch):
+    def test_creates_tradition_from_id_only_item(self, tmp_path, monkeypatch):
         items = [
             {"id": "book_42", "tradition": "Egyptian"},
         ]
@@ -208,4 +204,5 @@ class TestUpdateTraditionsInfo:
         _update_traditions_info(force=False)
 
         data = json.loads((corpus_dir / "traditions.json").read_text())
-        assert data["Egyptian"]["books"] == ["book_42"]
+        assert "Egyptian" in data
+        assert data["Egyptian"]["color"].startswith("#")

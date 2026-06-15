@@ -162,16 +162,12 @@ def process_single_item(item: dict, force: bool, metadata: list[dict]):
 
 
 def _update_traditions_info(force: bool) -> None:
-    tradition_books: dict[str, set] = {}
+    traditions: set[str] = set()
     if Path(settings.corpus_config_file).exists():
         with open(settings.corpus_config_file, encoding="utf-8") as f:
-            full_items = json.load(f)
-            for item in full_items:
+            for item in json.load(f):
                 if "tradition" in item:
-                    trad = item["tradition"]
-                    if trad not in tradition_books:
-                        tradition_books[trad] = set()
-                    tradition_books[trad].add(_item_tid(item))
+                    traditions.add(item["tradition"])
 
     info_file_path = settings.corpus_dir / "traditions.json"
     existing_info: dict = {}
@@ -189,31 +185,25 @@ def _update_traditions_info(force: bool) -> None:
                 logger.exception("Error reading traditions.json")
 
     changed = False
-    for trad in sorted(tradition_books):
+    for trad in sorted(traditions):
         color = get_tradition_color(trad)
-        books_list = sorted(tradition_books[trad])
 
         if trad not in existing_info:
             existing_info[trad] = {
                 "description": "",
                 "coordinates": [],
                 "color": color,
-                "books": books_list,
             }
             changed = True
-        else:
-            if "color" not in existing_info[trad]:
-                existing_info[trad]["color"] = color
-                changed = True
-            if existing_info[trad].get("books") != books_list:
-                existing_info[trad]["books"] = books_list
-                changed = True
+        elif "color" not in existing_info[trad]:
+            existing_info[trad]["color"] = color
+            changed = True
 
     with open(info_file_path, "w", encoding="utf-8") as f:
         json.dump(existing_info, f, ensure_ascii=False, indent=2)
 
     if changed and not force:
-        logger.info("traditions.json updated (colors added or book lists refreshed).")
+        logger.info("traditions.json updated.")
 
 
 def build_corpus(force: bool = False):
