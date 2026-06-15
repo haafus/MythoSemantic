@@ -15,7 +15,7 @@ def test_derived_paths():
     from settings import Settings
 
     s = Settings()
-    assert s.corpus_metadata_path == Path("outputs/corpus/corpus_metadata.json")
+    assert s.corpus_metadata_path == Path("outputs/corpus/corpus.json")
 
 
 def test_model_output_dir():
@@ -35,7 +35,7 @@ def test_env_override(monkeypatch):
     s = Settings()
     assert s.corpus_dir == Path("/tmp/my_corpus")
     assert s.log_level == "DEBUG"
-    assert s.corpus_metadata_path == Path("/tmp/my_corpus/corpus_metadata.json")
+    assert s.corpus_metadata_path == Path("/tmp/my_corpus/corpus.json")
 
 
 def test_env_override_chroma(monkeypatch):

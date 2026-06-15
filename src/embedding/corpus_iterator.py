@@ -17,7 +17,7 @@ def iter_corpus_files(corpus_dir: Path) -> Generator[dict[str, Any], None, None]
     The returned dict intentionally does NOT include file content — callers
     read one file at a time so the whole corpus is never held in memory.
     """
-    metadata_file = corpus_dir / "corpus_metadata.json"
+    metadata_file = corpus_dir / "corpus.json"
     text_info: dict[str, dict[str, Any]] = {}
 
     if metadata_file.exists():

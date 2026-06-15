@@ -48,11 +48,11 @@ def _get_user_agent():
 
 
 def load_download_list(force: bool = False) -> list[dict]:
-    if not Path(settings.download_list_file).exists():
-        logger.error(f"Download list file not found: {settings.download_list_file}")
+    if not Path(settings.corpus_config_file).exists():
+        logger.error(f"Download list file not found: {settings.corpus_config_file}")
         return []
 
-    with open(settings.download_list_file, encoding="utf-8") as f:
+    with open(settings.corpus_config_file, encoding="utf-8") as f:
         items = json.load(f)
 
     seen_urls = set()

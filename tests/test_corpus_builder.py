@@ -99,12 +99,12 @@ class TestUpdateTraditionsInfo:
     def _setup(self, tmp_path, monkeypatch, items):
         from settings import settings
 
-        dl_file = tmp_path / "download_list.json"
+        dl_file = tmp_path / "corpus.json"
         dl_file.write_text(json.dumps(items))
         corpus_dir = tmp_path / "corpus"
         corpus_dir.mkdir()
 
-        monkeypatch.setattr(settings, "download_list_file", dl_file)
+        monkeypatch.setattr(settings, "corpus_config_file", dl_file)
         monkeypatch.setattr(settings, "corpus_dir", corpus_dir)
         return corpus_dir
 
@@ -178,7 +178,7 @@ class TestUpdateTraditionsInfo:
 
         corpus_dir = tmp_path / "corpus"
         corpus_dir.mkdir()
-        monkeypatch.setattr(settings, "download_list_file", tmp_path / "nonexistent.json")
+        monkeypatch.setattr(settings, "corpus_config_file", tmp_path / "nonexistent.json")
         monkeypatch.setattr(settings, "corpus_dir", corpus_dir)
 
         _update_traditions_info(force=False)

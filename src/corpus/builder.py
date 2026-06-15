@@ -163,8 +163,8 @@ def process_single_item(item: dict, force: bool, metadata: list[dict]):
 
 def _update_traditions_info(force: bool) -> None:
     tradition_books: dict[str, set] = {}
-    if Path(settings.download_list_file).exists():
-        with open(settings.download_list_file, encoding="utf-8") as f:
+    if Path(settings.corpus_config_file).exists():
+        with open(settings.corpus_config_file, encoding="utf-8") as f:
             full_items = json.load(f)
             for item in full_items:
                 if "tradition" in item:

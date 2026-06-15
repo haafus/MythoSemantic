@@ -40,7 +40,7 @@ def get_catalog_documents(source: str = "corpus") -> list[dict]:
         return cached[1]
 
     root = source_root(source)
-    metadata_path = root / "corpus_metadata.json"
+    metadata_path = root / "corpus.json"
 
     metadata_rows = []
     if metadata_path.exists():

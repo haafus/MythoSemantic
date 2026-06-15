@@ -31,7 +31,7 @@ class TestIterCorpusFiles:
             p.write_text(content, encoding="utf-8")
 
         if metadata_items is not None:
-            metadata_file = corpus_dir / "corpus_metadata.json"
+            metadata_file = corpus_dir / "corpus.json"
             with open(metadata_file, "w", encoding="utf-8") as f:
                 json.dump(metadata_items, f)
 

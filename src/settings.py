@@ -88,7 +88,7 @@ class Settings(BaseSettings):
     analysis_dir: Path = Path("outputs/analysis")
     logs_dir: Path = Path("outputs/logs")
     graphs_dir: Path = Path("outputs/graphs")
-    download_list_file: Path = Path("config/download_list.json")
+    corpus_config_file: Path = Path("config/corpus.json")
 
     log_level: str = "INFO"
 
@@ -108,7 +108,7 @@ class Settings(BaseSettings):
 
     @property
     def corpus_metadata_path(self) -> Path:
-        return self.corpus_dir / "corpus_metadata.json"
+        return self.corpus_dir / "corpus.json"
 
     @property
     def template_dir(self) -> Path:

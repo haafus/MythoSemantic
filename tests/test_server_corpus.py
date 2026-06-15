@@ -142,7 +142,7 @@ class TestGetCatalogDocuments:
         metadata = [
             {"id": "Iliad", "major_tradition": "European", "tradition": "Greek"},
         ]
-        (tmp_path / "corpus_metadata.json").write_text(json.dumps(metadata))
+        (tmp_path / "corpus.json").write_text(json.dumps(metadata))
         _patch_corpus(monkeypatch, tmp_path)
         monkeypatch.setattr(corpus_mod, "_catalog_cache", {})
 
@@ -163,7 +163,7 @@ class TestGetCatalogDocuments:
         monkeypatch.setattr(corpus_mod, "_catalog_cache", {})
 
         get_catalog_documents("corpus")
-        (tmp_path / "corpus_metadata.json").write_text(json.dumps([{"id": "new"}]))
+        (tmp_path / "corpus.json").write_text(json.dumps([{"id": "new"}]))
         docs = get_catalog_documents("corpus")
         assert docs == []
 
@@ -172,7 +172,7 @@ class TestGetCatalogDocuments:
             {"id": "B", "major_tradition": "Z", "tradition": "Z"},
             {"id": "A", "major_tradition": "A", "tradition": "A"},
         ]
-        (tmp_path / "corpus_metadata.json").write_text(json.dumps(metadata))
+        (tmp_path / "corpus.json").write_text(json.dumps(metadata))
         _patch_corpus(monkeypatch, tmp_path)
         monkeypatch.setattr(corpus_mod, "_catalog_cache", {})
 
