@@ -272,7 +272,7 @@ HTML-шаблоны для старого UI.
 Возможности:
 - Страницы `home.html`, `corpus.html`, `geography.html`, `embeddings_analysis.html`, `cluster_analysis.html`.
 - Общая навигация `navbar.html`.
-- Логотип `Logo.jpg`.
+- Логотип `logo.jpg`.
 
 ## server/web
 
