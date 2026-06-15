@@ -72,7 +72,7 @@ class ModelManager:
             self.batch_size = get_optimal_batch_size(self.model_dim)
             logger.info(f"Batch size automatically set to {self.batch_size} for model {model_name}")
         else:
-            logger.info(f"Using configured batch size: {self.batch_size}")
+            logger.info(f"Using manual batch size: {self.batch_size}")
 
     def close(self) -> None:
         self.unload_model()
