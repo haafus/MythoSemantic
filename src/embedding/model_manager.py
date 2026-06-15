@@ -9,15 +9,7 @@ from settings import settings
 
 logger = logging.getLogger(__name__)
 
-BATCH_SIZE_THRESHOLDS = [(3072, 8), (1024, 16), (768, 24)]
 DEFAULT_BATCH_SIZE = 32
-
-
-def get_optimal_batch_size(model_dim: int) -> int:
-    for min_dim, opt_batch in BATCH_SIZE_THRESHOLDS:
-        if model_dim >= min_dim:
-            return opt_batch
-    return DEFAULT_BATCH_SIZE
 
 
 def _select_device() -> str:
@@ -34,8 +26,7 @@ class ModelManager:
         self.model_name: str | None = None
         self.model: Any = None
         self.model_dim: int = 0
-        self._override_batch_size = batch_size is not None
-        self.batch_size: int = batch_size if batch_size is not None else DEFAULT_BATCH_SIZE
+        self.batch_size: int = batch_size or DEFAULT_BATCH_SIZE
 
     def unload_model(self) -> None:
         if self.model is not None:
@@ -68,11 +59,6 @@ class ModelManager:
         self.model = self._load_model(model_name)
         self.model_name = model_name
         self.model_dim = self.model.get_embedding_dimension()
-        if not self._override_batch_size:
-            self.batch_size = get_optimal_batch_size(self.model_dim)
-            logger.info(f"Batch size automatically set to {self.batch_size} for model {model_name}")
-        else:
-            logger.info(f"Using manual batch size: {self.batch_size}")
 
     def close(self) -> None:
         self.unload_model()
