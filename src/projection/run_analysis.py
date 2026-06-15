@@ -10,6 +10,7 @@ from .visualization import (
     plot_interactive_2d,
     plot_residual_normalized_umap,
     plot_residual_umap,
+    plot_rlace_umap,
     plot_tradition_distribution,
 )
 
@@ -31,6 +32,7 @@ def analyze_embeddings(
     model_name: str | None = None,
     generate_all_plots: bool = True,
     motif_analysis: bool = False,
+    story_emb: bool = False,
 ) -> EmbeddingAnalyzer | None:
     try:
         base_analyzer = EmbeddingAnalyzer()
@@ -62,6 +64,9 @@ def analyze_embeddings(
 
             if motif_analysis and analyzer.data:
                 _generate_motif_plot(analyzer)
+
+            if story_emb and analyzer.data:
+                _generate_story_plot(analyzer)
 
         return analyzer
 
@@ -107,6 +112,17 @@ def _generate_all_plots(analyzer: EmbeddingAnalyzer) -> None:
     except Exception:
         logger.exception("Error creating Residual Normalized UMAP plot")
 
+    logger.info("Generating RLACE UMAP projection (INLP concept erasure)...")
+    try:
+        plot_rlace_umap(
+            data,
+            output_dir=analyzer.output_dir,
+            model_name=analyzer.model_name,
+            reducer_kwargs={"n_neighbors": cfg.umap_n_neighbors, "min_dist": cfg.umap_min_dist},
+        )
+    except Exception:
+        logger.exception("Error creating RLACE UMAP plot")
+
     logger.info("  - Distance heatmap...")
     try:
         plot_distance_heatmap(data, output_dir=analyzer.output_dir, model_name=analyzer.model_name)
@@ -146,3 +162,21 @@ def _generate_motif_plot(analyzer: EmbeddingAnalyzer) -> None:
         )
     except Exception:
         logger.exception("Error creating Motif UMAP plot")
+
+
+def _generate_story_plot(analyzer: EmbeddingAnalyzer) -> None:
+    from .motif_analysis import run_story_embedding_analysis
+
+    data = analyzer.filter_by_model()
+    cfg = settings.projection
+
+    logger.info("Generating Story UMAP projection (narrative re-embedding)...")
+    try:
+        run_story_embedding_analysis(
+            data,
+            output_dir=analyzer.output_dir,
+            model_name=analyzer.model_name,
+            reducer_kwargs={"n_neighbors": cfg.umap_n_neighbors, "min_dist": cfg.umap_min_dist},
+        )
+    except Exception:
+        logger.exception("Error creating Story UMAP plot")

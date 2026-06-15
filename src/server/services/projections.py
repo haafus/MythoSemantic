@@ -11,12 +11,14 @@ SAVED_HTML_METHOD_FILES = {
     "umap": "umap_2d_traditions.html",
     "residual_umap": "residual_umap_2d.html",
     "residual_normalized_umap": "residual_normalized_umap_2d.html",
+    "rlace_umap": "rlace_umap_2d.html",
+    "story_umap": "story_umap_2d.html",
     "motif_umap": "motif_umap_2d.html",
     "distance_heatmap": "distance_heatmap.html",
     "tradition_distribution": "tradition_distribution.html",
 }
 
-INTERACTIVE_SAVED_HTML_METHODS = {"umap", "residual_umap", "residual_normalized_umap", "motif_umap"}
+INTERACTIVE_SAVED_HTML_METHODS = {"umap", "residual_umap", "residual_normalized_umap", "rlace_umap", "story_umap", "motif_umap"}
 
 PLOTLY_DTYPE_FORMATS = {
     "f4": "f",

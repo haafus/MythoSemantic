@@ -6,8 +6,9 @@ from typing import Any
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics.pairwise import cosine_distances
-from sklearn.preprocessing import Normalizer
+from sklearn.preprocessing import LabelEncoder, Normalizer
 
 from settings import settings
 
@@ -93,6 +94,38 @@ def _compute_tradition_residuals(data: list[dict], embeddings: np.ndarray) -> np
     for i, trad in enumerate(traditions):
         residuals[i] = embeddings[i] - centroids[trad]
     return residuals
+
+
+def _concept_erasure(data: list[dict], embeddings: np.ndarray, max_iters: int = 35) -> np.ndarray:
+    """INLP: iteratively project out tradition-predictive directions (Ravfogel et al., ACL 2020)."""
+    traditions = [item.get("tradition", "unknown") for item in data]
+    le = LabelEncoder()
+    y = le.fit_transform(traditions)
+    n_classes = len(le.classes_)
+    chance = 1.0 / n_classes
+
+    X = embeddings.astype(np.float64)
+    d = X.shape[1]
+    P = np.eye(d, dtype=np.float64)
+
+    for i in range(max_iters):
+        X_proj = X @ P
+        clf = LogisticRegression(max_iter=2000, solver="lbfgs", C=1.0)
+        clf.fit(X_proj, y)
+        acc = clf.score(X_proj, y)
+        logger.info(f"  INLP iteration {i + 1}: classifier accuracy = {acc:.3f} (chance = {chance:.3f})")
+
+        if acc < chance + 0.03:
+            logger.info(f"  INLP converged after {i + 1} iterations")
+            break
+
+        W = clf.coef_
+        U, S, Vt = np.linalg.svd(W, full_matrices=False)
+        basis = Vt[S > 1e-10]
+        rowspace_proj = basis.T @ basis
+        P = P @ (np.eye(d, dtype=np.float64) - rowspace_proj)
+
+    return (X @ P).astype(embeddings.dtype)
 
 
 def _plot_umap_scatter(
@@ -253,6 +286,32 @@ def plot_residual_normalized_umap(
         title_prefix="Residual Normalized UMAP (tradition centroid removed, L2-normalized)",
         filename="residual_normalized_umap_2d.html",
         axis_prefix="Residual Normalized UMAP",
+        save_html=save_html, output_dir=output_dir,
+        model_name=model_name, reducer_kwargs=reducer_kwargs,
+    )
+
+
+def plot_rlace_umap(
+    data: list[dict],
+    save_html: bool = True,
+    output_dir: Path | None = None,
+    model_name: str | None = None,
+    reducer_kwargs: dict[str, Any] | None = None,
+) -> go.Figure | None:
+    if not data:
+        logger.warning("No data for visualization.")
+        return None
+    try:
+        embeddings = np.stack([item["embedding"] for item in data])
+    except Exception:
+        logger.exception("Failed to stack embeddings")
+        return None
+    erased = _concept_erasure(data, embeddings)
+    return _plot_umap_scatter(
+        data, erased,
+        title_prefix="RLACE UMAP (tradition signal erased via INLP)",
+        filename="rlace_umap_2d.html",
+        axis_prefix="RLACE UMAP",
         save_html=save_html, output_dir=output_dir,
         model_name=model_name, reducer_kwargs=reducer_kwargs,
     )
