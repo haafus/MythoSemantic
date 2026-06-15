@@ -19,21 +19,13 @@ export const state = {
 
 export const SIMILARITY_METHODS = [
     ["umap", "UMAP 2D"],
-    ["pca", "PCA 2D"],
-    ["tsne", "t-SNE 2D"],
     ["distance_heatmap", "Distance Heatmap"],
     ["tradition_distribution", "Tradition Distribution"],
-    ["methods_comparison", "Method Comparison"],
-    ["umap_hyperparameters_dashboard", "UMAP Parameter Dashboard"],
-    ["tsne_hyperparameters_dashboard", "t-SNE Parameter Dashboard"],
 ];
 
 export const HTML_ONLY_METHODS = new Set([
     "distance_heatmap",
     "tradition_distribution",
-    "methods_comparison",
-    "umap_hyperparameters_dashboard",
-    "tsne_hyperparameters_dashboard",
 ]);
 
 export const CLUSTERING_ALGORITHMS = [

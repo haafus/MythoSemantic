@@ -4,23 +4,18 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 from sklearn.metrics.pairwise import cosine_distances
 
 from settings import settings
 
-from .utils import _check_umap, reduce_dimensions
+from .utils import reduce_dimensions
 
 MAX_TEXT_PREVIEW_LEN = 200
-MAX_VIS_SAMPLES = None
-DEFAULT_SAMPLE_SIZE = -1
 RANDOM_SEED = 42
 HEATMAP_WIDTH = 1000
 HEATMAP_HEIGHT = 900
-DASHBOARD_HEIGHT = 700
 DISTRIBUTION_HEIGHT = 600
 DISTRIBUTION_WIDTH = 900
 GRID_COLOR = "rgba(190,200,210,0.45)"
@@ -30,69 +25,16 @@ AXIS_LINE_COLOR = "rgba(120,130,140,0.65)"
 logger = logging.getLogger(__name__)
 
 
-def _resolve_sample_limit(sample_size: int | None) -> int | None:
-    if sample_size is None or sample_size == DEFAULT_SAMPLE_SIZE:
-        return None
-    if sample_size <= 0:
-        return None
-    return sample_size
-
-
 def _sample_for_visualization(data: list[dict], sample_size: int | None, reason: str) -> list[dict]:
-    sample_limit = _resolve_sample_limit(sample_size)
-    if sample_limit is None or len(data) <= sample_limit:
+    if sample_size is None or len(data) <= sample_size:
         return data
 
-    logger.info(f"Sampling {sample_limit} of {len(data)} records for {reason}")
-    indices = np.random.default_rng(RANDOM_SEED).choice(len(data), sample_limit, replace=False)
+    logger.info(f"Sampling {sample_size} of {len(data)} records for {reason}")
+    indices = np.random.default_rng(RANDOM_SEED).choice(len(data), sample_size, replace=False)
     return [data[i] for i in indices]
 
 
-def _traditions_of(data: list[dict]) -> list[str]:
-    return [item.get("tradition", "unknown") for item in data]
-
-
-def _add_tradition_scatter_traces(
-    fig: go.Figure,
-    coords: np.ndarray,
-    traditions_array: np.ndarray,
-    color_map: dict[str, str],
-    *,
-    row: int,
-    col: int,
-    show_legend: bool,
-    marker_extra: dict[str, Any] | None = None,
-    x_label: str = "X",
-    y_label: str = "Y",
-) -> None:
-    """One scatter trace per tradition (shared by the dashboard plots)."""
-    for tradition in sorted(set(traditions_array.tolist())):
-        indices = np.where(traditions_array == tradition)[0]
-        if len(indices) == 0:
-            continue
-        fig.add_trace(
-            go.Scatter(
-                x=coords[indices, 0],
-                y=coords[indices, 1],
-                mode="markers",
-                name=tradition if show_legend else None,
-                marker={"size": 5, "opacity": 0.7, "color": color_map[tradition], **(marker_extra or {})},
-                legendgroup=tradition,
-                showlegend=show_legend,
-                hovertemplate=(
-                    f"<b>{tradition}</b><br>{x_label}: %{{x:.3f}}<br>{y_label}: %{{y:.3f}}<extra></extra>"
-                ),
-            ),
-            row=row,
-            col=col,
-        )
-
-
 def _get_color_map(data: list[dict]) -> dict[str, str]:
-    """
-    Extract tradition colors directly from the data.
-    If a color is missing, assign a default from the Plotly palette.
-    """
     color_map = {}
     for item in data:
         tradition = item.get("tradition", "unknown")
@@ -111,15 +53,12 @@ def _get_color_map(data: list[dict]) -> dict[str, str]:
 
 
 def _reduce_dimensions_safe(
-    embeddings: np.ndarray, method: str = "umap", n_components: int = 2, reducer_kwargs: dict[str, Any] | None = None
+    embeddings: np.ndarray, n_components: int = 2, reducer_kwargs: dict[str, Any] | None = None
 ) -> np.ndarray | None:
-    if reducer_kwargs is None:
-        reducer_kwargs = {}
-
     try:
-        return reduce_dimensions(embeddings, method=method, n_components=n_components, **reducer_kwargs)
+        return reduce_dimensions(embeddings, n_components=n_components, **(reducer_kwargs or {}))
     except Exception:
-        logger.exception("Dimension reduction failed for %s", method)
+        logger.exception("Dimension reduction failed")
         return None
 
 
@@ -142,45 +81,67 @@ def _cartesian_axis(title: str, tickangle: int = 0, showticklabels: bool = True)
     )
 
 
-def _create_interactive_figure_2d(
-    df_plot: pd.DataFrame,
-    x_col: str,
-    y_col: str,
-    title: str,
-    color_map: dict,
-    model_name: str | None = None,
+def plot_interactive_2d(
+    data: list[dict],
+    save_html: bool = True,
     output_dir: Path | None = None,
-    filename: str | None = None,
-) -> go.Figure:
+    model_name: str | None = None,
+    reducer_kwargs: dict[str, Any] | None = None,
+) -> go.Figure | None:
+    if not data:
+        logger.warning("No data for visualization.")
+        return None
+
+    if output_dir is None:
+        output_dir = settings.analysis_dir
+    output_dir.mkdir(parents=True, exist_ok=True)
+    reducer_kwargs = reducer_kwargs or {}
+
+    try:
+        embeddings = np.stack([item["embedding"] for item in data])
+    except Exception:
+        logger.exception("Failed to stack embeddings")
+        return None
+
+    embedding_2d = _reduce_dimensions_safe(embeddings, n_components=2, reducer_kwargs=reducer_kwargs)
+    if embedding_2d is None:
+        return None
+
     fig = go.Figure()
+    color_map = _get_color_map(data)
 
     for tradition, color in color_map.items():
-        trad_data = df_plot[df_plot["tradition"] == tradition]
-        if not trad_data.empty:
-            customdata = []
-            for _, row in trad_data.iterrows():
-                text_preview = row["text"][:MAX_TEXT_PREVIEW_LEN]
-                if len(row["text"]) > MAX_TEXT_PREVIEW_LEN:
-                    text_preview += "..."
-                text_preview = "<br>".join(textwrap.wrap(text_preview, width=60))
-                customdata.append(
-                    [row["id"], row["tradition"], row["chunk_index"], text_preview]
-                )
+        indices = [i for i, item in enumerate(data) if item.get("tradition", "unknown") == tradition]
+        if not indices:
+            continue
 
-            fig.add_trace(
-                go.Scatter(
-                    x=trad_data[x_col],
-                    y=trad_data[y_col],
-                    mode="markers",
-                    name=tradition,
-                    marker=dict(size=8, opacity=0.7, color=color, line=dict(width=1, color="white")),
-                    customdata=customdata,
-                    hovertemplate="<b>%{customdata[1]}</b><br>"
-                    "ID: %{customdata[0]}<br>"
-                    "Chunk: %{customdata[2]}<br>"
-                    "Text: %{customdata[3]}<extra></extra>",
-                )
+        customdata = []
+        for i in indices:
+            item = data[i]
+            text_preview = item.get("text", "")[:MAX_TEXT_PREVIEW_LEN]
+            if len(item.get("text", "")) > MAX_TEXT_PREVIEW_LEN:
+                text_preview += "..."
+            text_preview = "<br>".join(textwrap.wrap(text_preview, width=60))
+            customdata.append([item.get("id", "unknown"), tradition, item.get("chunk_index", 0), text_preview])
+
+        fig.add_trace(
+            go.Scatter(
+                x=embedding_2d[indices, 0],
+                y=embedding_2d[indices, 1],
+                mode="markers",
+                name=tradition,
+                marker=dict(size=8, opacity=0.7, color=color, line=dict(width=1, color="white")),
+                customdata=customdata,
+                hovertemplate="<b>%{customdata[1]}</b><br>"
+                "ID: %{customdata[0]}<br>"
+                "Chunk: %{customdata[2]}<br>"
+                "Text: %{customdata[3]}<extra></extra>",
             )
+        )
+
+    title = "UMAP visualization by tradition"
+    if model_name:
+        title += f" - {model_name}"
 
     fig.update_layout(
         title=dict(text=title, font=dict(size=16, family="Arial, sans-serif"), x=0.5, xanchor="center"),
@@ -200,161 +161,14 @@ def _create_interactive_figure_2d(
         margin=dict(l=50, r=50, t=80, b=100),
         plot_bgcolor="rgba(240,240,240,0.5)",
         paper_bgcolor="white",
-        xaxis=_cartesian_axis(f"{x_col.split('_')[0].upper()} component 1"),
-        yaxis=_cartesian_axis(f"{y_col.split('_')[0].upper()} component 2"),
-    )
-
-    if filename and output_dir:
-        html_path = output_dir / filename
-        fig.write_html(str(html_path), include_plotlyjs="cdn", full_html=True)
-        logger.info(f"Saved: {html_path}")
-
-    return fig
-
-
-def plot_interactive_2d(
-    data: list[dict],
-    sample_size: int | None = DEFAULT_SAMPLE_SIZE,
-    save_html: bool = True,
-    output_dir: Path | None = None,
-    model_name: str | None = None,
-    method: str = "umap",
-    reducer_kwargs: dict[str, Any] | None = None,
-) -> go.Figure | None:
-    if not data:
-        logger.warning("No data for visualization.")
-        return None
-
-    if method == "umap" and not _check_umap():
-        logger.warning("UMAP not available, falling back to PCA")
-        method = "pca"
-
-    if output_dir is None:
-        output_dir = settings.analysis_dir
-    output_dir.mkdir(parents=True, exist_ok=True)
-    reducer_kwargs = reducer_kwargs or {}
-
-    sample_limit = _resolve_sample_limit(sample_size)
-    if method == "tsne":
-        max_vis_limit = _resolve_sample_limit(MAX_VIS_SAMPLES)
-        if max_vis_limit is not None and (sample_limit is None or sample_limit > max_vis_limit):
-            sample_limit = max_vis_limit
-            logger.info(f"t-SNE optimization: limiting sample size to {sample_limit}")
-
-    sample = _sample_for_visualization(data, sample_limit, f"{method.upper()} visualization")
-
-    try:
-        embeddings = np.stack([item["embedding"] for item in sample])
-    except Exception:
-        logger.exception("Failed to stack embeddings")
-        return None
-
-    embedding_2d = _reduce_dimensions_safe(embeddings, method=method, n_components=2, reducer_kwargs=reducer_kwargs)
-
-    if embedding_2d is None:
-        return None
-
-    df_plot = pd.DataFrame(
-        {
-            f"{method}_x": embedding_2d[:, 0],
-            f"{method}_y": embedding_2d[:, 1],
-            "tradition": [item.get("tradition", "unknown") for item in sample],
-            "id": [item.get("id", "unknown") for item in sample],
-            "chunk_index": [item.get("chunk_index", 0) for item in sample],
-            "text": [item.get("text", "") for item in sample],
-        }
-    )
-
-    color_map = _get_color_map(data)
-
-    params_str = ", ".join([f"{k}={v}" for k, v in reducer_kwargs.items()])
-    title_suffix = f" ({params_str})" if params_str else ""
-    title = f"{method.upper()} visualization by tradition{title_suffix}"
-
-    if model_name:
-        title += f" - {model_name}"
-
-    file_params = "_".join([f"{k}-{v}" for k, v in reducer_kwargs.items()])
-    filename = f"{method}_2d_{file_params + '_' if file_params else ''}traditions.html" if save_html else None
-
-    fig = _create_interactive_figure_2d(
-        df_plot=df_plot,
-        x_col=f"{method}_x",
-        y_col=f"{method}_y",
-        title=title,
-        color_map=color_map,
-        model_name=model_name,
-        output_dir=output_dir if save_html else None,
-        filename=filename,
-    )
-
-    return fig
-
-
-def plot_hyperparameter_tuning_dashboard(
-    data: list[dict],
-    method: str = "umap",
-    param_configs: list[dict[str, Any]] | None = None,
-    output_dir: Path | None = None,
-    model_name: str | None = None,
-    save_html: bool = True,
-) -> go.Figure | None:
-    if not data or not param_configs:
-        return None
-
-    if output_dir is None:
-        output_dir = settings.analysis_dir
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    sample_data = _sample_for_visualization(data, MAX_VIS_SAMPLES, f"{method.upper()} hyperparameter tuning")
-
-    embeddings = np.stack([item["embedding"] for item in sample_data])
-    traditions = _traditions_of(sample_data)
-    color_map = _get_color_map(data)
-
-    cols = min(3, len(param_configs))
-    rows = (len(param_configs) - 1) // cols + 1
-
-    titles = [
-        f"{method.upper()} ({', '.join(f'{k}={v}' for k, v in cfg.items()) or 'default'})" for cfg in param_configs
-    ]
-
-    fig = make_subplots(rows=rows, cols=cols, subplot_titles=titles, horizontal_spacing=0.08, vertical_spacing=0.1)
-    traditions_array = np.array(traditions)
-
-    for idx, cfg in enumerate(param_configs):
-        r = idx // cols + 1
-        c = idx % cols + 1
-
-        logger.info(f"Computing {method.upper()} with params: {cfg}")
-        coords = _reduce_dimensions_safe(embeddings, method=method, n_components=2, reducer_kwargs=cfg)
-
-        if coords is None:
-            continue
-
-        _add_tradition_scatter_traces(
-            fig, coords, traditions_array, color_map, row=r, col=c, show_legend=(idx == 0),
-        )
-
-        fig.update_xaxes(**_cartesian_axis(f"{method.upper()} component 1"), row=r, col=c)
-        fig.update_yaxes(**_cartesian_axis(f"{method.upper()} component 2"), row=r, col=c)
-
-    title = f"{method.upper()} Hyperparameter Tuning{' - ' + model_name if model_name else ''}"
-    fig.update_layout(
-        title=dict(text=title, font=dict(size=18), x=0.5, xanchor="center"),
-        height=400 * rows + 100,
-        width=400 * cols,
-        showlegend=True,
-        legend=dict(orientation="h", yanchor="top", y=-0.1, xanchor="center", x=0.5),
-        plot_bgcolor="rgba(248,249,250,0.95)",
-        paper_bgcolor="white",
-        margin=dict(l=40, r=40, t=80, b=80),
+        xaxis=_cartesian_axis("UMAP component 1"),
+        yaxis=_cartesian_axis("UMAP component 2"),
     )
 
     if save_html and output_dir:
-        output_path = output_dir / f"{method}_hyperparameters_dashboard.html"
-        fig.write_html(str(output_path))
-        logger.info(f"Tuning dashboard saved: {output_path}")
+        html_path = output_dir / "umap_2d_traditions.html"
+        fig.write_html(str(html_path), include_plotlyjs="cdn", full_html=True)
+        logger.info(f"Saved: {html_path}")
 
     return fig
 
@@ -420,104 +234,6 @@ def plot_distance_heatmap(
         output_path = output_dir / "distance_heatmap.html"
         fig.write_html(str(output_path))
         logger.info(f"Heatmap saved: {output_path}")
-
-    return fig
-
-
-def plot_comparison_dashboard(
-    data: list[dict],
-    output_dir: Path | None = None,
-    model_name: str | None = None,
-    save_html: bool = True,
-    baseline_configs: dict[str, Any] | None = None,
-) -> go.Figure | None:
-    if not data:
-        logger.warning("No data for visualization.")
-        return None
-
-    if output_dir is None:
-        output_dir = settings.analysis_dir
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    sample_data = _sample_for_visualization(data, MAX_VIS_SAMPLES, "cross-method comparison dashboard")
-
-    try:
-        embeddings = np.stack([item["embedding"] for item in sample_data])
-    except Exception:
-        logger.exception("Failed to stack embeddings")
-        return None
-
-    methods_to_use = []
-    if _check_umap():
-        methods_to_use.append("umap")
-    methods_to_use.extend(["pca", "tsne"])
-
-    if baseline_configs is None:
-        baseline_configs = settings.projection.baseline_configs
-
-    coords_dict = {}
-    for method in methods_to_use:
-        logger.info(f"Computing {method.upper()} for comparison dashboard")
-
-        kwargs = baseline_configs.get(method, {})
-
-        coords = _reduce_dimensions_safe(embeddings, method=method, n_components=2, reducer_kwargs=kwargs)
-        if coords is not None:
-            coords_dict[method] = coords
-
-    traditions = _traditions_of(sample_data)
-    color_map = _get_color_map(data)
-
-    fig = make_subplots(
-        rows=1,
-        cols=len(coords_dict),
-        subplot_titles=[f"<b>{m.upper()}</b>" for m in coords_dict],
-        horizontal_spacing=0.12,
-    )
-
-    traditions_array = np.array(traditions)
-
-    for idx, (method, coords) in enumerate(coords_dict.items(), 1):
-        _add_tradition_scatter_traces(
-            fig, coords, traditions_array, color_map,
-            row=1, col=idx, show_legend=(idx == 1),
-            marker_extra={"size": 6, "line": dict(width=0.5, color="white")},
-            x_label=f"{method.upper()} component 1",
-            y_label=f"{method.upper()} component 2",
-        )
-
-        fig.update_xaxes(**_cartesian_axis(f"{method.upper()} component 1"), row=1, col=idx)
-        fig.update_yaxes(**_cartesian_axis(f"{method.upper()} component 2"), row=1, col=idx)
-
-    title = f"Comparison of visualization methods{' - ' + model_name if model_name else ''}"
-    fig.update_layout(
-        title=dict(text=title, font=dict(size=18), x=0.5, xanchor="center"),
-        height=DASHBOARD_HEIGHT,
-        width=550 * len(coords_dict),
-        showlegend=True,
-        legend=dict(
-            orientation="h",
-            yanchor="top",
-            y=-0.2,
-            xanchor="center",
-            x=0.5,
-            bgcolor="rgba(255,255,255,0.95)",
-            bordercolor="rgba(0,0,0,0.3)",
-            borderwidth=1,
-            font=dict(size=10),
-            itemclick="toggle",
-            itemdoubleclick="toggleothers",
-        ),
-        plot_bgcolor="rgba(248,249,250,0.95)",
-        paper_bgcolor="white",
-        hovermode="closest",
-        margin=dict(l=60, r=60, t=80, b=120),
-    )
-
-    if save_html and output_dir:
-        output_path = output_dir / "methods_comparison.html"
-        fig.write_html(str(output_path))
-        logger.info(f"Comparison dashboard saved: {output_path}")
 
     return fig
 
@@ -609,11 +325,6 @@ def add_click_handler_to_html(html_path: str) -> None:
         click_handler_js = """
         <script>
         (function() {
-            function getUrlParameter(name) {
-                const urlParams = new URLSearchParams(window.location.search);
-                return urlParams.get(name);
-            }
-
             function sendPointClick(pointId) {
                 if (window.parent !== window) {
                     window.parent.postMessage({
@@ -625,17 +336,16 @@ def add_click_handler_to_html(html_path: str) -> None:
 
             function addClickHandler() {
                 setTimeout(function() {
-                    const plotDiv = document.querySelector('.plotly-graph-div') || document.getElementById('plotly-graph');
+                    var plotDiv = document.querySelector('.plotly-graph-div') || document.getElementById('plotly-graph');
                     if (plotDiv && plotDiv.on) {
                         plotDiv.on('plotly_click', function(data) {
                             if (data.points && data.points[0] && data.points[0].customdata) {
-                                let pointId = data.points[0].customdata[0];
+                                var pointId = data.points[0].customdata[0];
                                 if (pointId) {
                                     sendPointClick(pointId);
                                 }
                             }
                         });
-                        console.log('Click handler added to plot');
                     } else {
                         setTimeout(addClickHandler, 500);
                     }
@@ -659,5 +369,3 @@ def add_click_handler_to_html(html_path: str) -> None:
         logger.info(f"Added click handler to {html_path}")
     except Exception as e:
         logger.warning(f"Failed to add click handler to {html_path}: {e}")
-
-

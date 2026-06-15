@@ -147,7 +147,7 @@ mytho embeddings clear-cache --model "BAAI/bge-m3"
 Основные файлы:
 - `src/projection/loader.py` читает данные из Chroma.
 - `src/projection/analyzer.py` собирает статистику.
-- `src/projection/visualization.py` строит PCA, UMAP, t-SNE, heatmap и dashboard.
+- `src/projection/visualization.py` строит UMAP-проекцию, heatmap и distribution chart.
 - `config/projection.yaml` задает пути и параметры визуализации.
 
 Возможности:

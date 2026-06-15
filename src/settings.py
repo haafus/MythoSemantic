@@ -49,20 +49,8 @@ class GraphsSettings(BaseModel):
 
 
 class ProjectionSettings(BaseModel):
-    umap_configs: list[dict] = [
-        {"n_neighbors": 5, "min_dist": 0.1},
-        {"n_neighbors": 15, "min_dist": 0.1},
-        {"n_neighbors": 50, "min_dist": 0.1},
-        {"n_neighbors": 15, "min_dist": 0.5},
-        {"n_neighbors": 15, "min_dist": 0.8},
-    ]
-    tsne_configs: list[dict] = [{"perplexity": 5}, {"perplexity": 30}, {"perplexity": 50}]
-    pca_configs: list[dict] = [{}]
-    baseline_configs: dict = {
-        "umap": {"n_neighbors": 15, "min_dist": 0.1},
-        "tsne": {"perplexity": 30},
-        "pca": {},
-    }
+    umap_n_neighbors: int = 15
+    umap_min_dist: float = 0.1
 
 
 class ServerSettings(BaseModel):

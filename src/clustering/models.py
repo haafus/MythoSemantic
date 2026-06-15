@@ -47,7 +47,6 @@ class BaseClusteringModel:
         actual_components = max(2, min(self.n_components, len(data) - 2))
         return reduce_dimensions(
             data,
-            method="umap",
             n_components=actual_components,
             metric="cosine",
             fallback_on_error=True,

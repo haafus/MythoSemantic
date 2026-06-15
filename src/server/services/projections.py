@@ -8,17 +8,12 @@ from pathlib import Path
 from server.services.models import get_model_output_dir, key_to_model, model_to_key
 
 SAVED_HTML_METHOD_FILES = {
-    "pca": "pca_2d_traditions.html",
-    "umap": "umap_2d_n_neighbors-15_min_dist-0.1_traditions.html",
-    "tsne": "tsne_2d_perplexity-30_traditions.html",
+    "umap": "umap_2d_traditions.html",
     "distance_heatmap": "distance_heatmap.html",
     "tradition_distribution": "tradition_distribution.html",
-    "methods_comparison": "methods_comparison.html",
-    "umap_hyperparameters_dashboard": "umap_hyperparameters_dashboard.html",
-    "tsne_hyperparameters_dashboard": "tsne_hyperparameters_dashboard.html",
 }
 
-INTERACTIVE_SAVED_HTML_METHODS = {"pca", "umap", "tsne"}
+INTERACTIVE_SAVED_HTML_METHODS = {"umap"}
 
 PLOTLY_DTYPE_FORMATS = {
     "f4": "f",

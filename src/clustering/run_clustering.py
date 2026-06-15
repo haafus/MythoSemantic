@@ -132,7 +132,7 @@ def _process_single_model(
         try:
             if embeddings_2d is None:
                 embeddings_2d = reduce_dimensions(
-                    embeddings, method="umap", n_components=2, normalize=True, fallback_on_error=True
+                    embeddings, n_components=2, normalize=True, fallback_on_error=True
                 )
 
             if embeddings_2d is not None and len(embeddings_2d) > 0:
@@ -213,7 +213,7 @@ def run_all_clustering_models(
 
     all_results = {}
 
-    embeddings_2d = reduce_dimensions(embeddings, method="umap", n_components=2, normalize=True, fallback_on_error=True)
+    embeddings_2d = reduce_dimensions(embeddings, n_components=2, normalize=True, fallback_on_error=True)
 
     for cl_model in models_to_run:
         base_dir = settings.project_root / output_base_dir / safe_model_name / "clustering" / cl_model

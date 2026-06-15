@@ -68,7 +68,7 @@ def embeddings(ctx, verbose: bool):
 @click.option("--model", "-m", default=None, help="Embedding model name (all models if omitted).")
 @click.option("--no-plots", is_flag=True, help="Skip plot generation, only compute stats.")
 def projection(model: str | None, no_plots: bool):
-    """Generate dimensionality-reduction projections (PCA, t-SNE, UMAP)."""
+    """Generate UMAP projections and embedding visualizations."""
     from projection.run_analysis import analyze_embeddings
 
     analyzer = analyze_embeddings(model_name=model, generate_all_plots=not no_plots)

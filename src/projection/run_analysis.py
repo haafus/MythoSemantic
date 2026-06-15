@@ -4,13 +4,9 @@ from pathlib import Path
 from settings import settings
 
 from .analyzer import EmbeddingAnalyzer
-from .utils import _check_umap
 from .visualization import (
-    DEFAULT_SAMPLE_SIZE,
     add_click_handler_to_html,
-    plot_comparison_dashboard,
     plot_distance_heatmap,
-    plot_hyperparameter_tuning_dashboard,
     plot_interactive_2d,
     plot_tradition_distribution,
 )
@@ -67,56 +63,18 @@ def analyze_embeddings(model_name: str | None = None, generate_all_plots: bool =
 
 def _generate_all_plots(analyzer: EmbeddingAnalyzer) -> None:
     data = analyzer.filter_by_model()
-    logger.info("Generating visualizations with hyperparameter variations...")
+    cfg = settings.projection
 
-    config = settings.projection
-    umap_configs = config.umap_configs
-    tsne_configs = config.tsne_configs
-    pca_configs = config.pca_configs
-    baseline_configs = config.baseline_configs
-
-    configs_map = {"umap": umap_configs, "tsne": tsne_configs, "pca": pca_configs}
-
-    for method, configs in configs_map.items():
-        if method == "umap" and not _check_umap():
-            continue
-
-        logger.info(f"  - Generating individual {method.upper()} plots...")
-        for cfg in configs:
-            try:
-                plot_interactive_2d(
-                    data,
-                    sample_size=DEFAULT_SAMPLE_SIZE,
-                    output_dir=analyzer.output_dir,
-                    model_name=analyzer.model_name,
-                    method=method,
-                    reducer_kwargs=cfg,
-                )
-            except Exception:
-                logger.exception("Error creating %s with %s", method.upper(), cfg)
-
-    logger.info("  - Generating hyperparameter tuning dashboards...")
+    logger.info("Generating UMAP projection...")
     try:
-        if _check_umap():
-            plot_hyperparameter_tuning_dashboard(
-                data, method="umap", param_configs=umap_configs,
-                output_dir=analyzer.output_dir, model_name=analyzer.model_name,
-            )
-        plot_hyperparameter_tuning_dashboard(
-            data, method="tsne", param_configs=tsne_configs,
-            output_dir=analyzer.output_dir, model_name=analyzer.model_name,
+        plot_interactive_2d(
+            data,
+            output_dir=analyzer.output_dir,
+            model_name=analyzer.model_name,
+            reducer_kwargs={"n_neighbors": cfg.umap_n_neighbors, "min_dist": cfg.umap_min_dist},
         )
     except Exception:
-        logger.exception("Error creating hyperparameter dashboards")
-
-    logger.info("  - Generating cross-method comparison dashboard...")
-    try:
-        plot_comparison_dashboard(
-            data, output_dir=analyzer.output_dir,
-            model_name=analyzer.model_name, baseline_configs=baseline_configs,
-        )
-    except Exception:
-        logger.exception("Error creating comparison dashboard")
+        logger.exception("Error creating UMAP plot")
 
     logger.info("  - Distance heatmap...")
     try:

@@ -86,7 +86,7 @@ class TestSimilarityEndpoints:
         assert response.status_code == 404
 
     def test_projection_not_found(self):
-        response = client.get("/api/similarity/projections/fake_model/pca")
+        response = client.get("/api/similarity/projections/fake_model/umap")
         assert response.status_code == 404
 
 
