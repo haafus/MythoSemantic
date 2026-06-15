@@ -9,8 +9,40 @@ from settings import settings
 
 from .builder import EmbeddingBuilder
 from .chroma_manager import collection_name_for_model, delete_collection
+from .chroma_writer import ChromaWriter
+from .chunking import create_chunking_strategies
+from .corpus_iterator import iter_corpus_files
 
 logger = logging.getLogger(__name__)
+
+
+def _collection_is_complete(chroma_client, model_name: str, corpus_dir, chunking: str) -> bool:
+    collection_name = collection_name_for_model(model_name)
+    try:
+        collection = chroma_client.get_collection(name=collection_name)
+    except Exception:
+        return False
+
+    existing_ids = set(collection.get(include=[])["ids"])
+    if not existing_ids:
+        return False
+
+    writer = ChromaWriter(chroma_client)
+    strategies = create_chunking_strategies()
+    chunk_fn = strategies[chunking]
+
+    for file_info in iter_corpus_files(corpus_dir):
+        from pathlib import Path
+
+        content = Path(file_info["path"]).read_text(encoding="utf-8")
+        chunks = [c for c in chunk_fn(content) if c.strip()]
+        if not chunks:
+            continue
+        ids, _ = writer.build_entries(chunks, file_info, model_name, chunking)
+        if any(cid not in existing_ids for cid in ids):
+            return False
+
+    return True
 
 
 def build_embeddings(
@@ -43,9 +75,13 @@ def build_embeddings(
 
     try:
         for model in models_to_run:
+            collection_name = collection_name_for_model(model)
+
             if force:
-                collection_name = collection_name_for_model(model)
                 delete_collection(builder.chroma_client, collection_name)
+            elif _collection_is_complete(builder.chroma_client, model, settings.corpus_dir, CHUNKING):
+                logger.info(f"   Skipping {model}: collection already complete")
+                continue
 
             builder.set_model(model)
             logger.info(f"   Model: {model}")
