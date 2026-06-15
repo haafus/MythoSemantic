@@ -42,7 +42,6 @@ def build_embeddings(
 
     builder = EmbeddingBuilder(
         corpus_dir=settings.corpus_dir,
-        out_dir=settings.analysis_dir,
         embedding_model=MODEL_NAME,
         chunking=CHUNKING,
         chroma_path=settings.chroma_dir,
@@ -55,7 +54,6 @@ def build_embeddings(
     logger.info("Starting embedding generation...")
     logger.info(f"   Source: {settings.corpus_dir}")
     logger.info(f"   Chroma DB: {settings.chroma_dir}")
-    logger.info(f"   Results directory: {builder.out_dir}")
     logger.info(f"   Clear collection: {CLEAR_EXISTING}")
 
     try:
@@ -79,6 +77,5 @@ def build_embeddings(
             torch.mps.empty_cache()
 
     logger.info("All embeddings saved to Chroma.")
-    logger.info(f"Analysis results: {builder.out_dir}")
 
     return builder

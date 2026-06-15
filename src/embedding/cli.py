@@ -13,7 +13,6 @@ def _create_builder(*, model: str | None = None, chunking: str | None = None) ->
     emb = settings.embedding
     return EmbeddingBuilder(
         corpus_dir=settings.corpus_dir,
-        out_dir=settings.analysis_dir,
         chroma_path=settings.chroma_dir,
         embedding_model=model or emb.models[0],
         chunking=chunking or emb.default_chunking,

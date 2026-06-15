@@ -20,21 +20,10 @@ from .model_manager import ModelManager
 logger = logging.getLogger(__name__)
 
 
-def _get_model_output_dir(base_out_dir: Path, model_name: str) -> Path:
-    if not model_name:
-        return base_out_dir
-    from settings import Settings
-
-    model_dir = base_out_dir / Settings.safe_model_name(model_name)
-    model_dir.mkdir(parents=True, exist_ok=True)
-    return model_dir
-
-
 class EmbeddingBuilder:
     def __init__(
         self,
         corpus_dir: str | Path,
-        out_dir: str | Path,
         chroma_path: str | Path = "outputs/chroma_db",
         embedding_model: str = "BAAI/bge-m3",
         chunking: str = "paragraph",
@@ -43,7 +32,6 @@ class EmbeddingBuilder:
         queue_maxsize: int = 10,
     ):
         self.corpus_dir = Path(corpus_dir)
-        self.base_out_dir = Path(out_dir)
         self.chroma_path = ensure_chroma_writable(chroma_path)
 
         self._models = ModelManager(batch_size=batch_size)
@@ -55,7 +43,6 @@ class EmbeddingBuilder:
         self.set_chunking_strategy(chunking)
 
         self._models.set_model(embedding_model)
-        self._update_output_dir()
 
     # --- Delegated properties for backward compat --------------------------
 
@@ -75,13 +62,6 @@ class EmbeddingBuilder:
     def batch_size(self) -> int:
         return self._models.batch_size
 
-    # --- Output dir --------------------------------------------------------
-
-    def _update_output_dir(self) -> None:
-        self.out_dir = _get_model_output_dir(self.base_out_dir, self.model_name)
-        self.out_dir.mkdir(parents=True, exist_ok=True)
-        logger.info(f"Results directory: {self.out_dir}")
-
     # --- Model management (delegated) --------------------------------------
 
     def unload_model(self) -> None:
@@ -89,7 +69,6 @@ class EmbeddingBuilder:
 
     def set_model(self, model_name: str) -> None:
         self._models.set_model(model_name)
-        self._update_output_dir()
 
     # --- Chunking ----------------------------------------------------------
 
