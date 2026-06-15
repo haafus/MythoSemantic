@@ -35,15 +35,18 @@ class EmbeddingSettings(BaseModel):
     ]
 
 
-class GraphsSettings(BaseModel):
+class LLMSettings(BaseModel):
     model_name: str = "gpt-4o-mini"
     base_url: str = "https://api.openai.com/v1"
-    use_json_mode: bool = True
-    chunk_size: int = 4000
-    chunk_overlap: int = 1000
     temperature: float = 0.1
     max_retries: int = 5
     retry_backoff_factor: float = 5.0
+
+
+class GraphsSettings(BaseModel):
+    use_json_mode: bool = True
+    chunk_size: int = 4000
+    chunk_overlap: int = 1000
 
 
 class ProjectionSettings(BaseModel):
@@ -81,6 +84,7 @@ class Settings(BaseSettings):
     # sub-settings
     corpus: CorpusSettings = CorpusSettings()
     embedding: EmbeddingSettings = EmbeddingSettings()
+    llm: LLMSettings = LLMSettings()
     graphs: GraphsSettings = GraphsSettings()
     projection: ProjectionSettings = ProjectionSettings()
     server: ServerSettings = ServerSettings()

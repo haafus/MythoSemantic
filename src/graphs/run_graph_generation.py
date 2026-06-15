@@ -158,7 +158,8 @@ def deduplicate_relations(relations: list[dict]) -> list[dict]:
 
 
 def run_generate_graphs(force: bool = False) -> None:
-    cfg = settings.graphs
+    llm_cfg = settings.llm
+    graphs_cfg = settings.graphs
 
     logger.info(f"Starting graph generation process (force={force})...")
 
@@ -170,12 +171,12 @@ def run_generate_graphs(force: bool = False) -> None:
         return
 
     llm = LLMProcessor(
-        model_name=cfg.model_name,
-        base_url=cfg.base_url,
-        use_json_mode=cfg.use_json_mode,
-        temperature=cfg.temperature,
-        max_retries=cfg.max_retries,
-        retry_backoff_factor=cfg.retry_backoff_factor,
+        model_name=llm_cfg.model_name,
+        base_url=llm_cfg.base_url,
+        use_json_mode=graphs_cfg.use_json_mode,
+        temperature=llm_cfg.temperature,
+        max_retries=llm_cfg.max_retries,
+        retry_backoff_factor=llm_cfg.retry_backoff_factor,
     )
 
     metadata_path = settings.corpus_metadata_path
@@ -219,7 +220,7 @@ def run_generate_graphs(force: bool = False) -> None:
 
         logger.info(f"--- Processing: {book_id} ---")
 
-        chunks = chunk_text(text, max_chars=cfg.chunk_size, overlap=cfg.chunk_overlap)
+        chunks = chunk_text(text, max_chars=graphs_cfg.chunk_size, overlap=graphs_cfg.chunk_overlap)
         logger.info(f"Text split into {len(chunks)} chunks.")
 
         chunk_prompts = {

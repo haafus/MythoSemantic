@@ -47,7 +47,7 @@ def generate_motif_summaries(
 ) -> list[str]:
     from llm_processing import LLMProcessor
 
-    cfg = settings.graphs
+    cfg = settings.llm
     llm = LLMProcessor(
         model_name=cfg.model_name,
         base_url=cfg.base_url,
