@@ -46,7 +46,6 @@ def build_embeddings(
         embedding_model=MODEL_NAME,
         chunking=CHUNKING,
         chroma_path=settings.chroma_dir,
-        chunked_dir=settings.corpus_chunked_dir,
         batch_size=BATCH_SIZE,
         chroma_batch_size=emb.chroma_batch_size,
     )

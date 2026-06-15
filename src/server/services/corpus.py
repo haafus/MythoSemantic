@@ -11,7 +11,6 @@ from settings import settings
 logger = logging.getLogger(__name__)
 
 _catalog_cache: dict[str, tuple[float, list[dict]]] = {}
-_doc_index_cache: dict[str, tuple[float, dict[tuple[str, str, str], Path]]] = {}
 _CATALOG_TTL = 300
 
 
@@ -23,23 +22,16 @@ def to_int(value, default: int = 0) -> int:
 
 
 
-def _catalog_sources() -> dict[str, Path]:
-    return {
-        "corpus": settings.corpus_dir,
-        "chunked": settings.corpus_chunked_dir,
-    }
+def source_root() -> Path:
+    return settings.corpus_dir
 
 
-def source_root(source: str = "corpus") -> Path:
-    return _catalog_sources().get(source, settings.corpus_dir)
-
-
-def get_catalog_documents(source: str = "corpus") -> list[dict]:
-    cached = _catalog_cache.get(source)
+def get_catalog_documents() -> list[dict]:
+    cached = _catalog_cache.get("corpus")
     if cached and time.monotonic() - cached[0] < _CATALOG_TTL:
         return cached[1]
 
-    root = source_root(source)
+    root = source_root()
     metadata_path = root / "corpus.json"
 
     metadata_rows = []
@@ -52,7 +44,7 @@ def get_catalog_documents(source: str = "corpus") -> list[dict]:
 
     source_rows = metadata_rows or scan_document_rows(root)
     documents = []
-    traditions_info = get_traditions_info(source)
+    traditions_info = get_traditions_info()
 
     for row in source_rows:
         tradition_info = traditions_info.get(row.get("tradition", ""), {})
@@ -67,7 +59,6 @@ def get_catalog_documents(source: str = "corpus") -> list[dict]:
                 "char_count": to_int(row.get("char_count")),
                 "color": row.get("color") or tradition_info.get("color") or "#6b7280",
                 "description": row.get("description") or tradition_info.get("description", ""),
-                "source": source,
             }
         )
 
@@ -79,7 +70,7 @@ def get_catalog_documents(source: str = "corpus") -> list[dict]:
         )
     )
 
-    _catalog_cache[source] = (time.monotonic(), documents)
+    _catalog_cache["corpus"] = (time.monotonic(), documents)
     return documents
 
 
@@ -111,36 +102,10 @@ def scan_document_rows(root: Path) -> list[dict]:
     return rows
 
 
-def _document_index(source: str) -> dict[tuple[str, str, str], Path]:
-    """TTL-cached index of (major, tradition, title) -> file path, symlink-escape safe."""
-    cached = _doc_index_cache.get(source)
-    if cached and time.monotonic() - cached[0] < _CATALOG_TTL:
-        return cached[1]
-
-    root = source_root(source).resolve()
-    index: dict[tuple[str, str, str], Path] = {}
-    if root.exists():
-        for candidate in root.glob("*/*/*/*.txt"):
-            resolved = candidate.resolve()
-            try:
-                resolved.relative_to(root)
-            except ValueError:
-                continue
-            key = (
-                candidate.parents[2].name.replace("_", " ").casefold(),
-                candidate.parents[1].name.replace("_", " ").casefold(),
-                candidate.stem.replace("_", " ").casefold(),
-            )
-            index[key] = resolved
-
-    _doc_index_cache[source] = (time.monotonic(), index)
-    return index
-
-
 def resolve_document_path(
-    doc_id: str, major_tradition: str, tradition: str, source: str = "corpus"
+    doc_id: str, major_tradition: str, tradition: str,
 ) -> tuple[Path | None, str]:
-    corpus_root = source_root(source).resolve()
+    corpus_root = source_root().resolve()
     major_path = sanitize_filename(major_tradition)
     tradition_path = sanitize_filename(tradition)
     title_path = sanitize_filename(doc_id)
@@ -151,15 +116,11 @@ def resolve_document_path(
     except ValueError:
         return None, title_path
 
-    if source == "chunked" and not file_path.exists():
-        key = (major_tradition.casefold(), tradition.casefold(), doc_id.casefold())
-        file_path = _document_index(source).get(key, file_path)
-
     return file_path, title_path
 
 
-def read_document(doc_id: str, major_tradition: str, tradition: str, source: str = "corpus") -> tuple[str, str]:
-    file_path, title_path = resolve_document_path(doc_id, major_tradition, tradition, source)
+def read_document(doc_id: str, major_tradition: str, tradition: str) -> tuple[str, str]:
+    file_path, title_path = resolve_document_path(doc_id, major_tradition, tradition)
     if not file_path:
         raise PermissionError("Access denied")
     if not file_path.exists():
@@ -178,7 +139,6 @@ def build_corpus_archive() -> io.BytesIO:
                 doc.get("id", ""),
                 doc.get("major_tradition", ""),
                 doc.get("tradition", ""),
-                doc.get("source", "corpus"),
             )
 
             if not file_path or not file_path.exists():
@@ -195,22 +155,14 @@ def build_corpus_archive() -> io.BytesIO:
     return buf
 
 
-def get_traditions_info(source: str | None = None) -> dict:
-    paths = (
-        [source_root(source) / "traditions.json"]
-        if source
-        else [
-            settings.corpus_chunked_dir / "traditions.json",
-            settings.corpus_dir / "traditions.json",
-        ]
-    )
-    for path in paths:
-        if not path.exists():
-            continue
-        try:
-            with path.open("r", encoding="utf-8") as handle:
-                data = json.load(handle)
-            return data if isinstance(data, dict) else {}
-        except (OSError, json.JSONDecodeError) as e:
-            logger.warning("Failed to read %s: %s", path, e)
+def get_traditions_info() -> dict:
+    path = settings.corpus_dir / "traditions.json"
+    if not path.exists():
+        return {}
+    try:
+        with path.open("r", encoding="utf-8") as handle:
+            data = json.load(handle)
+        return data if isinstance(data, dict) else {}
+    except (OSError, json.JSONDecodeError) as e:
+        logger.warning("Failed to read %s: %s", path, e)
     return {}

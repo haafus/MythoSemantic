@@ -60,7 +60,6 @@ def test_ensure_dirs(tmp_path, monkeypatch):
     monkeypatch.setenv("MYTHO_ANALYSIS_DIR", str(tmp_path / "analysis"))
     monkeypatch.setenv("MYTHO_LOGS_DIR", str(tmp_path / "logs"))
     monkeypatch.setenv("MYTHO_GRAPHS_DIR", str(tmp_path / "graphs"))
-    monkeypatch.setenv("MYTHO_CORPUS_CHUNKED_DIR", str(tmp_path / "chunked"))
 
     from settings import Settings
 
@@ -71,4 +70,3 @@ def test_ensure_dirs(tmp_path, monkeypatch):
     assert (tmp_path / "analysis").is_dir()
     assert (tmp_path / "logs").is_dir()
     assert (tmp_path / "graphs").is_dir()
-    assert (tmp_path / "chunked").is_dir()

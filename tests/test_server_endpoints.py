@@ -45,12 +45,8 @@ class TestCorpusCatalog:
         assert isinstance(data["documents"], list)
         assert data["total"] == len(data["documents"])
 
-    def test_catalog_source_validation(self):
-        response = client.get("/api/corpus/catalog?source=invalid")
-        assert response.status_code == 422
-
-    def test_catalog_chunked_source(self):
-        response = client.get("/api/corpus/catalog?source=chunked")
+    def test_catalog_ignores_unknown_params(self):
+        response = client.get("/api/corpus/catalog?source=anything")
         assert response.status_code == 200
 
 

@@ -1,5 +1,4 @@
 import logging
-import shutil
 import time
 from pathlib import Path
 from typing import Any
@@ -37,7 +36,6 @@ class EmbeddingBuilder:
         corpus_dir: str | Path,
         out_dir: str | Path,
         chroma_path: str | Path = "outputs/chroma_db",
-        chunked_dir: str | Path = "outputs/corpus_chunked",
         embedding_model: str = "BAAI/bge-m3",
         chunking: str = "paragraph",
         batch_size: int | None = None,
@@ -47,8 +45,6 @@ class EmbeddingBuilder:
         self.corpus_dir = Path(corpus_dir)
         self.base_out_dir = Path(out_dir)
         self.chroma_path = ensure_chroma_writable(chroma_path)
-        self.chunked_dir = Path(chunked_dir)
-        self.chunked_dir.mkdir(parents=True, exist_ok=True)
 
         self._models = ModelManager(batch_size=batch_size)
 
@@ -165,16 +161,6 @@ class EmbeddingBuilder:
             logger.warning("No files found in corpus/. Check the folder structure.")
             return
 
-        traditions_file = self.corpus_dir / "traditions.json"
-        if traditions_file.exists():
-            try:
-                dest_file = self.chunked_dir / "traditions.json"
-                self.chunked_dir.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(traditions_file, dest_file)
-                logger.info(f"File {traditions_file.name} copied successfully to {self.chunked_dir}")
-            except Exception as e:
-                logger.warning(f"Failed to copy {traditions_file.name}: {e}")
-
         collection = self.chroma_client.get_or_create_collection(name=collection_name)
         write_queue, writer_thread = self._chroma.start_background_writer(collection)
 
@@ -202,16 +188,6 @@ class EmbeddingBuilder:
                         write_queue.put((ids[i:end], embeddings[i:end].tolist(), metadatas[i:end], chunks[i:end]))
 
                     added_total += len(chunks)
-
-                    rel_path = Path(file_info["path"]).relative_to(self.corpus_dir)
-                    out_file_path = self.chunked_dir / rel_path
-                    out_file_path.parent.mkdir(parents=True, exist_ok=True)
-
-                    with open(out_file_path, "w", encoding="utf-8") as out_f:
-                        for i, chunk in enumerate(chunks, 1):
-                            out_f.write(f"=== [ CHUNK {i} | Size: {len(chunk)} chars ] ===\n")
-                            out_f.write(chunk)
-                            out_f.write("\n\n")
 
                 except Exception:
                     logger.exception("Error processing %s", file_info.get('filename', 'unknown'))

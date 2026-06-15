@@ -83,7 +83,6 @@ class Settings(BaseSettings):
     project_root: Path = Field(default_factory=lambda: Path(__file__).resolve().parent.parent)
 
     corpus_dir: Path = Path("outputs/corpus")
-    corpus_chunked_dir: Path = Path("outputs/corpus_chunked")
     chroma_dir: Path = Path("outputs/chroma_db")
     analysis_dir: Path = Path("outputs/analysis")
     logs_dir: Path = Path("outputs/logs")
@@ -133,7 +132,6 @@ class Settings(BaseSettings):
     def ensure_dirs(self) -> None:
         for d in (
             self.corpus_dir,
-            self.corpus_chunked_dir,
             self.analysis_dir,
             self.logs_dir,
             self.graphs_dir,

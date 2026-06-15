@@ -8,8 +8,8 @@ router = APIRouter(prefix="/api/corpus", tags=["corpus"])
 
 
 @router.get("/catalog", response_model=CatalogResponse)
-def catalog(source: str = Query("corpus", pattern="^(corpus|chunked)$")):
-    documents = get_catalog_documents(source)
+def catalog():
+    documents = get_catalog_documents()
     return {"documents": documents, "total": len(documents)}
 
 
@@ -18,10 +18,9 @@ def document(
     doc_id: str = Query(..., alias="id"),
     major_tradition: str = Query(...),
     tradition: str = Query(...),
-    source: str = Query("corpus", pattern="^(corpus|chunked)$"),
 ):
     try:
-        text, _ = read_document(doc_id, major_tradition, tradition, source)
+        text, _ = read_document(doc_id, major_tradition, tradition)
         return text
     except PermissionError as exc:
         raise HTTPException(status_code=403, detail="Access denied") from exc

@@ -4,7 +4,6 @@ export const state = {
     models: [],
     selectedModel: localStorage.getItem("selectedModel") || localStorage.getItem("mythoscope.model") || "",
     corpusDocuments: [],
-    corpusDocumentsBySource: {},
     selectedCorpusDoc: null,
     corpusOpenTraditions: new Set(),
     corpusOpenTraditionsInitialized: false,
@@ -207,15 +206,12 @@ export function renderModelOptions(selectedKey = state.selectedModel) {
     `).join("");
 }
 
-export async function ensureCorpusDocuments(source = "corpus") {
-    if (!state.corpusDocumentsBySource[source]) {
-        const data = await api(`/api/corpus/catalog?source=${encodeURIComponent(source)}`);
-        state.corpusDocumentsBySource[source] = Array.isArray(data.documents) ? data.documents : [];
-        if (source === "corpus") {
-            state.corpusDocuments = state.corpusDocumentsBySource[source];
-        }
+export async function ensureCorpusDocuments() {
+    if (!state.corpusDocuments.length) {
+        const data = await api("/api/corpus/catalog");
+        state.corpusDocuments = Array.isArray(data.documents) ? data.documents : [];
     }
-    return state.corpusDocumentsBySource[source];
+    return state.corpusDocuments;
 }
 
 export function buildCorpusApiUrl(doc) {

@@ -1,7 +1,6 @@
 import concurrent.futures
 import json
 import logging
-import shutil
 import threading
 from datetime import datetime, timezone
 from pathlib import Path

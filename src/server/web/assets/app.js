@@ -1009,7 +1009,7 @@ async function initializeAnalysisLibrary() {
     if (!container) return;
 
     try {
-        const documents = await ensureCorpusDocuments("chunked");
+        const documents = await ensureCorpusDocuments();
         container.innerHTML = "";
         renderAnalysisTreeFromDocuments(documents, container);
     } catch (error) {
