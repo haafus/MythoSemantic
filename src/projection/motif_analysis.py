@@ -48,7 +48,7 @@ def generate_motif_summaries(
     from openai import OpenAI
 
     cfg = settings.graphs
-    client = OpenAI(base_url=cfg.base_url, api_key=cfg.api_key or "dummy", timeout=120.0)
+    client = OpenAI(base_url=cfg.base_url, timeout=120.0)
 
     cache_file = _cache_path(output_dir)
     cache = _load_cache(cache_file)

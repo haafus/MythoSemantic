@@ -12,7 +12,6 @@ class LLMProcessor:
 
     def __init__(
         self,
-        api_key: str,
         model_name: str,
         base_url: str,
         use_json_mode: bool = True,
@@ -28,7 +27,7 @@ class LLMProcessor:
         self.retry_backoff_factor = retry_backoff_factor
         self.request_timeout = request_timeout
 
-        self.client = OpenAI(base_url=base_url, api_key=api_key, timeout=request_timeout)
+        self.client = OpenAI(base_url=base_url, timeout=request_timeout)
 
     def _ask_llm(self, system_prompt: str, user_content: str) -> list[dict]:
         retries = 0

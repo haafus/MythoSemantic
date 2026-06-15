@@ -170,7 +170,6 @@ def run_generate_graphs(force: bool = False) -> None:
         return
 
     llm = LLMProcessor(
-        api_key=cfg.api_key,
         model_name=cfg.model_name,
         base_url=cfg.base_url,
         use_json_mode=cfg.use_json_mode,
