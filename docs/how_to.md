@@ -113,7 +113,7 @@ mytho embeddings generate
 Сгенерировать для конкретной модели:
 
 ```bash
-mytho embeddings generate --model "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+mytho embeddings generate --model "BAAI/bge-m3"
 ```
 
 Выбрать chunking и тип текста:

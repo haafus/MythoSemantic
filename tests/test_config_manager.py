@@ -14,7 +14,7 @@ class TestEmbeddingSettings:
 
     def test_models_defaults(self):
         emb = EmbeddingSettings()
-        assert len(emb.models) == 5
+        assert len(emb.models) == 4
         assert "BAAI/bge-m3" in emb.models
 
     def test_settings_embedding_is_embedding_settings(self):

@@ -37,7 +37,7 @@ class TestCollectionNameForModel:
         assert "_" in name
 
     def test_safe_characters(self):
-        name = collection_name_for_model("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+        name = collection_name_for_model("sentence-transformers/LaBSE")
         assert "/" not in name
 
     def test_max_length(self):
