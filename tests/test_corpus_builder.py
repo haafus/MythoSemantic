@@ -136,7 +136,6 @@ class TestUpdateTraditionsInfo:
         existing = {
             "Greek": {
                 "description": "Ancient Greek mythology",
-                "region": "Mediterranean",
                 "coordinates": [37.9, 23.7],
                 "color": "#123456",
                 "books": ["Iliad"],
@@ -148,7 +147,6 @@ class TestUpdateTraditionsInfo:
 
         data = json.loads((corpus_dir / "traditions_info.json").read_text())
         assert data["Greek"]["description"] == "Ancient Greek mythology"
-        assert data["Greek"]["region"] == "Mediterranean"
         assert sorted(data["Greek"]["books"]) == ["Iliad", "Odyssey"]
 
     def test_force_creates_backup(self, tmp_path, monkeypatch):

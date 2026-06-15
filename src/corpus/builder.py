@@ -196,7 +196,6 @@ def _update_traditions_info(force: bool) -> None:
         if trad not in existing_info:
             existing_info[trad] = {
                 "description": "",
-                "region": "",
                 "coordinates": [],
                 "color": color,
                 "books": books_list,

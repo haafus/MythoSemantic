@@ -1,8 +1,10 @@
 {
   "Ancient Egyptian": {
     "description": "An ancient polytheistic religion and mythology of Northeast Africa, centered around deities such as Ra, Osiris, and Isis, with a strong focus on the afterlife.",
-    "region": "Egypt, North Africa",
-    "coordinates": [26.8206, 30.8025],
+    "coordinates": [
+      26.8206,
+      30.8025
+    ],
     "color": "#7A962A",
     "books": [
       "The Book of the Dead"
@@ -10,8 +12,10 @@
   },
   "Anglo-Saxon": {
     "description": "The Germanic paganism and subsequent heroic folklore practiced by the early medieval inhabitants of England before their conversion to Christianity.",
-    "region": "England, United Kingdom",
-    "coordinates": [52.3555, -1.1743],
+    "coordinates": [
+      52.3555,
+      -1.1743
+    ],
     "color": "#7F25C4",
     "books": [
       "Beowulf"
@@ -19,8 +23,10 @@
   },
   "Australian": {
     "description": "The diverse folklore, myths, and legends recorded on the Australian continent, frequently intersecting with the oral traditions of its Indigenous peoples.",
-    "region": "Australia",
-    "coordinates": [-25.2744, 133.7751],
+    "coordinates": [
+      -25.2744,
+      133.7751
+    ],
     "color": "#66B4F0",
     "books": [
       "Myths of the Australian Aborigines"
@@ -28,8 +34,10 @@
   },
   "Australian Aboriginal": {
     "description": "The deeply rooted spiritual belief system of Indigenous Australians, characterized by animism and a mythological era known as the Dreamtime.",
-    "region": "Australia",
-    "coordinates": [-25.2744, 133.7751],
+    "coordinates": [
+      -25.2744,
+      133.7751
+    ],
     "color": "#41C3DA",
     "books": [
       "Australian Legendary Tales"
@@ -37,8 +45,10 @@
   },
   "Babylonian": {
     "description": "The mythology and religious practices of ancient Mesopotamia, featuring a pantheon headed by Marduk and epic creation narratives.",
-    "region": "Mesopotamia (Modern-day Iraq)",
-    "coordinates": [32.5364, 44.4208],
+    "coordinates": [
+      32.5364,
+      44.4208
+    ],
     "color": "#E61E71",
     "books": [
       "The Babylonian Legends of the Creation",
@@ -47,8 +57,10 @@
   },
   "Buddhism": {
     "description": "A major world religion and philosophy originating in ancient India, based on the teachings of Siddhartha Gautama (the Buddha), emphasizing the path to enlightenment.",
-    "region": "South Asia / East Asia",
-    "coordinates": [24.6951, 84.9913],
+    "coordinates": [
+      24.6951,
+      84.9913
+    ],
     "color": "#BDC596",
     "books": [
       "The Dhammapada"
@@ -56,8 +68,10 @@
   },
   "Celtic": {
     "description": "The polytheistic religion and animistic mythology of the ancient Celtic peoples, primarily preserved in the traditions of Ireland, Scotland, and Wales.",
-    "region": "Western Europe / British Isles",
-    "coordinates": [53.1424, -7.6921],
+    "coordinates": [
+      53.1424,
+      -7.6921
+    ],
     "color": "#1E8540",
     "books": [
       "The Mabinogion"
@@ -65,8 +79,10 @@
   },
   "Chinese": {
     "description": "A complex collection of cultural history, folktales, and ancient religious beliefs from China, integrating natural forces, ancestor worship, and mythological figures.",
-    "region": "China, East Asia",
-    "coordinates": [35.8617, 104.1954],
+    "coordinates": [
+      35.8617,
+      104.1954
+    ],
     "color": "#ED19E8",
     "books": [
       "Myths and Legends of China"
@@ -74,8 +90,10 @@
   },
   "Christianity": {
     "description": "An Abrahamic monotheistic religion based on the life, teachings, and resurrection of Jesus of Nazareth.",
-    "region": "Middle East (Origin) / Worldwide",
-    "coordinates": [31.7683, 35.2137],
+    "coordinates": [
+      31.7683,
+      35.2137
+    ],
     "color": "#D9DAD6",
     "books": [
       "The King James Version of the Bible"
@@ -83,8 +101,10 @@
   },
   "Confucianism": {
     "description": "An ancient Chinese philosophical and ethical system formulated by Confucius, focusing on morality, family hierarchy, and social harmony.",
-    "region": "China, East Asia",
-    "coordinates": [35.5959, 116.9853],
+    "coordinates": [
+      35.5959,
+      116.9853
+    ],
     "color": "#14203E",
     "books": [
       "The Analects of Confucius"
@@ -92,8 +112,10 @@
   },
   "Finnish": {
     "description": "The traditional pagan religion and mythological folklore of Finland, characterized by shamanism, nature spirits, and epic poetry.",
-    "region": "Finland, Northern Europe",
-    "coordinates": [61.9241, 25.7482],
+    "coordinates": [
+      61.9241,
+      25.7482
+    ],
     "color": "#7B3812",
     "books": [
       "Kalevala The Epic Poem of Finland"
@@ -101,8 +123,10 @@
   },
   "Germanic": {
     "description": "The historical religion and mythology of the Germanic peoples, encompassing heroic sagas and a pantheon of gods that influenced Northern and Central Europe.",
-    "region": "Central and Northern Europe",
-    "coordinates": [51.1657, 10.4515],
+    "coordinates": [
+      51.1657,
+      10.4515
+    ],
     "color": "#0CC6A9",
     "books": [
       "The Nibelungenlied"
@@ -110,8 +134,10 @@
   },
   "Greek": {
     "description": "The body of myths and religious teachings belonging to the ancient Greeks, concerning their polytheistic pantheon of gods, heroes, and the origins of the world.",
-    "region": "Greece, Mediterranean",
-    "coordinates": [39.0742, 21.8243],
+    "coordinates": [
+      39.0742,
+      21.8243
+    ],
     "color": "#0A0C13",
     "books": [
       "The Iliad",
@@ -120,8 +146,10 @@
   },
   "Hinduism": {
     "description": "One of the world's oldest religions, originating in the Indian subcontinent, characterized by a diverse range of philosophies, a vast pantheon of deities, and concepts like karma and dharma.",
-    "region": "India, South Asia",
-    "coordinates": [20.5937, 78.9629],
+    "coordinates": [
+      20.5937,
+      78.9629
+    ],
     "color": "#923D54",
     "books": [
       "The Bhagavad Gita",
@@ -132,8 +160,10 @@
   },
   "Islam": {
     "description": "An Abrahamic monotheistic religion articulating that there is only one God (Allah), and that Muhammad is His messenger, centered around the Quran.",
-    "region": "Arabian Peninsula (Origin) / Worldwide",
-    "coordinates": [21.4225, 39.8262],
+    "coordinates": [
+      21.4225,
+      39.8262
+    ],
     "color": "#93B222",
     "books": [
       "The Koran"
@@ -141,8 +171,10 @@
   },
   "Japanese Buddhism": {
     "description": "The adaptation and practice of Buddhism in Japan, characterized by unique sects like Zen and Pure Land, and its historical syncretism with native Shinto beliefs.",
-    "region": "Japan, East Asia",
-    "coordinates": [36.2048, 138.2529],
+    "coordinates": [
+      36.2048,
+      138.2529
+    ],
     "color": "#65115F",
     "books": [
       "Buddhist Psalms"
@@ -150,8 +182,10 @@
   },
   "Maori": {
     "description": "The rich mythological and cultural traditions of the indigenous Polynesian people of New Zealand, featuring tales of creation, demigods like Maui, and ancestral spirits.",
-    "region": "New Zealand, Oceania",
-    "coordinates": [-40.9006, 174.8860],
+    "coordinates": [
+      -40.9006,
+      174.886
+    ],
     "color": "#BAA831",
     "books": [
       "Te Tohunga"
@@ -159,8 +193,10 @@
   },
   "Maya": {
     "description": "The Mesoamerican mythology of the Maya civilization, heavily intertwined with precise astronomy, natural cycles, and a complex pantheon of deities.",
-    "region": "Mesoamerica (Mexico, Guatemala)",
-    "coordinates": [16.7369, -89.6268],
+    "coordinates": [
+      16.7369,
+      -89.6268
+    ],
     "color": "#70B53D",
     "books": [
       "The Popol Vuh"
@@ -168,8 +204,10 @@
   },
   "Norse": {
     "description": "The mythology of the North Germanic peoples, derived from Norse paganism, featuring gods such as Odin and Thor, and the cosmological framework of Yggdrasil.",
-    "region": "Scandinavia, Northern Europe",
-    "coordinates": [60.4720, 8.4689],
+    "coordinates": [
+      60.472,
+      8.4689
+    ],
     "color": "#288A68",
     "books": [
       "The Poetic Edda"
@@ -177,8 +215,10 @@
   },
   "Polynesian": {
     "description": "The oral traditions, folklore, and mythological narratives shared by the peoples of the Polynesian triangle in the Pacific Ocean.",
-    "region": "Polynesia, Oceania",
-    "coordinates": [-16.8396, -149.6766],
+    "coordinates": [
+      -16.8396,
+      -149.6766
+    ],
     "color": "#4183F5",
     "books": [
       "Legends of Ma-ui a Demi God of Polynesia"
@@ -186,8 +226,10 @@
   },
   "Roman": {
     "description": "The mythology and religious system of ancient Rome, heavily influenced by Greek tradition but uniquely focused on statehood, historical foundations, and civic duty.",
-    "region": "Rome, Italy / Mediterranean",
-    "coordinates": [41.9028, 12.4964],
+    "coordinates": [
+      41.9028,
+      12.4964
+    ],
     "color": "#6ED551",
     "books": [
       "The Aeneid"
@@ -195,8 +237,10 @@
   },
   "Taoism": {
     "description": "An ancient Chinese philosophical and spiritual tradition emphasizing living in harmony with the Tao (the Way), focusing on balance, naturalness, and non-action (wu wei).",
-    "region": "China, East Asia",
-    "coordinates": [34.3227, 108.5505],
+    "coordinates": [
+      34.3227,
+      108.5505
+    ],
     "color": "#A51357",
     "books": [
       "The Tao Teh King"
@@ -204,8 +248,10 @@
   },
   "West African": {
     "description": "The diverse and rich collection of traditional religions, folklore, and mythologies belonging to the various ethnic groups of West Africa, often featuring trickster spirits and complex pantheons.",
-    "region": "West Africa",
-    "coordinates": [9.0820, 8.6753],
+    "coordinates": [
+      9.082,
+      8.6753
+    ],
     "color": "#26F08C",
     "books": [
       "West African Folk-Tales"
