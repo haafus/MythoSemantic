@@ -44,7 +44,7 @@ corpus = [
     "PyMuPDF>=1.23.0",
 ]
 graphs = [
-    "openai>=1.0.0,<2.0.0",
+    "openai>=1.0.0",
     "networkx>=3.0",
     "pandas>=2.0.0",
 ]

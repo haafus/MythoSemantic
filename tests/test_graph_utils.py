@@ -15,9 +15,9 @@ _graph_gen_stub = types.ModuleType("graphs.graph_generator")
 _graph_gen_stub.generate_and_save_graph = lambda *a, **kw: None  # type: ignore[attr-defined]
 sys.modules["graphs.graph_generator"] = _graph_gen_stub
 
-_llm_stub = types.ModuleType("graphs.llm_processing")
+_llm_stub = types.ModuleType("llm_processing")
 _llm_stub.LLMProcessor = type("LLMProcessor", (), {})  # type: ignore[attr-defined]
-sys.modules["graphs.llm_processing"] = _llm_stub
+sys.modules["llm_processing"] = _llm_stub
 
 _spec = importlib.util.spec_from_file_location(
     "graphs.run_graph_generation",
