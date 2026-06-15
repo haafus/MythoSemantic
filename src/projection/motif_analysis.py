@@ -45,10 +45,16 @@ def generate_motif_summaries(
     data: list[dict],
     output_dir: Path,
 ) -> list[str]:
-    from openai import OpenAI
+    from graphs.llm_processing import LLMProcessor
 
     cfg = settings.graphs
-    client = OpenAI(base_url=cfg.base_url, timeout=120.0)
+    llm = LLMProcessor(
+        model_name=cfg.model_name,
+        base_url=cfg.base_url,
+        temperature=cfg.temperature,
+        max_retries=cfg.max_retries,
+        retry_backoff_factor=cfg.retry_backoff_factor,
+    )
 
     cache_file = _cache_path(output_dir)
     cache = _load_cache(cache_file)
@@ -63,19 +69,7 @@ def generate_motif_summaries(
             summaries.append(cache[key])
             continue
 
-        try:
-            resp = client.chat.completions.create(
-                model=cfg.model_name,
-                messages=[
-                    {"role": "system", "content": SUMMARY_PROMPT},
-                    {"role": "user", "content": text[:4000]},
-                ],
-                temperature=cfg.temperature,
-            )
-            summary = resp.choices[0].message.content.strip()
-        except Exception:
-            logger.exception("LLM call failed, using empty summary")
-            summary = ""
+        summary = llm.ask_text(SUMMARY_PROMPT, text[:4000])
 
         cache[key] = summary
         summaries.append(summary)

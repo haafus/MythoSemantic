@@ -102,6 +102,45 @@ class LLMProcessor:
         logger.error(f"Maximum retry count exceeded ({self.max_retries}) because of API limits or failures. Skipping chunk.")
         return []
 
+    def ask_text(self, system_prompt: str, user_content: str) -> str:
+        retries = 0
+        backoff_factor = self.retry_backoff_factor
+
+        while retries < self.max_retries:
+            try:
+                response = self.client.chat.completions.create(
+                    model=self.model_name,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_content},
+                    ],
+                    temperature=self.temperature,
+                )
+                return response.choices[0].message.content.strip()
+
+            except RateLimitError:
+                logger.warning(
+                    f"API limit reached (429). Waiting {backoff_factor:.0f}s before attempt {retries + 1}/{self.max_retries}..."
+                )
+                time.sleep(backoff_factor)
+                retries += 1
+                backoff_factor = min(backoff_factor * 2, self.MAX_BACKOFF_SECONDS)
+
+            except APIError as e:
+                logger.warning(
+                    f"Temporary API failure. Waiting {backoff_factor:.0f}s before attempt {retries + 1}/{self.max_retries}. Details: {e}"
+                )
+                time.sleep(backoff_factor)
+                retries += 1
+                backoff_factor = min(backoff_factor * 2, self.MAX_BACKOFF_SECONDS)
+
+            except Exception:
+                logger.exception("Critical LLM or network error")
+                return ""
+
+        logger.error(f"Maximum retry count exceeded ({self.max_retries}). Skipping chunk.")
+        return ""
+
     def extract_characters(self, text: str, prompt: str) -> list[dict]:
         return self._ask_llm(prompt, text)
 
