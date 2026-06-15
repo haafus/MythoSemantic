@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from pydantic import BaseModel, Field
@@ -36,7 +37,7 @@ class EmbeddingSettings(BaseModel):
 
 
 class GraphsSettings(BaseModel):
-    api_key: str = ""
+    api_key: str = Field(default_factory=lambda: os.environ.get("OPENAI_API_KEY", ""))
     model_name: str = "gpt-4o-mini"
     base_url: str = "https://api.openai.com/v1"
     use_json_mode: bool = True
