@@ -27,7 +27,11 @@ def generate_clickable_plots(output_dir: Path, model_name: str) -> None:
         add_click_handler_to_html(str(filepath))
 
 
-def analyze_embeddings(model_name: str | None = None, generate_all_plots: bool = True) -> EmbeddingAnalyzer | None:
+def analyze_embeddings(
+    model_name: str | None = None,
+    generate_all_plots: bool = True,
+    motif_analysis: bool = False,
+) -> EmbeddingAnalyzer | None:
     try:
         base_analyzer = EmbeddingAnalyzer()
         available_models = base_analyzer.available_models
@@ -55,6 +59,9 @@ def analyze_embeddings(model_name: str | None = None, generate_all_plots: bool =
 
             if generate_all_plots and analyzer.data:
                 _generate_all_plots(analyzer)
+
+            if motif_analysis and analyzer.data:
+                _generate_motif_plot(analyzer)
 
         return analyzer
 
@@ -120,3 +127,22 @@ def _generate_all_plots(analyzer: EmbeddingAnalyzer) -> None:
         logger.exception("Error adding click handlers")
 
     logger.info(f"\nAll visualizations for {analyzer.model_name} saved to: {analyzer.output_dir}")
+
+
+def _generate_motif_plot(analyzer: EmbeddingAnalyzer) -> None:
+    from .motif_analysis import run_motif_analysis
+
+    data = analyzer.filter_by_model()
+    cfg = settings.projection
+
+    logger.info("Generating Motif UMAP projection (LLM summaries)...")
+    try:
+        run_motif_analysis(
+            data,
+            output_dir=analyzer.output_dir,
+            embedding_model=analyzer.model_name,
+            model_name=analyzer.model_name,
+            reducer_kwargs={"n_neighbors": cfg.umap_n_neighbors, "min_dist": cfg.umap_min_dist},
+        )
+    except Exception:
+        logger.exception("Error creating Motif UMAP plot")

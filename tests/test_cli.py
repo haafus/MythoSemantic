@@ -30,6 +30,7 @@ class TestProjectionCommand:
         assert result.exit_code == 0
         assert "--model" in result.output
         assert "--no-plots" in result.output
+        assert "--motif-analysis" in result.output
 
 
 class TestGraphsCommand:
