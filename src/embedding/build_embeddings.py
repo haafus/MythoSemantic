@@ -2,43 +2,29 @@ from __future__ import annotations
 
 import gc
 import logging
-import shutil
 
 import torch
 
 from settings import settings
 
 from .builder import EmbeddingBuilder
-from .chroma_manager import collection_name_for_model
+from .chroma_manager import collection_name_for_model, delete_collection
 
 logger = logging.getLogger(__name__)
 
 
 def build_embeddings(
-    clear_existing: bool | None = None,
     batch_size: int | None = None,
     model_name: str | None = None,
     models: list | None = None,
     chunking: str | None = None,
+    force: bool = False,
 ):
-    if clear_existing is False:
-        raise ValueError("Incremental Chroma writes are not supported for full embedding generation.")
-
     emb = settings.embedding
 
     MODEL_NAME = model_name or emb.models[0]
     CHUNKING = chunking or emb.default_chunking
     BATCH_SIZE = batch_size if batch_size is not None else emb.batch_size
-    CLEAR_EXISTING = clear_existing if clear_existing is not None else True
-
-    if CLEAR_EXISTING:
-        chroma_dir = settings.chroma_dir
-        if chroma_dir.exists():
-            logger.info(f"Fully clearing ChromaDB directory: {chroma_dir.resolve()}")
-            try:
-                shutil.rmtree(chroma_dir, ignore_errors=True)
-            except Exception as e:
-                logger.warning(f"Failed to fully remove database directory: {e}")
 
     builder = EmbeddingBuilder(
         corpus_dir=settings.corpus_dir,
@@ -54,14 +40,25 @@ def build_embeddings(
     logger.info("Starting embedding generation...")
     logger.info(f"   Source: {settings.corpus_dir}")
     logger.info(f"   Chroma DB: {settings.chroma_dir}")
-    logger.info(f"   Clear collection: {CLEAR_EXISTING}")
 
     try:
         for model in models_to_run:
+            collection_name = collection_name_for_model(model)
+
+            if not force:
+                try:
+                    collection = builder.chroma_client.get_collection(name=collection_name)
+                    count = collection.count()
+                    if count > 0:
+                        logger.info(f"   Skipping {model}: collection '{collection_name}' already has {count} entries (use --force to regenerate)")
+                        continue
+                except Exception:
+                    pass
+
+            delete_collection(builder.chroma_client, collection_name)
             builder.set_model(model)
             logger.info(f"   Model: {model}")
             logger.info(f"   Model batch size: {builder.batch_size}")
-            logger.info(f"Collection: {collection_name_for_model(model)}")
             builder.save_all_corpus_to_chroma()
 
     except Exception as e:

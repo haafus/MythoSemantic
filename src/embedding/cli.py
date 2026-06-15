@@ -24,14 +24,16 @@ def _create_builder(*, model: str | None = None, chunking: str | None = None) ->
 @click.option("--model", "-m", default=None, help="Embedding model to use")
 @click.option("--chunking", "-ch", default=None, help="Chunking strategy")
 @click.option("--batch-size", "-b", default=None, type=int, help="Batch size for encoding")
+@click.option("--force", is_flag=True, help="Regenerate even if collection exists.")
 @click.pass_context
-def generate(ctx, model: str | None, chunking: str | None, batch_size: int | None):
+def generate(ctx, model: str | None, chunking: str | None, batch_size: int | None, force: bool):
     t0 = time.monotonic()
     try:
         build_embeddings(
             model_name=model,
             chunking=chunking,
             batch_size=batch_size,
+            force=force,
         )
         elapsed = time.monotonic() - t0
         click.echo(click.style(f"Embeddings generated successfully in {elapsed:.1f}s", fg="green"))
