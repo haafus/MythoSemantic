@@ -67,7 +67,7 @@ class ModelManager:
 
         self.model = self._load_model(model_name)
         self.model_name = model_name
-        self.model_dim = self.model.get_sentence_embedding_dimension()
+        self.model_dim = self.model.get_embedding_dimension()
         if not self._override_batch_size:
             self.batch_size = get_optimal_batch_size(self.model_dim)
             logger.info(f"Batch size automatically set to {self.batch_size} for model {model_name}")
