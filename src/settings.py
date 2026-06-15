@@ -112,10 +112,6 @@ class Settings(BaseSettings):
         return self.corpus_dir / "corpus.json"
 
     @property
-    def template_dir(self) -> Path:
-        return self.project_root / "config" / "template"
-
-    @property
     def server_dir(self) -> Path:
         return self.project_root / "src" / "server"
 

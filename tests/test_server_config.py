@@ -36,5 +36,3 @@ class TestServerPaths:
     def test_assets_under_web_root(self):
         assert settings.assets_dir == settings.web_root / "assets"
 
-    def test_template_dir_under_project_root(self):
-        assert settings.template_dir == settings.project_root / "config" / "template"

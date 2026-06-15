@@ -27,8 +27,6 @@ def create_app() -> FastAPI:
         app.mount("/assets", StaticFiles(directory=str(settings.assets_dir)), name="assets")
     if settings.analysis_dir.exists():
         app.mount("/analysis", StaticFiles(directory=str(settings.analysis_dir)), name="analysis")
-    if settings.template_dir.exists():
-        app.mount("/template", StaticFiles(directory=str(settings.template_dir)), name="template")
     if settings.corpus_dir.exists():
         app.mount("/corpus", StaticFiles(directory=str(settings.corpus_dir)), name="corpus")
     if settings.corpus_chunked_dir.exists():
@@ -41,7 +39,7 @@ def create_app() -> FastAPI:
 
         if path.startswith("/api/") or path.startswith("/assets/"):
             response.headers["Cache-Control"] = "no-store"
-        elif path.startswith(("/analysis/", "/template/", "/corpus/", "/corpus_chunked/")):
+        elif path.startswith(("/analysis/", "/corpus/", "/corpus_chunked/")):
             response.headers["Cache-Control"] = f"public, max-age={srv.cache_max_age}"
         else:
             response.headers["Cache-Control"] = "no-cache"

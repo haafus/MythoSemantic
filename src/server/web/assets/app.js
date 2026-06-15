@@ -58,7 +58,7 @@ function renderHome() {
     app.innerHTML = `
         <main class="home-page">
             <div class="header-container">
-                <img src="/template/Logo.jpg" alt="MythoScope Logo" class="logo-image">
+                <img src="/assets/Logo.jpg" alt="MythoScope Logo" class="logo-image">
 
                 <nav class="nav-menu">
                     <button class="nav-item active" type="button" data-tab="vision">Vision</button>
