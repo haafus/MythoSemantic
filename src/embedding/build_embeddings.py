@@ -43,19 +43,9 @@ def build_embeddings(
 
     try:
         for model in models_to_run:
-            collection_name = collection_name_for_model(model)
-
             if force:
+                collection_name = collection_name_for_model(model)
                 delete_collection(builder.chroma_client, collection_name)
-            else:
-                try:
-                    collection = builder.chroma_client.get_collection(name=collection_name)
-                    count = collection.count()
-                    if count > 0:
-                        logger.info(f"   Skipping {model}: collection already has {count} chunks (use --force to regenerate)")
-                        continue
-                except Exception:
-                    pass
 
             builder.set_model(model)
             logger.info(f"   Model: {model}")
