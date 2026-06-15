@@ -9,7 +9,6 @@ from settings import settings
 
 from .graph_generator import generate_and_save_graph
 from .llm_processing import LLMProcessor
-from .prompts_loader import load_prompts
 
 logger = logging.getLogger(__name__)
 
@@ -163,11 +162,11 @@ def run_generate_graphs(force: bool = False) -> None:
 
     logger.info(f"Starting graph generation process (force={force})...")
 
-    prompts_path = str(settings.project_root / "config" / "graphs_prompts.txt")
+    prompts_path = settings.project_root / "config" / "graphs_prompts.json"
     try:
-        prompts = load_prompts(prompts_path)
+        prompts = json.loads(prompts_path.read_text(encoding="utf-8"))
     except Exception:
-        logger.exception("Failed to load prompts")
+        logger.exception("Failed to load prompts from %s", prompts_path)
         return
 
     llm = LLMProcessor(

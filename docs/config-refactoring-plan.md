@@ -390,7 +390,7 @@ def _flatten(d: dict, parent_key: str = "", sep: str = "_") -> dict:
 - **`settings.py` Settings class** — глобальные пути и env vars остаются как есть
 - **`.env` / `config/.env`** — механизм env vars через Pydantic не меняется
 - **`config/details/`** — справочные JSON-файлы (traditions.json, download_list.json) — не конфигурация приложения
-- **`config/graphs_prompts.txt`** — промпты, не настройки
+- **`config/graphs_prompts.json`** — промпты, не настройки
 - **Visualization constants** (`GRID_COLOR`, `ZERO_LINE_COLOR`) — визуальные константы остаются в коде, не выносятся в конфиг (это стилистика, не настройки)
 
 ## Результат

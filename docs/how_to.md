@@ -212,7 +212,7 @@ mytho cluster --single-model --algorithm kmeans --no-viz
 
 Основные файлы:
 - `config/graphs.yaml` задает LLM, пути и параметры чанков.
-- `config/graphs_prompts.txt` содержит промпты.
+- `config/graphs_prompts.json` содержит промпты.
 - `src/graphs/llm_processing.py` вызывает OpenAI-compatible API.
 - `src/graphs/run_graph_generation.py` режет тексты и агрегирует сущности.
 - `src/graphs/graph_generator.py` строит HTML-граф через NetworkX и Cytoscape.
