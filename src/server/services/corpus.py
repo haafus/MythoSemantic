@@ -197,11 +197,11 @@ def build_corpus_archive() -> io.BytesIO:
 
 def get_traditions_info(source: str | None = None) -> dict:
     paths = (
-        [source_root(source) / "traditions_info.json"]
+        [source_root(source) / "traditions.json"]
         if source
         else [
-            settings.corpus_chunked_dir / "traditions_info.json",
-            settings.corpus_dir / "traditions_info.json",
+            settings.corpus_chunked_dir / "traditions.json",
+            settings.corpus_dir / "traditions.json",
         ]
     )
     for path in paths:

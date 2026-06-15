@@ -184,7 +184,7 @@ class TestGetCatalogDocuments:
 class TestGetTraditionsInfo:
     def test_from_specific_source(self, tmp_path, monkeypatch):
         info = {"Greek": {"color": "#ff0000", "description": "Ancient Greek"}}
-        (tmp_path / "traditions_info.json").write_text(json.dumps(info))
+        (tmp_path / "traditions.json").write_text(json.dumps(info))
         _patch_corpus(monkeypatch, tmp_path)
 
         result = get_traditions_info("corpus")
@@ -192,7 +192,7 @@ class TestGetTraditionsInfo:
 
     def test_fallback_without_source(self, tmp_path, monkeypatch):
         info = {"Norse": {"color": "#0000ff"}}
-        (tmp_path / "traditions_info.json").write_text(json.dumps(info))
+        (tmp_path / "traditions.json").write_text(json.dumps(info))
         nonexistent = tmp_path / "nonexistent"
         monkeypatch.setattr(settings, "corpus_dir", nonexistent)
         monkeypatch.setattr(settings, "corpus_chunked_dir", tmp_path)

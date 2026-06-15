@@ -173,12 +173,12 @@ def _update_traditions_info(force: bool) -> None:
                         tradition_books[trad] = set()
                     tradition_books[trad].add(_item_tid(item))
 
-    info_file_path = settings.corpus_dir / "traditions_info.json"
+    info_file_path = settings.corpus_dir / "traditions.json"
     existing_info: dict = {}
 
     if info_file_path.exists():
         if force:
-            backup_path = settings.corpus_dir / "traditions_info_backup.json"
+            backup_path = settings.corpus_dir / "traditions_backup.json"
             shutil.copy2(info_file_path, backup_path)
             logger.warning(f"force=True: old reference file saved as {backup_path.name}, creating a clean template.")
         else:
@@ -186,7 +186,7 @@ def _update_traditions_info(force: bool) -> None:
                 with open(info_file_path, encoding="utf-8") as f:
                     existing_info = json.load(f)
             except Exception:
-                logger.exception("Error reading traditions_info.json")
+                logger.exception("Error reading traditions.json")
 
     changed = False
     for trad in sorted(tradition_books):
@@ -213,7 +213,7 @@ def _update_traditions_info(force: bool) -> None:
         json.dump(existing_info, f, ensure_ascii=False, indent=2)
 
     if changed and not force:
-        logger.info("traditions_info.json updated (colors added or book lists refreshed).")
+        logger.info("traditions.json updated (colors added or book lists refreshed).")
 
 
 def build_corpus(force: bool = False):

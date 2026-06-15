@@ -118,7 +118,7 @@ class TestUpdateTraditionsInfo:
 
         _update_traditions_info(force=False)
 
-        data = json.loads((corpus_dir / "traditions_info.json").read_text())
+        data = json.loads((corpus_dir / "traditions.json").read_text())
         assert "Greek" in data
         assert "Norse" in data
         assert sorted(data["Greek"]["books"]) == ["Iliad", "Odyssey"]
@@ -141,11 +141,11 @@ class TestUpdateTraditionsInfo:
                 "books": ["Iliad"],
             }
         }
-        (corpus_dir / "traditions_info.json").write_text(json.dumps(existing))
+        (corpus_dir / "traditions.json").write_text(json.dumps(existing))
 
         _update_traditions_info(force=False)
 
-        data = json.loads((corpus_dir / "traditions_info.json").read_text())
+        data = json.loads((corpus_dir / "traditions.json").read_text())
         assert data["Greek"]["description"] == "Ancient Greek mythology"
         assert sorted(data["Greek"]["books"]) == ["Iliad", "Odyssey"]
 
@@ -153,11 +153,11 @@ class TestUpdateTraditionsInfo:
         corpus_dir = self._setup(tmp_path, monkeypatch, [])
 
         existing = {"Greek": {"description": "old data", "color": "#000", "books": []}}
-        (corpus_dir / "traditions_info.json").write_text(json.dumps(existing))
+        (corpus_dir / "traditions.json").write_text(json.dumps(existing))
 
         _update_traditions_info(force=True)
 
-        backup = json.loads((corpus_dir / "traditions_info_backup.json").read_text())
+        backup = json.loads((corpus_dir / "traditions_backup.json").read_text())
         assert backup["Greek"]["description"] == "old data"
 
     def test_includes_all_traditions(self, tmp_path, monkeypatch):
@@ -169,7 +169,7 @@ class TestUpdateTraditionsInfo:
 
         _update_traditions_info(force=False)
 
-        data = json.loads((corpus_dir / "traditions_info.json").read_text())
+        data = json.loads((corpus_dir / "traditions.json").read_text())
         assert "Greek" in data
         assert "Norse" in data
 
@@ -183,7 +183,7 @@ class TestUpdateTraditionsInfo:
 
         _update_traditions_info(force=False)
 
-        data = json.loads((corpus_dir / "traditions_info.json").read_text())
+        data = json.loads((corpus_dir / "traditions.json").read_text())
         assert data == {}
 
     def test_adds_missing_color(self, tmp_path, monkeypatch):
@@ -191,11 +191,11 @@ class TestUpdateTraditionsInfo:
         corpus_dir = self._setup(tmp_path, monkeypatch, items)
 
         existing = {"Norse": {"description": "Norse myths", "books": ["Edda"]}}
-        (corpus_dir / "traditions_info.json").write_text(json.dumps(existing))
+        (corpus_dir / "traditions.json").write_text(json.dumps(existing))
 
         _update_traditions_info(force=False)
 
-        data = json.loads((corpus_dir / "traditions_info.json").read_text())
+        data = json.loads((corpus_dir / "traditions.json").read_text())
         assert data["Norse"]["color"].startswith("#")
         assert data["Norse"]["description"] == "Norse myths"
 
@@ -207,5 +207,5 @@ class TestUpdateTraditionsInfo:
 
         _update_traditions_info(force=False)
 
-        data = json.loads((corpus_dir / "traditions_info.json").read_text())
+        data = json.loads((corpus_dir / "traditions.json").read_text())
         assert data["Egyptian"]["books"] == ["book_42"]

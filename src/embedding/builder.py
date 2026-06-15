@@ -165,10 +165,10 @@ class EmbeddingBuilder:
             logger.warning("No files found in corpus/. Check the folder structure.")
             return
 
-        traditions_file = self.corpus_dir / "traditions_info.json"
+        traditions_file = self.corpus_dir / "traditions.json"
         if traditions_file.exists():
             try:
-                dest_file = self.chunked_dir / "traditions_info.json"
+                dest_file = self.chunked_dir / "traditions.json"
                 self.chunked_dir.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(traditions_file, dest_file)
                 logger.info(f"File {traditions_file.name} copied successfully to {self.chunked_dir}")
