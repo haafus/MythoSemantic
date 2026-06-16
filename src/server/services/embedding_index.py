@@ -70,14 +70,7 @@ class EmbeddingIndexService:
             },
         }
 
-    def get_neighbors(
-        self,
-        model_key: str,
-        point_id: str,
-        n: int = 10,
-        chunk_index: int | None = None,
-        exclude_same_tradition: bool = False,
-    ) -> list[dict]:
+    def get_neighbors(self, model_key: str, point_id: str, n: int = 10, chunk_index: int | None = None) -> list[dict]:
         index = self.get_index(model_key)
         item_index = index.id_to_index.get(self._point_key(point_id, chunk_index))
         if item_index is None:
@@ -88,11 +81,6 @@ class EmbeddingIndexService:
         query_vector = index.normalized_matrix[item_index]
         similarities = index.normalized_matrix @ query_vector
         similarities[item_index] = -np.inf
-        if exclude_same_tradition:
-            tradition = index.items[item_index].get("tradition", "").strip().lower()
-            for idx, item in enumerate(index.items):
-                if item.get("tradition", "").strip().lower() == tradition:
-                    similarities[idx] = -np.inf
         return self._top_results(index, similarities, n)
 
     def search(self, model_key: str, query: str, top_k: int = 20) -> list[dict]:

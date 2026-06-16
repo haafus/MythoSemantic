@@ -56,13 +56,9 @@ def point_neighbors(
     point_id: str,
     n: int = Query(10, ge=1, le=100),
     chunk_index: int | None = Query(None),
-    exclude_same_tradition: bool = Query(False),
 ):
     try:
-        neighbors = embedding_index_service.get_neighbors(
-            model_key, point_id, n, chunk_index,
-            exclude_same_tradition=exclude_same_tradition,
-        )
+        neighbors = embedding_index_service.get_neighbors(model_key, point_id, n, chunk_index)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail="Point not found") from exc
     return {"point_id": point_id, "neighbors": neighbors}
