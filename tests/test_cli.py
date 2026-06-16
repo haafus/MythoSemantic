@@ -13,7 +13,7 @@ class TestMythoTopLevel:
 
     def test_lists_all_commands(self):
         result = runner.invoke(mytho, ["--help"])
-        for cmd in ["corpus", "embeddings", "projection", "graphs", "server", "pipeline"]:
+        for cmd in ["corpus", "embeddings", "projection", "graphs", "server", "build", "status"]:
             assert cmd in result.output
 
 
@@ -49,10 +49,11 @@ class TestServerCommand:
         assert "--port" in result.output
 
 
-class TestPipelineCommand:
+class TestBuildCommand:
     def test_help(self):
-        result = runner.invoke(mytho, ["pipeline", "--help"])
+        result = runner.invoke(mytho, ["build", "--help"])
         assert result.exit_code == 0
+        assert "--force" in result.output
         assert "--skip-corpus" in result.output
         assert "--skip-embeddings" in result.output
         assert "--skip-projection" in result.output

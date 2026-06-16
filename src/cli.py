@@ -115,21 +115,22 @@ def server(host: str | None, port: int | None):
 
 
 # ---------------------------------------------------------------------------
-# pipeline — run everything end-to-end
+# build — run everything end-to-end
 # ---------------------------------------------------------------------------
 @mytho.command()
 @click.option("--model", "-m", default=None, help="Embedding model (default from config).")
+@click.option("--force", is_flag=True, help="Force regeneration of all steps.")
 @click.option("--skip-corpus", is_flag=True, help="Skip corpus download.")
 @click.option("--skip-embeddings", is_flag=True, help="Skip embedding generation.")
 @click.option("--skip-projection", is_flag=True, help="Skip projection generation.")
 @click.option("--skip-graphs", is_flag=True, help="Skip graph extraction.")
-def pipeline(model, skip_corpus, skip_embeddings, skip_projection, skip_graphs):
+def build(model, force, skip_corpus, skip_embeddings, skip_projection, skip_graphs):
     """Run the full analysis pipeline end-to-end."""
     steps = [
-        ("Corpus", skip_corpus, _pipeline_corpus, {}),
-        ("Embeddings", skip_embeddings, _pipeline_embeddings, {"model": model}),
-        ("Projection", skip_projection, _pipeline_projection, {"model": model}),
-        ("Graphs", skip_graphs, _pipeline_graphs, {}),
+        ("Corpus", skip_corpus, _build_corpus, {"force": force}),
+        ("Embeddings", skip_embeddings, _build_embeddings, {"model": model, "force": force}),
+        ("Projection", skip_projection, _build_projection, {"model": model, "force": force}),
+        ("Graphs", skip_graphs, _build_graphs, {"force": force}),
     ]
 
     for name, skip, fn, kwargs in steps:
@@ -144,31 +145,164 @@ def pipeline(model, skip_corpus, skip_embeddings, skip_projection, skip_graphs):
             click.echo(click.style(f"[fail]  {name}: {e}", fg="red"), err=True)
             sys.exit(1)
 
-    click.echo(click.style("\nPipeline finished.", fg="green", bold=True))
+    click.echo(click.style("\nBuild finished.", fg="green", bold=True))
 
 
-def _pipeline_corpus():
+def _build_corpus(force: bool = False):
     from corpus.builder import build_corpus
 
-    build_corpus()
+    build_corpus(force=force)
 
 
-def _pipeline_embeddings(model: str | None):
+def _build_embeddings(model: str | None, force: bool = False):
     from embedding.build_embeddings import build_embeddings
 
-    build_embeddings(model_name=model)
+    build_embeddings(model_name=model, force=force)
 
 
-def _pipeline_projection(model: str | None):
+def _build_projection(model: str | None, force: bool = False):
     from projection.run_analysis import analyze_embeddings
 
-    analyze_embeddings(model_name=model)
+    analyze_embeddings(model_name=model, force=force)
 
 
-def _pipeline_graphs():
+def _build_graphs(force: bool = False):
     from graphs.run_graph_generation import run_generate_graphs
 
-    run_generate_graphs()
+    run_generate_graphs(force=force)
+
+
+# ---------------------------------------------------------------------------
+# status
+# ---------------------------------------------------------------------------
+PROJECTION_PLOTS = [
+    "umap_2d_traditions.html",
+    "residual_umap_2d.html",
+    "residual_normalized_umap_2d.html",
+    "rlace_umap_2d.html",
+    "distance_heatmap.html",
+    "tradition_distribution.html",
+]
+
+
+@mytho.command()
+def status():
+    """Show the current state of the data pipeline."""
+    import json
+    from pathlib import Path
+
+    from settings import settings
+
+    _status_corpus(settings)
+    _status_embeddings(settings)
+    _status_projections(settings)
+    _status_graphs(settings)
+
+
+def _status_corpus(settings):
+    import json
+
+    click.echo(click.style("Corpus:", bold=True))
+
+    config_path = settings.corpus_config_file
+    config_count = 0
+    if config_path.exists():
+        try:
+            with open(config_path, encoding="utf-8") as f:
+                config_count = len(json.load(f))
+        except Exception:
+            pass
+
+    meta_path = settings.corpus_metadata_path
+    meta_count = 0
+    if meta_path.exists():
+        try:
+            with open(meta_path, encoding="utf-8") as f:
+                meta_count = len(json.load(f))
+        except Exception:
+            pass
+
+    click.echo(f"  {meta_count} texts built (from {config_count} in config)")
+    if config_count > meta_count:
+        click.echo(click.style(f"  {config_count - meta_count} missing", fg="yellow"))
+    click.echo()
+
+
+def _status_embeddings(settings):
+    click.echo(click.style("Embeddings:", bold=True))
+
+    chroma_path = settings.chroma_dir
+    if not chroma_path.exists():
+        click.echo("  No ChromaDB found")
+        click.echo()
+        return
+
+    try:
+        import chromadb
+
+        from embedding.chroma_manager import is_model_collection_name
+
+        client = chromadb.PersistentClient(path=str(chroma_path))
+        collections = client.list_collections()
+        model_collections = []
+        for col in collections:
+            name = col if isinstance(col, str) else col.name
+            if is_model_collection_name(name):
+                coll = client.get_collection(name=name)
+                count = coll.count()
+                result = coll.get(limit=1, include=["metadatas"])
+                metadatas = result.get("metadatas", [])
+                model_name = metadatas[0].get("model", name) if metadatas else name
+                model_collections.append((model_name, count))
+
+        if not model_collections:
+            click.echo("  No embedding collections")
+        else:
+            click.echo(f"  {len(model_collections)} models:")
+            for model_name, count in sorted(model_collections):
+                click.echo(f"    {model_name:<40} {count:>6} chunks")
+    except Exception as e:
+        click.echo(click.style(f"  Error reading ChromaDB: {e}", fg="red"))
+
+    click.echo()
+
+
+def _status_projections(settings):
+    click.echo(click.style("Projections:", bold=True))
+
+    analysis_dir = settings.analysis_dir
+    if not analysis_dir.exists():
+        click.echo("  No analysis directory")
+        click.echo()
+        return
+
+    model_dirs = sorted(d for d in analysis_dir.iterdir() if d.is_dir())
+    if not model_dirs:
+        click.echo("  No model results")
+    else:
+        for model_dir in model_dirs:
+            existing = [p for p in PROJECTION_PLOTS if (model_dir / p).exists()]
+            total = len(PROJECTION_PLOTS)
+            count = len(existing)
+            color = "green" if count == total else "yellow" if count > 0 else "red"
+            mark = "ok" if count == total else f"{count}/{total}"
+            click.echo(click.style(f"  {model_dir.name:<40} {mark}", fg=color))
+
+    click.echo()
+
+
+def _status_graphs(settings):
+    click.echo(click.style("Graphs:", bold=True))
+
+    graphs_dir = settings.graphs_dir
+    if not graphs_dir.exists():
+        click.echo("  No graphs directory")
+        click.echo()
+        return
+
+    html_files = list(graphs_dir.glob("*.html"))
+    click.echo(f"  {len(html_files)} graph files")
+    click.echo()
 
 
 if __name__ == "__main__":
