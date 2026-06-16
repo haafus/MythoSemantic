@@ -9,8 +9,6 @@ outputs/logs/
 outputs/graphs/
 
 # legacy root-level output dirs (pre-restructure)
-/cache/
-/sources_backup/
 /chroma_db/
 /analysis/
 /logs/
