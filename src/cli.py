@@ -29,9 +29,9 @@ class _LazyEmbeddingGroup(click.Group):
 
 
 @click.group()
-@click.version_option(package_name="mythosemantic")
+@click.version_option(package_name="mythoscope")
 def mytho():
-    """MythoSemantic — computational framework for comparative mythology."""
+    """MythoScope — computational framework for comparative mythology."""
     setup_logging()
 
 

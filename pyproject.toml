@@ -3,7 +3,7 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mythosemantic"
+name = "mythoscope"
 version = "0.1.0"
 description = "Computational framework for comparative mythology"
 readme = "README.md"
@@ -54,7 +54,7 @@ dev = [
     "mypy>=1.10.0",
 ]
 all = [
-    "mythosemantic[server,embeddings,analysis,corpus,graphs]",
+    "mythoscope[server,embeddings,analysis,corpus,graphs]",
 ]
 
 [project.scripts]

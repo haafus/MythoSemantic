@@ -10,7 +10,7 @@ from settings import settings
 
 def create_app() -> FastAPI:
     app = FastAPI(
-        title="MythoSemantic UI Server",
+        title="MythoScope UI Server",
         default_response_class=ORJSONResponse,
     )
 
