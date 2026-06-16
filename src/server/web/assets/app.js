@@ -27,6 +27,9 @@ import {
     resizeEmbeddedPlots,
 } from "./plot-utils.js";
 
+const NEAREST_NEIGHBOR_COUNT = 5;
+const CROSS_TRADITION_NEIGHBOR_COUNT = 10;
+
 function render() {
     cleanupRoute();
 
@@ -964,6 +967,27 @@ function chunkTextHtml(item, query = "") {
     return highlightText(text, query);
 }
 
+function renderNeighborCards(neighbors, emptyText) {
+    if (!neighbors.length) {
+        return `<div class="neighbor-empty">${escapeHtml(emptyText)}</div>`;
+    }
+    return neighbors.map((neighbor) => `
+        <div class="neighbor-item" data-neighbor-id="${escapeAttribute(neighbor.id)}" data-neighbor-chunk="${escapeAttribute(neighbor.chunk_index)}">
+            <span class="badge" style="background:#dee2e6; color:#212529">${escapeHtml(neighbor.tradition)}</span>
+            <div class="neighbor-meta">${escapeHtml(chunkMetaLine(neighbor))}</div>
+            <div class="neighbor-text">${escapeHtml(neighbor.text || neighbor.text_preview || "")}</div>
+            <div class="neighbor-stats">Similarity: ${(Number(neighbor.similarity_score || 0) * 100).toFixed(1)}%</div>
+        </div>
+    `).join("");
+}
+
+function bindNeighborCards(container) {
+    if (!container) return;
+    container.querySelectorAll(".neighbor-item").forEach((item) => {
+        item.addEventListener("click", () => displayPointInfo(item.dataset.neighborId, item.dataset.neighborChunk));
+    });
+}
+
 async function displayPointInfo(pointId, chunkIndex = null) {
     if (!state.selectedModel || !pointId) return;
 
@@ -977,39 +1001,33 @@ async function displayPointInfo(pointId, chunkIndex = null) {
         const pointQuery = chunkIndex !== null && chunkIndex !== undefined && chunkIndex !== ""
             ? `?chunk_index=${encodeURIComponent(chunkIndex)}`
             : "";
-        const neighborsQuery = new URLSearchParams({n: "5"});
+        const neighborsQuery = new URLSearchParams({n: String(NEAREST_NEIGHBOR_COUNT)});
         if (chunkIndex !== null && chunkIndex !== undefined && chunkIndex !== "") {
             neighborsQuery.set("chunk_index", String(chunkIndex));
         }
+        const crossTraditionQuery = new URLSearchParams(neighborsQuery);
+        crossTraditionQuery.set("n", String(CROSS_TRADITION_NEIGHBOR_COUNT));
+        crossTraditionQuery.set("exclude_same_tradition", "true");
 
-        const [point, neighborsData] = await Promise.all([
+        const [point, neighborsData, crossTraditionData] = await Promise.all([
             api(`/api/similarity/points/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(pointId)}${pointQuery}`),
             api(`/api/similarity/points/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(pointId)}/neighbors?${neighborsQuery.toString()}`),
+            api(`/api/similarity/points/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(pointId)}/neighbors?${crossTraditionQuery.toString()}`),
         ]);
 
         const neighbors = Array.isArray(neighborsData.neighbors) ? neighborsData.neighbors : [];
-        let html = `
+        const crossTraditionNeighbors = Array.isArray(crossTraditionData.neighbors) ? crossTraditionData.neighbors : [];
+
+        infoContent.innerHTML = `
             <div class="badge">${escapeHtml(point.tradition)}</div>
             <div class="search-result-meta">${escapeHtml(chunkMetaLine(point))}</div>
             <div class="text-preview"><strong>ID:</strong> ${escapeHtml(point.id)}<br><br>${escapeHtml(point.text)}</div>
             <h4 style="margin: 16px 0 8px; font-size:14px; color:#111;">Nearest neighbors:</h4>
+            ${renderNeighborCards(neighbors, "No nearest chunks found.")}
+            <h4 style="margin: 18px 0 8px; font-size:14px; color:#111;">Nearest from other traditions:</h4>
+            ${renderNeighborCards(crossTraditionNeighbors, "No cross-tradition neighbors found.")}
         `;
-
-        if (neighbors.length > 0) {
-            html += neighbors.map((neighbor) => `
-                <div class="neighbor-item" data-neighbor-id="${escapeAttribute(neighbor.id)}" data-neighbor-chunk="${escapeAttribute(neighbor.chunk_index)}">
-                    <span class="badge" style="background:#dee2e6; color:#212529">${escapeHtml(neighbor.tradition)}</span>
-                    <div class="neighbor-meta">${escapeHtml(chunkMetaLine(neighbor))}</div>
-                    <div class="neighbor-text">${escapeHtml(neighbor.text || neighbor.text_preview || "")}</div>
-                    <div class="neighbor-stats">Similarity: ${(Number(neighbor.similarity_score || 0) * 100).toFixed(1)}%</div>
-                </div>
-            `).join("");
-        }
-
-        infoContent.innerHTML = html;
-        infoContent.querySelectorAll(".neighbor-item").forEach((item) => {
-            item.addEventListener("click", () => displayPointInfo(item.dataset.neighborId, item.dataset.neighborChunk));
-        });
+        bindNeighborCards(infoContent);
     } catch (error) {
         infoContent.innerHTML = `<div style="color:#d32f2f">Error: ${escapeHtml(error.message)}</div>`;
     }
