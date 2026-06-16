@@ -79,14 +79,14 @@ def scan_document_rows(root: Path) -> list[dict]:
     if not root.exists():
         return rows
 
-    for file_path in root.glob("*/*/*/*.txt"):
+    for file_path in root.glob("*/*/*.txt"):
         try:
-            major, tradition, title_dir, _ = file_path.relative_to(root).parts
+            major, tradition, _ = file_path.relative_to(root).parts
         except ValueError:
             continue
 
         text = file_path.read_text(encoding="utf-8", errors="ignore")
-        title = title_dir.replace("_", " ")
+        title = file_path.stem.replace("_", " ")
         rows.append(
             {
                 "id": title,
@@ -109,7 +109,7 @@ def resolve_document_path(
     major_path = sanitize_filename(major_tradition)
     tradition_path = sanitize_filename(tradition)
     title_path = sanitize_filename(doc_id)
-    file_path = (corpus_root / major_path / tradition_path / title_path / f"{title_path}.txt").resolve()
+    file_path = (corpus_root / major_path / tradition_path / f"{title_path}.txt").resolve()
 
     try:
         file_path.relative_to(corpus_root)

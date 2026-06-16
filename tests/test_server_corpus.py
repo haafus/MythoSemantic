@@ -16,7 +16,7 @@ def _make_corpus(tmp_path, docs=None):
         docs = [("European", "Greek", "Iliad", "Sing, O goddess, the anger of Achilles")]
 
     for major, tradition, title, text in docs:
-        doc_dir = tmp_path / major / tradition / title
+        doc_dir = tmp_path / major / tradition
         doc_dir.mkdir(parents=True, exist_ok=True)
         (doc_dir / f"{title}.txt").write_text(text)
 
