@@ -5,7 +5,7 @@ import time
 import zipfile
 from pathlib import Path
 
-from corpus.utils import count_sentences, count_words, sanitize_filename
+from corpus.utils import sanitize_filename
 from settings import settings
 
 logger = logging.getLogger(__name__)
@@ -42,11 +42,10 @@ def get_catalog_documents() -> list[dict]:
         except (OSError, json.JSONDecodeError) as e:
             logger.warning("Failed to read metadata %s: %s", metadata_path, e)
 
-    source_rows = metadata_rows or scan_document_rows(root)
     documents = []
     traditions_info = get_traditions_info()
 
-    for row in source_rows:
+    for row in metadata_rows:
         tradition_info = traditions_info.get(row.get("tradition", ""), {})
         documents.append(
             {
@@ -73,33 +72,6 @@ def get_catalog_documents() -> list[dict]:
     _catalog_cache["corpus"] = (time.monotonic(), documents)
     return documents
 
-
-def scan_document_rows(root: Path) -> list[dict]:
-    rows: list[dict] = []
-    if not root.exists():
-        return rows
-
-    for file_path in root.glob("*/*/*.txt"):
-        try:
-            major, tradition, _ = file_path.relative_to(root).parts
-        except ValueError:
-            continue
-
-        text = file_path.read_text(encoding="utf-8", errors="ignore")
-        title = file_path.stem.replace("_", " ")
-        rows.append(
-            {
-                "id": title,
-                "major_tradition": major.replace("_", " "),
-                "tradition": tradition.replace("_", " "),
-                "path": str(file_path.relative_to(root)),
-                "char_count": len(text),
-                "word_count": count_words(text),
-                "sentence_count": count_sentences(text),
-            }
-        )
-
-    return rows
 
 
 def resolve_document_path(
