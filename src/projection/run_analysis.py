@@ -32,7 +32,6 @@ def analyze_embeddings(
     model_name: str | None = None,
     generate_all_plots: bool = True,
     motif_analysis: bool = False,
-    story_emb: bool = False,
     force: bool = False,
 ) -> EmbeddingAnalyzer | None:
     try:
@@ -64,9 +63,6 @@ def analyze_embeddings(
 
             if motif_analysis and analyzer.data:
                 _generate_motif_plot(analyzer, force=force)
-
-            if story_emb and analyzer.data:
-                _generate_story_plot(analyzer, force=force)
 
         return analyzer
 
@@ -148,23 +144,3 @@ def _generate_motif_plot(analyzer: EmbeddingAnalyzer, force: bool = False) -> No
         logger.exception("Error creating Motif UMAP plot")
 
 
-def _generate_story_plot(analyzer: EmbeddingAnalyzer, force: bool = False) -> None:
-    if not force and (analyzer.output_dir / "story_umap_2d.html").exists():
-        logger.info("Skipping Story UMAP (already exists)")
-        return
-
-    from .motif_analysis import run_story_embedding_analysis
-
-    data = analyzer.filter_by_model()
-    cfg = settings.projection
-
-    logger.info("Generating Story UMAP projection (narrative re-embedding)...")
-    try:
-        run_story_embedding_analysis(
-            data,
-            output_dir=analyzer.output_dir,
-            model_name=analyzer.model_name,
-            reducer_kwargs={"n_neighbors": cfg.umap_n_neighbors, "min_dist": cfg.umap_min_dist},
-        )
-    except Exception:
-        logger.exception("Error creating Story UMAP plot")

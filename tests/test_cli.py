@@ -31,7 +31,6 @@ class TestProjectionCommand:
         assert "--model" in result.output
         assert "--no-plots" in result.output
         assert "--motif-analysis" in result.output
-        assert "--story-emb" in result.output
 
 
 class TestGraphsCommand:

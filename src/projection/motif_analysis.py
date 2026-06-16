@@ -103,36 +103,6 @@ def embed_summaries(summaries: list[str], model_name: str) -> np.ndarray:
     return embeddings
 
 
-STORY_EMBEDDING_MODEL = "uhhlt/story-emb"
-
-
-def run_story_embedding_analysis(
-    data: list[dict],
-    output_dir: Path,
-    story_model: str = STORY_EMBEDDING_MODEL,
-    model_name: str | None = None,
-    reducer_kwargs: dict | None = None,
-) -> None:
-    from .visualization import _plot_umap_scatter
-
-    texts = [item.get("text", "") for item in data]
-    story_embeddings = embed_summaries(texts, story_model)
-
-    logger.info("Building Story UMAP projection...")
-    _plot_umap_scatter(
-        data,
-        story_embeddings,
-        title_prefix="Story UMAP (narrative re-embedding)",
-        filename="story_umap_2d.html",
-        axis_prefix="Story UMAP",
-        save_html=True,
-        output_dir=output_dir,
-        model_name=model_name,
-        reducer_kwargs=reducer_kwargs,
-    )
-    logger.info("Story UMAP projection saved")
-
-
 def run_motif_analysis(
     data: list[dict],
     output_dir: Path,
