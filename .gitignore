@@ -4,17 +4,13 @@ __pycache__/
 
 # generated artifacts — reproduce via pipeline, store outside git
 outputs/chroma_db/
-outputs/cache/
 outputs/analysis/
-outputs/sources_backup/
 outputs/logs/
 outputs/graphs/
 
 # legacy root-level output dirs (pre-restructure)
 /chroma_db/
-/cache/
 /analysis/
-/sources_backup/
 /logs/
 /graphs/
 
