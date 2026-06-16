@@ -1,7 +1,6 @@
-import json
+from unittest.mock import patch
 
 from server.services.models import (
-    get_model_info,
     get_model_output_dir,
     key_to_model,
     list_model_summaries,
@@ -9,10 +8,6 @@ from server.services.models import (
     model_to_key,
 )
 from settings import settings
-
-
-def _patch_analysis(monkeypatch, tmp_path):
-    monkeypatch.setattr(settings, "analysis_dir", tmp_path)
 
 
 class TestModelToKey:
@@ -50,68 +45,30 @@ class TestKeyToModel:
 
 
 class TestListModelsRaw:
-    def test_reads_models_json(self, tmp_path, monkeypatch):
-        models_json = tmp_path / "models.json"
-        models_json.write_text(json.dumps(["model/a", "model/b"]))
-        _patch_analysis(monkeypatch, tmp_path)
-
-        result = list_models_raw()
+    def test_returns_models_from_loader(self):
+        with patch("projection.loader.EmbeddingDataLoader") as mock_cls:
+            mock_cls.return_value.get_available_models.return_value = ["model/a", "model/b"]
+            result = list_models_raw()
         assert result == ["model/a", "model/b"]
 
-    def test_fallback_to_dirs(self, tmp_path, monkeypatch):
-        model_dir = tmp_path / "model_a"
-        model_dir.mkdir()
-        (model_dir / "model_info.json").write_text(json.dumps({"model_name": "author/model_a"}))
-        _patch_analysis(monkeypatch, tmp_path)
-
-        result = list_models_raw()
-        assert "author/model_a" in result
-
-    def test_empty_dir(self, tmp_path, monkeypatch):
-        _patch_analysis(monkeypatch, tmp_path)
-        assert list_models_raw() == []
-
-    def test_cached_within_ttl(self, tmp_path, monkeypatch):
-        models_json = tmp_path / "models.json"
-        models_json.write_text(json.dumps(["model/a"]))
-        _patch_analysis(monkeypatch, tmp_path)
-
-        assert list_models_raw() == ["model/a"]
-        models_json.write_text(json.dumps(["model/a", "model/b"]))
-        assert list_models_raw() == ["model/a"]
+    def test_returns_empty_on_error(self):
+        with patch("projection.loader.EmbeddingDataLoader", side_effect=Exception("no db")):
+            result = list_models_raw()
+        assert result == []
 
 
 class TestListModelSummaries:
-    def test_returns_dicts_with_keys(self, tmp_path, monkeypatch):
-        models_json = tmp_path / "models.json"
-        models_json.write_text(json.dumps(["BAAI/bge-m3"]))
-        _patch_analysis(monkeypatch, tmp_path)
-
-        result = list_model_summaries()
+    def test_returns_dicts_with_keys(self):
+        with patch("server.services.models.list_models_raw", return_value=["BAAI/bge-m3"]):
+            result = list_model_summaries()
         assert len(result) == 1
         assert result[0]["name"] == "BAAI/bge-m3"
         assert result[0]["key"] == "BAAI_bge-m3"
         assert result[0]["safe_dir"] == "BAAI_bge-m3"
 
 
-class TestGetModelInfo:
-    def test_existing_info(self, tmp_path, monkeypatch):
-        model_dir = tmp_path / "test_model"
-        model_dir.mkdir()
-        info = {"model_name": "test/model", "dim": 768}
-        (model_dir / "model_info.json").write_text(json.dumps(info))
-        _patch_analysis(monkeypatch, tmp_path)
-
-        result = get_model_info("test_model")
-        assert result["model_name"] == "test/model"
-
-    def test_missing_info(self, tmp_path, monkeypatch):
-        _patch_analysis(monkeypatch, tmp_path)
-        assert get_model_info("nonexistent") == {}
-
-
 class TestGetModelOutputDir:
     def test_returns_path(self, tmp_path, monkeypatch):
-        _patch_analysis(monkeypatch, tmp_path)
+        monkeypatch.setattr(settings, "analysis_dir", tmp_path)
         result = get_model_output_dir("BAAI_bge-m3")
         assert result.parent == tmp_path

@@ -1,15 +1,10 @@
-import json
 import logging
-import time
-from pathlib import Path
 
-from settings import Settings, settings
+from settings import Settings
 
 logger = logging.getLogger(__name__)
 
 _key_to_model_cache: dict[str, str] = {}
-_models_cache: dict[str, tuple[float, list[str]]] = {}
-_MODELS_TTL = 300
 
 
 def model_to_key(model_name: str) -> str:
@@ -36,27 +31,13 @@ def key_to_model(model_key: str, models: list[str] | None = None) -> str:
 
 
 def list_models_raw() -> list[str]:
-    cache_key = str(settings.analysis_dir)
-    cached = _models_cache.get(cache_key)
-    if cached and time.monotonic() - cached[0] < _MODELS_TTL:
-        return cached[1]
+    from projection.loader import EmbeddingDataLoader
 
-    models: list[str] | None = None
-    models_path = settings.analysis_dir / "models.json"
-    if models_path.exists():
-        try:
-            with models_path.open("r", encoding="utf-8") as handle:
-                data = json.load(handle)
-            if isinstance(data, list):
-                models = [str(item) for item in data]
-        except (OSError, json.JSONDecodeError) as e:
-            logger.warning("Failed to read %s: %s", models_path, e)
-
-    if models is None:
-        models = _models_from_analysis_dirs()
-
-    _models_cache[cache_key] = (time.monotonic(), models)
-    return models
+    try:
+        return EmbeddingDataLoader().get_available_models()
+    except Exception:
+        logger.exception("Failed to get available models from ChromaDB")
+        return []
 
 
 def list_model_summaries() -> list[dict[str, str]]:
@@ -70,40 +51,8 @@ def list_model_summaries() -> list[dict[str, str]]:
     ]
 
 
-def get_model_output_dir(model_key: str) -> Path:
+def get_model_output_dir(model_key: str):
+    from settings import settings
+
     model_name = key_to_model(model_key)
     return settings.analysis_dir / model_to_key(model_name)
-
-
-def get_model_info(model_key: str) -> dict:
-    info_path = get_model_output_dir(model_key) / "model_info.json"
-    if not info_path.exists():
-        return {}
-
-    try:
-        with info_path.open("r", encoding="utf-8") as handle:
-            result: dict = json.load(handle)
-            return result
-    except (OSError, json.JSONDecodeError) as e:
-        logger.warning("Failed to read %s: %s", info_path, e)
-        return {}
-
-
-def _models_from_analysis_dirs() -> list[str]:
-    if not settings.analysis_dir.exists():
-        return []
-
-    models = []
-    for item in sorted(settings.analysis_dir.iterdir()):
-        if item.is_dir() and (item / "model_info.json").exists():
-            info_path = item / "model_info.json"
-            try:
-                with info_path.open("r", encoding="utf-8") as handle:
-                    model_info = json.load(handle)
-                model_name = model_info.get("model_name")
-                models.append(model_name or item.name.replace("_", "/"))
-            except (OSError, json.JSONDecodeError) as e:
-                logger.warning("Failed to read %s: %s", info_path, e)
-                models.append(item.name.replace("_", "/"))
-
-    return models

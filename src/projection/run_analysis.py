@@ -35,8 +35,9 @@ def analyze_embeddings(
     story_emb: bool = False,
 ) -> EmbeddingAnalyzer | None:
     try:
-        base_analyzer = EmbeddingAnalyzer()
-        available_models = base_analyzer.available_models
+        from .loader import EmbeddingDataLoader
+
+        available_models = EmbeddingDataLoader().get_available_models()
 
         if not available_models:
             logger.error("ERROR: No available models in the Chroma database!")
@@ -56,8 +57,6 @@ def analyze_embeddings(
                 continue
 
             analyzer.print_statistics()
-            analyzer.save_summary()
-            analyzer.save_models_list()
 
             if generate_all_plots and analyzer.data:
                 _generate_all_plots(analyzer)
