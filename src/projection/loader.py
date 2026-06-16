@@ -257,7 +257,6 @@ class EmbeddingDataLoader:
                         "model": meta.get("model", "unknown"),
                         "filename": meta.get("filename", "unknown"),
                         "chunking": meta.get("chunking", "unknown"),
-                        "color": meta.get("color", "#CCCCCC"),
                         "url": meta.get("url", ""),
                     }
                 )

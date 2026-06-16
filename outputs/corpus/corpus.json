@@ -9,8 +9,7 @@
     "path": "Indian/Buddhism/The_Dhammapada.txt",
     "char_count": 86091,
     "word_count": 15444,
-    "sentence_count": 1060,
-    "color": "#BDC596"
+    "sentence_count": 1060
   },
   {
     "id": "The Tao Teh King",
@@ -22,8 +21,7 @@
     "path": "Chinese/Taoism/The_Tao_Teh_King.txt",
     "char_count": 77725,
     "word_count": 13939,
-    "sentence_count": 937,
-    "color": "#A51357"
+    "sentence_count": 937
   },
   {
     "id": "The Book of the Dead",
@@ -35,8 +33,7 @@
     "path": "Near_Eastern/Ancient_Egyptian/The_Book_of_the_Dead.txt",
     "char_count": 89118,
     "word_count": 16059,
-    "sentence_count": 626,
-    "color": "#7A962A"
+    "sentence_count": 626
   },
   {
     "id": "The Upanishads",
@@ -48,8 +45,7 @@
     "path": "Indian/Hinduism/The_Upanishads.txt",
     "char_count": 121070,
     "word_count": 20981,
-    "sentence_count": 1012,
-    "color": "#923D54"
+    "sentence_count": 1012
   },
   {
     "id": "Buddhist Psalms",
@@ -61,8 +57,7 @@
     "path": "Buddhist/Japanese_Buddhism/Buddhist_Psalms.txt",
     "char_count": 108543,
     "word_count": 19260,
-    "sentence_count": 1069,
-    "color": "#65115F"
+    "sentence_count": 1069
   },
   {
     "id": "The Analects of Confucius",
@@ -74,8 +69,7 @@
     "path": "Chinese/Confucianism/The_Analects_of_Confucius.txt",
     "char_count": 210160,
     "word_count": 38577,
-    "sentence_count": 2664,
-    "color": "#14203E"
+    "sentence_count": 2664
   },
   {
     "id": "The Babylonian Legends of the Creation",
@@ -87,8 +81,7 @@
     "path": "Mesopotamian/Babylonian/The_Babylonian_Legends_of_the_Creation.txt",
     "char_count": 124942,
     "word_count": 22014,
-    "sentence_count": 1627,
-    "color": "#E61E71"
+    "sentence_count": 1627
   },
   {
     "id": "Myths and Legends of China",
@@ -100,8 +93,7 @@
     "path": "Chinese/Chinese/Myths_and_Legends_of_China.txt",
     "char_count": 698558,
     "word_count": 126056,
-    "sentence_count": 4803,
-    "color": "#ED19E8"
+    "sentence_count": 4803
   },
   {
     "id": "West African Folk-Tales",
@@ -113,8 +105,7 @@
     "path": "African/West_African/West_African_Folk-Tales.txt",
     "char_count": 169019,
     "word_count": 31323,
-    "sentence_count": 1871,
-    "color": "#26F08C"
+    "sentence_count": 1871
   },
   {
     "id": "The Nibelungenlied",
@@ -126,8 +117,7 @@
     "path": "Indo-European/Germanic/The_Nibelungenlied.txt",
     "char_count": 655907,
     "word_count": 116458,
-    "sentence_count": 4947,
-    "color": "#0CC6A9"
+    "sentence_count": 4947
   },
   {
     "id": "The Iliad",
@@ -139,8 +129,7 @@
     "path": "Indo-European/Greek/The_Iliad.txt",
     "char_count": 841799,
     "word_count": 157591,
-    "sentence_count": 4391,
-    "color": "#0A0C13"
+    "sentence_count": 4391
   },
   {
     "id": "The Poetic Edda",
@@ -152,8 +141,7 @@
     "path": "Indo-European/Norse/The_Poetic_Edda.txt",
     "char_count": 894163,
     "word_count": 157109,
-    "sentence_count": 9895,
-    "color": "#288A68"
+    "sentence_count": 9895
   },
   {
     "id": "Kalevala The Epic Poem of Finland",
@@ -165,8 +153,7 @@
     "path": "Finno-Ugric/Finnish/Kalevala_The_Epic_Poem_of_Finland.txt",
     "char_count": 835992,
     "word_count": 146097,
-    "sentence_count": 3208,
-    "color": "#7B3812"
+    "sentence_count": 3208
   },
   {
     "id": "The Mabinogion",
@@ -178,8 +165,7 @@
     "path": "Indo-European/Celtic/The_Mabinogion.txt",
     "char_count": 589790,
     "word_count": 111364,
-    "sentence_count": 4054,
-    "color": "#1E8540"
+    "sentence_count": 4054
   },
   {
     "id": "Australian Legendary Tales",
@@ -191,8 +177,7 @@
     "path": "Indigenous_Australian/Australian_Aboriginal/Australian_Legendary_Tales.txt",
     "char_count": 202737,
     "word_count": 36799,
-    "sentence_count": 1821,
-    "color": "#41C3DA"
+    "sentence_count": 1821
   },
   {
     "id": "Te Tohunga",
@@ -204,8 +189,7 @@
     "path": "Polynesian/Maori/Te_Tohunga.txt",
     "char_count": 182683,
     "word_count": 33316,
-    "sentence_count": 1194,
-    "color": "#BAA831"
+    "sentence_count": 1194
   },
   {
     "id": "The Ramayan of Valmiki",
@@ -217,8 +201,7 @@
     "path": "Indian/Hinduism/The_Ramayan_of_Valmiki.txt",
     "char_count": 2267887,
     "word_count": 412903,
-    "sentence_count": 18998,
-    "color": "#923D54"
+    "sentence_count": 18998
   },
   {
     "id": "The Popol Vuh",
@@ -230,8 +213,7 @@
     "path": "Mesoamerican/Maya/The_Popol_Vuh.txt",
     "char_count": 94255,
     "word_count": 16092,
-    "sentence_count": 673,
-    "color": "#70B53D"
+    "sentence_count": 673
   },
   {
     "id": "The Koran",
@@ -243,8 +225,7 @@
     "path": "Abrahamic/Islam/The_Koran.txt",
     "char_count": 2374123,
     "word_count": 434567,
-    "sentence_count": 20548,
-    "color": "#93B222"
+    "sentence_count": 20548
   },
   {
     "id": "The Bhagavad Gita",
@@ -256,8 +237,7 @@
     "path": "Indian/Hinduism/The_Bhagavad_Gita.txt",
     "char_count": 140198,
     "word_count": 24016,
-    "sentence_count": 1300,
-    "color": "#923D54"
+    "sentence_count": 1300
   },
   {
     "id": "Beowulf",
@@ -269,8 +249,7 @@
     "path": "Indo-European/Anglo-Saxon/Beowulf.txt",
     "char_count": 262263,
     "word_count": 44900,
-    "sentence_count": 1861,
-    "color": "#7F25C4"
+    "sentence_count": 1861
   },
   {
     "id": "The King James Version of the Bible",
@@ -282,8 +261,7 @@
     "path": "Abrahamic/Christianity/The_King_James_Version_of_the_Bible.txt",
     "char_count": 4351660,
     "word_count": 857542,
-    "sentence_count": 29892,
-    "color": "#D9DAD6"
+    "sentence_count": 29892
   },
   {
     "id": "Legends of Ma-ui a Demi God of Polynesia",
@@ -295,8 +273,7 @@
     "path": "Polynesian/Polynesian/Legends_of_Ma-ui_a_Demi_God_of_Polynesia.txt",
     "char_count": 246928,
     "word_count": 45526,
-    "sentence_count": 2200,
-    "color": "#4183F5"
+    "sentence_count": 2200
   },
   {
     "id": "The Odyssey",
@@ -308,8 +285,7 @@
     "path": "Indo-European/Greek/The_Odyssey.txt",
     "char_count": 697717,
     "word_count": 133756,
-    "sentence_count": 3738,
-    "color": "#0A0C13"
+    "sentence_count": 3738
   },
   {
     "id": "The Aeneid",
@@ -321,8 +297,7 @@
     "path": "Indo-European/Roman/The_Aeneid.txt",
     "char_count": 646803,
     "word_count": 116763,
-    "sentence_count": 4164,
-    "color": "#6ED551"
+    "sentence_count": 4164
   },
   {
     "id": "Myths of the Australian Aborigines",
@@ -334,8 +309,7 @@
     "path": "Indigenous_Australian/Australian/Myths_of_the_Australian_Aborigines.txt",
     "char_count": 824186,
     "word_count": 141607,
-    "sentence_count": 5235,
-    "color": "#66B4F0"
+    "sentence_count": 5235
   },
   {
     "id": "The Mahabharata",
@@ -347,8 +321,7 @@
     "path": "Indian/Hinduism/The_Mahabharata.txt",
     "char_count": 3693700,
     "word_count": 642393,
-    "sentence_count": 27196,
-    "color": "#923D54"
+    "sentence_count": 27196
   },
   {
     "id": "The Code of Hammurabi",
@@ -360,7 +333,6 @@
     "path": "Mesopotamian/Babylonian/The_Code_of_Hammurabi.txt",
     "char_count": 117716,
     "word_count": 21152,
-    "sentence_count": 1650,
-    "color": "#E61E71"
+    "sentence_count": 1650
   }
 ]

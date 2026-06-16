@@ -56,7 +56,6 @@ class TestIterCorpusFiles:
                 "id": "mytext",
                 "tradition": "Buddhism",
                 "major_tradition": "Eastern",
-                "color": "#FF0000",
                 "url": "http://example.com",
                 "path": "Eastern/Buddhism/mytext/mytext.txt",
             },
@@ -67,7 +66,6 @@ class TestIterCorpusFiles:
         r = results[0]
         assert r["tradition"] == "Buddhism"
         assert r["major_tradition"] == "Eastern"
-        assert r["color"] == "#FF0000"
         assert r["url"] == "http://example.com"
         assert r["text_id"] == "mytext"
 

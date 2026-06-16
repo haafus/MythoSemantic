@@ -56,7 +56,7 @@ def get_catalog_documents() -> list[dict]:
                 "word_count": to_int(row.get("word_count")),
                 "sentence_count": to_int(row.get("sentence_count")),
                 "char_count": to_int(row.get("char_count")),
-                "color": row.get("color") or tradition_info.get("color") or "#6b7280",
+                "color": tradition_info.get("color") or "#6b7280",
                 "description": row.get("description") or tradition_info.get("description", ""),
             }
         )

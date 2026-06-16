@@ -48,7 +48,7 @@ class TestBuildMetadata:
     def test_date_downloaded_is_timezone_aware(self):
         stats = {"md5": "abc", "char_count": 10, "word_count": 2, "sentence_count": 1}
         item = {**_BASE_ITEM, "title": "Iliad"}
-        meta = _build_metadata(item, path="/tmp/x.txt", color="#000", stats=stats)
+        meta = _build_metadata(item, path="/tmp/x.txt", stats=stats)
         parsed = datetime.fromisoformat(meta["date_downloaded"])
         assert parsed.tzinfo is not None
 
@@ -57,32 +57,32 @@ class TestBuildMetadataFields:
     def test_available_is_true(self):
         stats = {"md5": "abc", "char_count": 10, "word_count": 500, "sentence_count": 40}
         item = {**_BASE_ITEM, "title": "Iliad"}
-        meta = _build_metadata(item, path="/tmp/x.txt", color="#FF0000", stats=stats)
+        meta = _build_metadata(item, path="/tmp/x.txt", stats=stats)
         assert meta["available"] is True
         assert meta["word_count"] == 500
 
     def test_description_from_item(self):
         stats = {"md5": "abc", "char_count": 10, "word_count": 10, "sentence_count": 1}
         item = {**_BASE_ITEM, "title": "Iliad", "description": "An epic poem"}
-        meta = _build_metadata(item, path="/tmp/x.txt", color="#000", stats=stats)
+        meta = _build_metadata(item, path="/tmp/x.txt", stats=stats)
         assert meta["description"] == "An epic poem"
 
     def test_empty_description(self):
         stats = {"md5": "abc", "char_count": 10, "word_count": 10, "sentence_count": 1}
         item = {**_BASE_ITEM, "title": "Iliad"}
-        meta = _build_metadata(item, path="/tmp/x.txt", color="#000", stats=stats)
+        meta = _build_metadata(item, path="/tmp/x.txt", stats=stats)
         assert meta["description"] == ""
 
     def test_missing_major_tradition_defaults(self):
         stats = {"md5": "abc", "char_count": 10, "word_count": 1, "sentence_count": 1}
         item = {"tradition": "T", "url": "http://example.com/no-major"}
-        meta = _build_metadata(item, path="/tmp/x.txt", color="#000", stats=stats)
+        meta = _build_metadata(item, path="/tmp/x.txt", stats=stats)
         assert meta["major_tradition"] == "Unknown"
 
 
 class TestBuildFailureMetadata:
     def test_failure_has_zero_counts(self):
-        meta = _build_failure_metadata(_BASE_ITEM, color="#FF0000", error="Timeout")
+        meta = _build_failure_metadata(_BASE_ITEM, error="Timeout")
         assert meta["available"] is False
         assert meta["word_count"] == 0
         assert meta["sentence_count"] == 0
@@ -90,7 +90,7 @@ class TestBuildFailureMetadata:
 
     def test_failure_with_description_includes_both(self):
         item = {**_BASE_ITEM, "description": "The Odyssey"}
-        meta = _build_failure_metadata(item, color="#FF0000", error="404")
+        meta = _build_failure_metadata(item, error="404")
         assert "The Odyssey" in meta["description"]
         assert "404" in meta["description"]
 

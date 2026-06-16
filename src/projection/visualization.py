@@ -1,3 +1,4 @@
+import json
 import logging
 import textwrap
 from pathlib import Path
@@ -37,12 +38,19 @@ def _sample_for_visualization(data: list[dict], sample_size: int | None, reason:
 
 
 def _get_color_map(data: list[dict]) -> dict[str, str]:
+    traditions_path = settings.corpus_dir / "traditions.json"
+    traditions_info: dict = {}
+    if traditions_path.exists():
+        try:
+            with open(traditions_path, encoding="utf-8") as f:
+                traditions_info = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            pass
+
     color_map = {}
-    for item in data:
-        tradition = item.get("tradition", "unknown")
-        color = item.get("color")
-        if tradition not in color_map and color:
-            color_map[tradition] = color
+    for name, info in traditions_info.items():
+        if info.get("color"):
+            color_map[name] = info["color"]
 
     base_colors = px.colors.qualitative.Plotly
     unique_traditions = sorted(set(item.get("tradition", "unknown") for item in data))

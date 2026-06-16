@@ -42,7 +42,7 @@ def _finalize_text(text: str, url: str, tid: str) -> dict:
     }
 
 
-def _build_metadata(item: dict, *, path: str, color: str, stats: dict) -> dict:
+def _build_metadata(item: dict, *, path: str, stats: dict) -> dict:
     return {
         "id": _item_tid(item),
         "major_tradition": item.get("major_tradition", "Unknown"),
@@ -54,13 +54,12 @@ def _build_metadata(item: dict, *, path: str, color: str, stats: dict) -> dict:
         "char_count": stats["char_count"],
         "word_count": stats["word_count"],
         "sentence_count": stats["sentence_count"],
-        "color": color,
         "available": True,
         "description": item.get("description", ""),
     }
 
 
-def _build_failure_metadata(item: dict, *, color: str, error: str) -> dict:
+def _build_failure_metadata(item: dict, *, error: str) -> dict:
     description = item.get("description", "")
     return {
         "id": _item_tid(item),
@@ -70,7 +69,6 @@ def _build_failure_metadata(item: dict, *, color: str, error: str) -> dict:
         "available": False,
         "word_count": 0,
         "sentence_count": 0,
-        "color": color,
         "description": f"{description} [{error}]" if description else error,
     }
 
@@ -98,7 +96,7 @@ def _extract_text(data: bytes, url: str, tid: str, content_type: str = "") -> st
     return _decode_bytes(data)
 
 
-def process_local_file(filename: Path, item: dict, color: str) -> dict | None:
+def process_local_file(filename: Path, item: dict) -> dict | None:
     tid = _item_tid(item)
     url = item["url"]
 
@@ -108,7 +106,7 @@ def process_local_file(filename: Path, item: dict, color: str) -> dict | None:
         text = _extract_text(data, url, tid)
         stats = _finalize_text(text, url, tid)
         rel_path = str(filename.resolve().relative_to(Path(settings.corpus_dir).resolve()))
-        return _build_metadata(item, path=rel_path, color=color, stats=stats)
+        return _build_metadata(item, path=rel_path, stats=stats)
     except Exception:
         logger.exception("%s: Error processing local file %s", tid, filename)
         return None
@@ -117,17 +115,16 @@ def process_local_file(filename: Path, item: dict, color: str) -> dict | None:
 def process_single_item(item: dict, force: bool, metadata: list[dict]):
     tid = _item_tid(item)
     url = item["url"]
-    color = get_tradition_color(item["tradition"])
 
     if "_local_file" in item and not force:
         filename = Path(item["_local_file"])
         if filename.exists():
-            local_meta = process_local_file(filename, item, color)
+            local_meta = process_local_file(filename, item)
             with data_lock:
                 if local_meta:
                     metadata.append(local_meta)
                 else:
-                    metadata.append(_build_failure_metadata(item, color=color, error="Local file read error"))
+                    metadata.append(_build_failure_metadata(item, error="Local file read error"))
             return
         else:
             logger.warning(f"{tid}: Local file {filename} not found, trying download")
@@ -151,15 +148,15 @@ def process_single_item(item: dict, force: bool, metadata: list[dict]):
         with data_lock:
             rel_path = str(filename.resolve().relative_to(Path(settings.corpus_dir).resolve()))
             metadata.append(
-                _build_metadata(item, path=rel_path, color=color, stats=stats)
+                _build_metadata(item, path=rel_path, stats=stats)
             )
 
-        logger.info(f"Saved successfully: {filename.name} (words: {stats['word_count']}, color: {color})")
+        logger.info(f"Saved successfully: {filename.name} (words: {stats['word_count']})")
 
     except Exception as e:
         logger.exception("%s: Processing error", tid)
         with data_lock:
-            metadata.append(_build_failure_metadata(item, color=color, error=str(e)))
+            metadata.append(_build_failure_metadata(item, error=str(e)))
 
 
 def _update_traditions(force: bool) -> None:
