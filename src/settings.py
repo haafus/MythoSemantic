@@ -32,8 +32,8 @@ class EmbeddingSettings(BaseModel):
         "sentence-transformers/LaBSE",
         "intfloat/e5-large-v2",
         "Qwen/Qwen3-Embedding-0.6B",
-        "Qwen/Qwen3-Embedding-4B",
-        "uhhlt/story-emb",
+        # "Qwen/Qwen3-Embedding-4B",
+        # "uhhlt/story-emb",
     ]
 
 
