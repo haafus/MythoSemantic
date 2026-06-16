@@ -59,7 +59,7 @@ class TestSanitizeFilename:
 class TestCorpusTextPath:
     def test_canonical_layout(self, tmp_path):
         path = corpus_text_path(tmp_path, "European", "Greek", "Iliad")
-        assert path == tmp_path / "European" / "Greek" / "Iliad" / "Iliad.txt"
+        assert path == tmp_path / "European" / "Greek" / "Iliad.txt"
 
     def test_spaces_and_slashes_normalized(self, tmp_path):
         path = corpus_text_path(tmp_path, "Near East", "Sumer/Akkad", "Epic of Gilgamesh")

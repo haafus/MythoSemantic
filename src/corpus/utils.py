@@ -53,11 +53,11 @@ def ensure_dir(path: Path):
 
 
 def corpus_text_path(corpus_dir: Path, major_tradition: str, tradition: str, tid: str) -> Path:
-    """Canonical on-disk location of a corpus text: <major>/<tradition>/<title>/<title>.txt"""
+    """Canonical on-disk location of a corpus text: <major>/<tradition>/<title>.txt"""
     major = sanitize_filename(major_tradition)
     trad = sanitize_filename(tradition)
     title = sanitize_filename(tid)
-    return corpus_dir / major / trad / title / f"{title}.txt"
+    return corpus_dir / major / trad / f"{title}.txt"
 
 
 def get_tradition_color(tradition: str) -> str:
