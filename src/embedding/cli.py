@@ -67,7 +67,7 @@ def query(ctx, query: str, top_k: int, model: str | None):
 
 
 
-@click.command("delete-collection")
+@click.command("remove")
 @click.option("--model", "-m", default=None, help="Model whose collection should be deleted")
 @click.option("--yes", is_flag=True, help="Skip confirmation")
 @click.pass_context
