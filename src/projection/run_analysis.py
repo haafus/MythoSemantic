@@ -56,8 +56,6 @@ def analyze_embeddings(
                 logger.warning(f"No data found for model {current_model}, skipping...")
                 continue
 
-            analyzer.print_statistics()
-
             if generate_all_plots and analyzer.data:
                 _generate_all_plots(analyzer, force=force)
 
