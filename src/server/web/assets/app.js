@@ -738,6 +738,7 @@ async function renderProjectionPlot(data) {
     const traces = traditions.map((tradition) => {
         const pts = points.filter((point) => (point.tradition || "Unknown") === tradition);
         return {
+            type: "scattergl",
             x: pts.map((point) => point.x),
             y: pts.map((point) => point.y),
             mode: "markers",
