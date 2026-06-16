@@ -56,10 +56,10 @@ def analyze_embeddings(
                 logger.warning(f"No data found for model {current_model}, skipping...")
                 continue
 
-            if generate_all_plots and analyzer.data:
+            if generate_all_plots:
                 _generate_all_plots(analyzer, force=force)
 
-            if motif_analysis and analyzer.data:
+            if motif_analysis:
                 _generate_motif_plot(analyzer, force=force)
 
         return analyzer

@@ -152,7 +152,6 @@ def _plot_umap_scatter(
 ) -> go.Figure | None:
     if output_dir is None:
         output_dir = settings.analysis_dir
-    output_dir.mkdir(parents=True, exist_ok=True)
 
     embedding_2d = _reduce_dimensions_safe(embeddings, n_components=2, reducer_kwargs=reducer_kwargs or {})
     if embedding_2d is None:
@@ -231,14 +230,7 @@ def plot_interactive_2d(
     model_name: str | None = None,
     reducer_kwargs: dict[str, Any] | None = None,
 ) -> go.Figure | None:
-    if not data:
-        logger.warning("No data for visualization.")
-        return None
-    try:
-        embeddings = np.stack([item["embedding"] for item in data])
-    except Exception:
-        logger.exception("Failed to stack embeddings")
-        return None
+    embeddings = np.stack([item["embedding"] for item in data])
     return _plot_umap_scatter(
         data, embeddings,
         title_prefix="UMAP visualization by tradition",
@@ -256,14 +248,7 @@ def plot_residual_umap(
     model_name: str | None = None,
     reducer_kwargs: dict[str, Any] | None = None,
 ) -> go.Figure | None:
-    if not data:
-        logger.warning("No data for visualization.")
-        return None
-    try:
-        embeddings = np.stack([item["embedding"] for item in data])
-    except Exception:
-        logger.exception("Failed to stack embeddings")
-        return None
+    embeddings = np.stack([item["embedding"] for item in data])
     residuals = _compute_tradition_residuals(data, embeddings)
     return _plot_umap_scatter(
         data, residuals,
@@ -282,14 +267,7 @@ def plot_residual_normalized_umap(
     model_name: str | None = None,
     reducer_kwargs: dict[str, Any] | None = None,
 ) -> go.Figure | None:
-    if not data:
-        logger.warning("No data for visualization.")
-        return None
-    try:
-        embeddings = np.stack([item["embedding"] for item in data])
-    except Exception:
-        logger.exception("Failed to stack embeddings")
-        return None
+    embeddings = np.stack([item["embedding"] for item in data])
     residuals = _compute_tradition_residuals(data, embeddings)
     residuals = Normalizer(norm="l2").fit_transform(residuals)
     return _plot_umap_scatter(
@@ -309,14 +287,7 @@ def plot_rlace_umap(
     model_name: str | None = None,
     reducer_kwargs: dict[str, Any] | None = None,
 ) -> go.Figure | None:
-    if not data:
-        logger.warning("No data for visualization.")
-        return None
-    try:
-        embeddings = np.stack([item["embedding"] for item in data])
-    except Exception:
-        logger.exception("Failed to stack embeddings")
-        return None
+    embeddings = np.stack([item["embedding"] for item in data])
     erased = _concept_erasure(data, embeddings)
     return _plot_umap_scatter(
         data, erased,
@@ -331,13 +302,8 @@ def plot_rlace_umap(
 def plot_distance_heatmap(
     data: list[dict], output_dir: Path | None = None, model_name: str | None = None, save_html: bool = True
 ) -> go.Figure | None:
-    if not data:
-        logger.warning("No data for visualization.")
-        return None
-
     if output_dir is None:
         output_dir = settings.analysis_dir
-    output_dir.mkdir(parents=True, exist_ok=True)
 
     traditions_data: dict[str, list] = {}
     for item in data:
@@ -396,13 +362,8 @@ def plot_distance_heatmap(
 def plot_tradition_distribution(
     data: list[dict], output_dir: Path | None = None, model_name: str | None = None, save_html: bool = True
 ) -> go.Figure | None:
-    if not data:
-        logger.warning("No data for visualization.")
-        return None
-
     if output_dir is None:
         output_dir = settings.analysis_dir
-    output_dir.mkdir(parents=True, exist_ok=True)
 
     tradition_counts: dict[str, int] = {}
     tradition_docs: dict[str, set] = {}

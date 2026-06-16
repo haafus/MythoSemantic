@@ -14,7 +14,6 @@ class EmbeddingAnalyzer:
         self.loader = EmbeddingDataLoader()
         self.model_name: str | None = None
         self.data: list[dict[str, Any]] = []
-        self._is_loaded = False
         self.output_dir: Path = settings.analysis_dir
 
         if model_name:
@@ -27,7 +26,6 @@ class EmbeddingAnalyzer:
 
         logger.info(f"Loading data for model: {model_name}...")
         self.data = self.loader.load_data(model_name=model_name)
-        self._is_loaded = bool(self.data)
 
         if not self.data:
             logger.warning(f"No data found for model '{model_name}' ")
@@ -35,7 +33,7 @@ class EmbeddingAnalyzer:
             logger.info(f"Chunks loaded: {len(self.data)}")
 
     def filter_by_model(self) -> list[dict[str, Any]]:
-        if not self._is_loaded or not self.data:
+        if not self.data:
             raise RuntimeError("Data is not loaded. Call .set_model() first.")
         return self.data
 
