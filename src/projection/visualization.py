@@ -121,9 +121,10 @@ def _concept_erasure(data: list[dict], embeddings: np.ndarray, max_iters: int = 
         clf = LogisticRegression(max_iter=2000, solver="lbfgs", C=1.0)
         clf.fit(X_proj, y)
         acc = clf.score(X_proj, y)
-        logger.info(f"  INLP iteration {i + 1}: classifier accuracy = {acc:.3f} (chance = {chance:.3f})")
+        print(f"  INLP iteration {i + 1}/{max_iters}: accuracy = {acc:.3f} (chance = {chance:.3f})", end="\r", flush=True)
 
         if acc < chance + 0.03:
+            print()
             logger.info(f"  INLP converged after {i + 1} iterations")
             break
 
@@ -132,6 +133,8 @@ def _concept_erasure(data: list[dict], embeddings: np.ndarray, max_iters: int = 
         basis = Vt[S > 1e-10]
         rowspace_proj = basis.T @ basis
         P = P @ (np.eye(d, dtype=np.float64) - rowspace_proj)
+    else:
+        print()
 
     return (X @ P).astype(embeddings.dtype)
 
