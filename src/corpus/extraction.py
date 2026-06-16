@@ -17,8 +17,6 @@ from .utils import normalize_text
 
 logger = logging.getLogger(__name__)
 
-PYMUPDF_AVAILABLE = True
-
 
 def _decode_bytes(content: bytes) -> str:
     encodings_to_try = ["utf-8", "windows-1251", "iso-8859-1", "cp1251", "gb2312"]
@@ -79,10 +77,6 @@ def pdf_to_text(
     pdf_content: bytes, extract_tables: bool = False, preserve_layout: bool = True, ocr_fallback: bool = False
 ) -> str:
     if not pdf_content:
-        return ""
-
-    if not PYMUPDF_AVAILABLE:
-        logger.error("PyMuPDF is not installed.")
         return ""
 
     text_parts = []

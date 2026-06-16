@@ -59,15 +59,18 @@ class EmbeddingAnalyzer:
 
     def print_statistics(self) -> None:
         if not self._is_loaded or not self.data:
-            print("No data loaded!")
+            logger.warning("No data loaded!")
             return
 
         stats = self.get_statistics()
-        print("Embedding statistics:")
-        print(f"   • Model: {self.model_name}")
-        print(f"   • Chunks: {stats['n_samples']}")
-        print(f"   • Dimension: {stats['embedding_dim']}")
-        print(f"   • Traditions: {stats['traditions']}")
-        print("   • Tradition Distribution:")
+        lines = [
+            "Embedding statistics:",
+            f"   Model: {self.model_name}",
+            f"   Chunks: {stats['n_samples']}",
+            f"   Dimension: {stats['embedding_dim']}",
+            f"   Traditions: {stats['traditions']}",
+            "   Tradition Distribution:",
+        ]
         for trad, count in sorted(stats["tradition_counts"].items(), key=lambda x: -x[1]):
-            print(f"     {trad:<20}: {count:>4}")
+            lines.append(f"     {trad:<20}: {count:>4}")
+        logger.info("\n".join(lines))
