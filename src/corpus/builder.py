@@ -107,7 +107,8 @@ def process_local_file(filename: Path, item: dict, color: str) -> dict | None:
         data = filename.read_bytes()
         text = _extract_text(data, url, tid)
         stats = _finalize_text(text, url, tid)
-        return _build_metadata(item, path=str(filename.resolve()), color=color, stats=stats)
+        rel_path = str(filename.resolve().relative_to(Path(settings.corpus_dir).resolve()))
+        return _build_metadata(item, path=rel_path, color=color, stats=stats)
     except Exception:
         logger.exception("%s: Error processing local file %s", tid, filename)
         return None
@@ -148,8 +149,9 @@ def process_single_item(item: dict, force: bool, metadata: list[dict]):
             filename.write_bytes(stats["data_utf8"])
 
         with data_lock:
+            rel_path = str(filename.resolve().relative_to(Path(settings.corpus_dir).resolve()))
             metadata.append(
-                _build_metadata(item, path=str(filename.resolve()), color=color, stats=stats)
+                _build_metadata(item, path=rel_path, color=color, stats=stats)
             )
 
         logger.info(f"Saved successfully: {filename.name} (words: {stats['word_count']}, color: {color})")
