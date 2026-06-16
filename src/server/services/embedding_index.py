@@ -94,9 +94,9 @@ class EmbeddingIndexService:
         from projection.analyzer import EmbeddingAnalyzer
 
         analyzer = EmbeddingAnalyzer(model_name=model_name)
-        items = analyzer.filter_by_model()
+        items = analyzer.data
         if not items:
-            raise RuntimeError(f"No embedding data found for {model_name}")
+            raise KeyError(f"No embedding data found for {model_name}")
 
         matrix = np.stack([item["embedding"] for item in items]).astype(np.float32)
         normalized_matrix = self._normalize_matrix(matrix)
