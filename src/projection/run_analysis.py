@@ -33,6 +33,7 @@ def analyze_embeddings(
     generate_all_plots: bool = True,
     motif_analysis: bool = False,
     story_emb: bool = False,
+    force: bool = False,
 ) -> EmbeddingAnalyzer | None:
     try:
         from .loader import EmbeddingDataLoader
@@ -59,13 +60,13 @@ def analyze_embeddings(
             analyzer.print_statistics()
 
             if generate_all_plots and analyzer.data:
-                _generate_all_plots(analyzer)
+                _generate_all_plots(analyzer, force=force)
 
             if motif_analysis and analyzer.data:
-                _generate_motif_plot(analyzer)
+                _generate_motif_plot(analyzer, force=force)
 
             if story_emb and analyzer.data:
-                _generate_story_plot(analyzer)
+                _generate_story_plot(analyzer, force=force)
 
         return analyzer
 
@@ -74,77 +75,61 @@ def analyze_embeddings(
         return None
 
 
-def _generate_all_plots(analyzer: EmbeddingAnalyzer) -> None:
+def _generate_all_plots(analyzer: EmbeddingAnalyzer, force: bool = False) -> None:
     data = analyzer.filter_by_model()
     cfg = settings.projection
+    out = analyzer.output_dir
+    reducer_kwargs = {"n_neighbors": cfg.umap_n_neighbors, "min_dist": cfg.umap_min_dist}
 
-    logger.info("Generating UMAP projection...")
-    try:
-        plot_interactive_2d(
-            data,
-            output_dir=analyzer.output_dir,
-            model_name=analyzer.model_name,
-            reducer_kwargs={"n_neighbors": cfg.umap_n_neighbors, "min_dist": cfg.umap_min_dist},
-        )
-    except Exception:
-        logger.exception("Error creating UMAP plot")
+    umap_plots = [
+        ("UMAP projection", "umap_2d_traditions.html", plot_interactive_2d),
+        ("Residual UMAP projection", "residual_umap_2d.html", plot_residual_umap),
+        ("Residual Normalized UMAP projection", "residual_normalized_umap_2d.html", plot_residual_normalized_umap),
+        ("RLACE UMAP projection (INLP concept erasure)", "rlace_umap_2d.html", plot_rlace_umap),
+    ]
+    simple_plots = [
+        ("Distance heatmap", "distance_heatmap.html", plot_distance_heatmap),
+        ("Tradition distribution chart", "tradition_distribution.html", plot_tradition_distribution),
+    ]
 
-    logger.info("Generating Residual UMAP projection...")
-    try:
-        plot_residual_umap(
-            data,
-            output_dir=analyzer.output_dir,
-            model_name=analyzer.model_name,
-            reducer_kwargs={"n_neighbors": cfg.umap_n_neighbors, "min_dist": cfg.umap_min_dist},
-        )
-    except Exception:
-        logger.exception("Error creating Residual UMAP plot")
+    generated = False
+    for label, filename, plot_fn in umap_plots:
+        if not force and (out / filename).exists():
+            logger.info("Skipping %s (already exists)", label)
+            continue
+        logger.info("Generating %s...", label)
+        try:
+            plot_fn(data, output_dir=out, model_name=analyzer.model_name, reducer_kwargs=reducer_kwargs)
+            generated = True
+        except Exception:
+            logger.exception("Error creating %s", label)
 
-    logger.info("Generating Residual Normalized UMAP projection...")
-    try:
-        plot_residual_normalized_umap(
-            data,
-            output_dir=analyzer.output_dir,
-            model_name=analyzer.model_name,
-            reducer_kwargs={"n_neighbors": cfg.umap_n_neighbors, "min_dist": cfg.umap_min_dist},
-        )
-    except Exception:
-        logger.exception("Error creating Residual Normalized UMAP plot")
+    for label, filename, plot_fn in simple_plots:
+        if not force and (out / filename).exists():
+            logger.info("Skipping %s (already exists)", label)
+            continue
+        logger.info("Generating %s...", label)
+        try:
+            plot_fn(data, output_dir=out, model_name=analyzer.model_name)
+            generated = True
+        except Exception:
+            logger.exception("Error creating %s", label)
 
-    logger.info("Generating RLACE UMAP projection (INLP concept erasure)...")
-    try:
-        plot_rlace_umap(
-            data,
-            output_dir=analyzer.output_dir,
-            model_name=analyzer.model_name,
-            reducer_kwargs={"n_neighbors": cfg.umap_n_neighbors, "min_dist": cfg.umap_min_dist},
-        )
-    except Exception:
-        logger.exception("Error creating RLACE UMAP plot")
+    if generated:
+        try:
+            if analyzer.model_name:
+                generate_clickable_plots(out, analyzer.model_name)
+        except Exception:
+            logger.exception("Error adding click handlers")
 
-    logger.info("  - Distance heatmap...")
-    try:
-        plot_distance_heatmap(data, output_dir=analyzer.output_dir, model_name=analyzer.model_name)
-    except Exception:
-        logger.exception("Error creating heatmap")
-
-    logger.info("  - Tradition distribution chart...")
-    try:
-        plot_tradition_distribution(data, output_dir=analyzer.output_dir, model_name=analyzer.model_name)
-    except Exception:
-        logger.exception("Error creating distribution chart")
-
-    logger.info("  - Adding click handlers...")
-    try:
-        if analyzer.model_name:
-            generate_clickable_plots(analyzer.output_dir, analyzer.model_name)
-    except Exception:
-        logger.exception("Error adding click handlers")
-
-    logger.info(f"\nAll visualizations for {analyzer.model_name} saved to: {analyzer.output_dir}")
+    logger.info("Visualizations for %s: %s", analyzer.model_name, out)
 
 
-def _generate_motif_plot(analyzer: EmbeddingAnalyzer) -> None:
+def _generate_motif_plot(analyzer: EmbeddingAnalyzer, force: bool = False) -> None:
+    if not force and (analyzer.output_dir / "motif_umap_2d.html").exists():
+        logger.info("Skipping Motif UMAP (already exists)")
+        return
+
     from .motif_analysis import run_motif_analysis
 
     data = analyzer.filter_by_model()
@@ -163,7 +148,11 @@ def _generate_motif_plot(analyzer: EmbeddingAnalyzer) -> None:
         logger.exception("Error creating Motif UMAP plot")
 
 
-def _generate_story_plot(analyzer: EmbeddingAnalyzer) -> None:
+def _generate_story_plot(analyzer: EmbeddingAnalyzer, force: bool = False) -> None:
+    if not force and (analyzer.output_dir / "story_umap_2d.html").exists():
+        logger.info("Skipping Story UMAP (already exists)")
+        return
+
     from .motif_analysis import run_story_embedding_analysis
 
     data = analyzer.filter_by_model()

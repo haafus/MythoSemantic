@@ -69,11 +69,12 @@ def embeddings(ctx, verbose: bool):
 @click.option("--no-plots", is_flag=True, help="Skip plot generation, only compute stats.")
 @click.option("--motif-analysis", is_flag=True, help="Generate motif UMAP from LLM plot summaries.")
 @click.option("--story-emb", is_flag=True, help="Generate story UMAP from narrative re-embedding.")
-def projection(model: str | None, no_plots: bool, motif_analysis: bool, story_emb: bool):
+@click.option("--force", is_flag=True, help="Regenerate all plots even if they already exist.")
+def projection(model: str | None, no_plots: bool, motif_analysis: bool, story_emb: bool, force: bool):
     """Generate UMAP projections and embedding visualizations."""
     from projection.run_analysis import analyze_embeddings
 
-    analyzer = analyze_embeddings(model_name=model, generate_all_plots=not no_plots, motif_analysis=motif_analysis, story_emb=story_emb)
+    analyzer = analyze_embeddings(model_name=model, generate_all_plots=not no_plots, motif_analysis=motif_analysis, story_emb=story_emb, force=force)
     if analyzer is None:
         click.echo(click.style("No data found — check that embeddings exist.", fg="red"), err=True)
         sys.exit(1)
