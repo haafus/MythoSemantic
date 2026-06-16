@@ -32,5 +32,6 @@ def reduce_dimensions(
         min_dist=kwargs.get("min_dist", 0.1),
         metric=kwargs.get("metric", "cosine"),
         random_state=random_state,
+        n_jobs=1,
     ).fit_transform(data)
     return result
