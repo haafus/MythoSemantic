@@ -8,8 +8,6 @@ from urllib3.util.retry import Retry
 
 from settings import settings
 
-from .utils import corpus_text_path
-
 logger = logging.getLogger(__name__)
 
 # Lazily initialized: creating a session / UserAgent at import time would make
@@ -47,7 +45,7 @@ def _get_user_agent():
     return _user_agent
 
 
-def load_download_list(force: bool = False) -> list[dict]:
+def load_download_list() -> list[dict]:
     if not Path(settings.corpus_config_file).exists():
         logger.error(f"Download list file not found: {settings.corpus_config_file}")
         return []
@@ -55,29 +53,16 @@ def load_download_list(force: bool = False) -> list[dict]:
     with open(settings.corpus_config_file, encoding="utf-8") as f:
         items = json.load(f)
 
-    seen_urls = set()
+    seen_urls: set[str] = set()
     filtered = []
 
     for item in items:
         url = item["url"]
-        tid = item.get("title", item.get("id", "unknown_id"))
-        tradition = item["tradition"]
-
         if url in seen_urls:
             logger.warning(f"Duplicate URL: {url}, skipping")
             continue
-
-        filename = corpus_text_path(settings.corpus_dir, item.get("major_tradition", "Unknown"), tradition, tid)
-
-        if filename.exists() and not force:
-            logger.info(f"File exists for {tid}, will be processed locally")
-            new_item = item.copy()
-            new_item["_local_file"] = str(filename)
-            seen_urls.add(url)
-            filtered.append(new_item)
-        else:
-            seen_urls.add(url)
-            filtered.append(item)
+        seen_urls.add(url)
+        filtered.append(item)
 
     return filtered
 

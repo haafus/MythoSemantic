@@ -82,36 +82,9 @@ def _extract_text(data: bytes, url: str, tid: str, content_type: str = "") -> st
     return _decode_bytes(data)
 
 
-def process_local_file(filename: Path, item: dict) -> dict | None:
+def _download_and_process(item: dict) -> dict | None:
     tid = _item_tid(item)
     url = item["url"]
-
-    try:
-        logger.info(f"{tid}: Processing existing file {filename}")
-        data = filename.read_bytes()
-        text = _extract_text(data, url, tid)
-        stats = _finalize_text(text, url, tid)
-        rel_path = str(filename.resolve().relative_to(Path(settings.corpus_dir).resolve()))
-        return _build_metadata(item, path=rel_path, stats=stats)
-    except Exception:
-        logger.exception("%s: Error processing local file %s", tid, filename)
-        return None
-
-
-def process_single_item(item: dict, force: bool, metadata: list[dict]):
-    tid = _item_tid(item)
-    url = item["url"]
-
-    if "_local_file" in item and not force:
-        filename = Path(item["_local_file"])
-        if filename.exists():
-            local_meta = process_local_file(filename, item)
-            if local_meta:
-                with data_lock:
-                    metadata.append(local_meta)
-            return
-        else:
-            logger.warning(f"{tid}: Local file {filename} not found, trying download")
 
     try:
         data = download_file(url)
@@ -129,16 +102,14 @@ def process_single_item(item: dict, force: bool, metadata: list[dict]):
             ensure_dir(filename.parent)
             filename.write_bytes(stats["data_utf8"])
 
-        with data_lock:
-            rel_path = str(filename.resolve().relative_to(Path(settings.corpus_dir).resolve()))
-            metadata.append(
-                _build_metadata(item, path=rel_path, stats=stats)
-            )
-
+        rel_path = str(filename.resolve().relative_to(Path(settings.corpus_dir).resolve()))
+        meta = _build_metadata(item, path=rel_path, stats=stats)
         logger.info(f"Saved successfully: {filename.name} (words: {stats['word_count']})")
+        return meta
 
     except Exception:
         logger.exception("%s: Processing error", tid)
+        return None
 
 
 def _update_traditions(force: bool) -> None:
@@ -170,29 +141,60 @@ def _update_traditions(force: bool) -> None:
         json.dump(result, f, ensure_ascii=False, indent=2)
 
 
+def _load_existing_metadata() -> dict[str, dict]:
+    path = settings.corpus_metadata_path
+    if not path.exists():
+        return {}
+    try:
+        with open(path, encoding="utf-8") as f:
+            rows = json.load(f)
+        return {row["id"]: row for row in rows if "id" in row}
+    except (OSError, json.JSONDecodeError, KeyError) as e:
+        logger.warning("Failed to read existing %s: %s", path, e)
+        return {}
+
+
 def build_corpus(force: bool = False):
     ensure_dir(settings.corpus_dir)
-    metadata: list[dict] = []
 
-    download_list = load_download_list(force)
+    download_list = load_download_list()
 
     _update_traditions(force)
 
-    logger.info(f"Starting multithreaded build (items: {len(download_list)})")
+    existing = {} if force else _load_existing_metadata()
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=settings.corpus.max_workers) as executor:
-        futures = [executor.submit(process_single_item, item, force, metadata) for item in download_list]
-        for future in concurrent.futures.as_completed(futures):
-            exc = future.exception()
-            if exc:
-                logger.error(f"Unhandled error in worker thread: {exc}")
+    to_download = []
+    metadata: list[dict] = []
+    corpus_root = Path(settings.corpus_dir).resolve()
+
+    for item in download_list:
+        tid = _item_tid(item)
+        prev = existing.get(tid)
+        if prev and (corpus_root / prev.get("path", "")).exists():
+            metadata.append(prev)
+            logger.debug(f"{tid}: already in corpus, skipping")
+        else:
+            to_download.append(item)
+
+    logger.info(f"Corpus: {len(metadata)} cached, {len(to_download)} to download")
+
+    if to_download:
+        new_metadata: list[dict] = []
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=settings.corpus.max_workers) as executor:
+            futures = {executor.submit(_download_and_process, item): item for item in to_download}
+            for future in concurrent.futures.as_completed(futures):
+                result = future.result()
+                if result:
+                    new_metadata.append(result)
+
+        metadata.extend(new_metadata)
+        logger.info(f"Downloaded: {len(new_metadata)}, failed: {len(to_download) - len(new_metadata)}")
 
     with open(settings.corpus_metadata_path, "w", encoding="utf-8") as f:
         json.dump(metadata, f, ensure_ascii=False, indent=2)
 
-    failed = len(download_list) - len(metadata)
-    logger.info("Corpus build complete.")
-    logger.info(f"Downloaded: {len(metadata)}, failed: {failed}")
+    logger.info("Corpus build complete. Total: %d texts", len(metadata))
 
     if metadata:
         total_words = sum(m.get("word_count", 0) for m in metadata)
