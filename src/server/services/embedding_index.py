@@ -119,6 +119,10 @@ class EmbeddingIndexService:
             return str(point_id)
         return f"{point_id}::{chunk_index}"
 
+    def warmup(self, model_key: str) -> None:
+        self.get_index(model_key)
+        self._embed_query(model_key, "warmup")
+
     def _embed_query(self, model_name: str, query: str) -> np.ndarray:
         from sentence_transformers import SentenceTransformer
 

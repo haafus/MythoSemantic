@@ -14,6 +14,7 @@ export const state = {
     lastAnalysisSearchData: null,
     analysisSearchRequestId: 0,
     searchPageRequestId: 0,
+    warmedSearchModels: new Set(),
     keydownHandler: null,
 };
 
