@@ -54,23 +54,9 @@ def _build_metadata(item: dict, *, path: str, stats: dict) -> dict:
         "char_count": stats["char_count"],
         "word_count": stats["word_count"],
         "sentence_count": stats["sentence_count"],
-        "available": True,
         "description": item.get("description", ""),
     }
 
-
-def _build_failure_metadata(item: dict, *, error: str) -> dict:
-    description = item.get("description", "")
-    return {
-        "id": _item_tid(item),
-        "major_tradition": item.get("major_tradition", "Unknown"),
-        "tradition": item["tradition"],
-        "url": item["url"],
-        "available": False,
-        "word_count": 0,
-        "sentence_count": 0,
-        "description": f"{description} [{error}]" if description else error,
-    }
 
 
 def _extract_text(data: bytes, url: str, tid: str, content_type: str = "") -> str:
@@ -120,11 +106,9 @@ def process_single_item(item: dict, force: bool, metadata: list[dict]):
         filename = Path(item["_local_file"])
         if filename.exists():
             local_meta = process_local_file(filename, item)
-            with data_lock:
-                if local_meta:
+            if local_meta:
+                with data_lock:
                     metadata.append(local_meta)
-                else:
-                    metadata.append(_build_failure_metadata(item, error="Local file read error"))
             return
         else:
             logger.warning(f"{tid}: Local file {filename} not found, trying download")
@@ -153,10 +137,8 @@ def process_single_item(item: dict, force: bool, metadata: list[dict]):
 
         logger.info(f"Saved successfully: {filename.name} (words: {stats['word_count']})")
 
-    except Exception as e:
+    except Exception:
         logger.exception("%s: Processing error", tid)
-        with data_lock:
-            metadata.append(_build_failure_metadata(item, error=str(e)))
 
 
 def _update_traditions(force: bool) -> None:
@@ -208,17 +190,13 @@ def build_corpus(force: bool = False):
     with open(settings.corpus_metadata_path, "w", encoding="utf-8") as f:
         json.dump(metadata, f, ensure_ascii=False, indent=2)
 
+    failed = len(download_list) - len(metadata)
     logger.info("Corpus build complete.")
-    logger.info(f"Total records: {len(metadata)}")
+    logger.info(f"Downloaded: {len(metadata)}, failed: {failed}")
 
-    available = [m for m in metadata if m.get("available", True)]
-    logger.info(f"Available: {len(available)}")
-    logger.info(f"Unavailable: {len(metadata) - len(available)}")
-
-    if available:
-        total_words = sum(m.get("word_count", 0) for m in available)
-        total_sentences = sum(m.get("sentence_count", 0) for m in available)
-        logger.info("\nOverall statistics for available texts:")
+    if metadata:
+        total_words = sum(m.get("word_count", 0) for m in metadata)
+        total_sentences = sum(m.get("sentence_count", 0) for m in metadata)
         logger.info(f"  Total words: {total_words}")
         logger.info(f"  Total sentences: {total_sentences}")
-        logger.info(f"  Average words per text: {total_words / len(available):.1f}")
+        logger.info(f"  Average words per text: {total_words / len(metadata):.1f}")

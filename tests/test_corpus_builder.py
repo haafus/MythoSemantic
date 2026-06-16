@@ -20,7 +20,7 @@ if not hasattr(fu_mod, "UserAgent"):
 
 from datetime import datetime
 
-from corpus.builder import _build_failure_metadata, _build_metadata, _item_tid, _update_traditions
+from corpus.builder import _build_metadata, _item_tid, _update_traditions
 
 
 class TestItemTid:
@@ -54,11 +54,10 @@ class TestBuildMetadata:
 
 
 class TestBuildMetadataFields:
-    def test_available_is_true(self):
+    def test_word_count(self):
         stats = {"md5": "abc", "char_count": 10, "word_count": 500, "sentence_count": 40}
         item = {**_BASE_ITEM, "title": "Iliad"}
         meta = _build_metadata(item, path="/tmp/x.txt", stats=stats)
-        assert meta["available"] is True
         assert meta["word_count"] == 500
 
     def test_description_from_item(self):
@@ -79,20 +78,6 @@ class TestBuildMetadataFields:
         meta = _build_metadata(item, path="/tmp/x.txt", stats=stats)
         assert meta["major_tradition"] == "Unknown"
 
-
-class TestBuildFailureMetadata:
-    def test_failure_has_zero_counts(self):
-        meta = _build_failure_metadata(_BASE_ITEM, error="Timeout")
-        assert meta["available"] is False
-        assert meta["word_count"] == 0
-        assert meta["sentence_count"] == 0
-        assert "Timeout" in meta["description"]
-
-    def test_failure_with_description_includes_both(self):
-        item = {**_BASE_ITEM, "description": "The Odyssey"}
-        meta = _build_failure_metadata(item, error="404")
-        assert "The Odyssey" in meta["description"]
-        assert "404" in meta["description"]
 
 
 class TestUpdateTraditions:
