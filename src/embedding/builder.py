@@ -134,9 +134,8 @@ class EmbeddingBuilder:
         collection_name = collection_name_for_model(self.model_name)
         t0 = time.monotonic()
         files_info = list(iter_corpus_files(self.corpus_dir))
-        total_files = len(files_info)
 
-        if total_files == 0:
+        if not files_info:
             logger.warning("No files found in corpus/. Check the folder structure.")
             return
 
@@ -146,21 +145,27 @@ class EmbeddingBuilder:
         if existing_ids:
             logger.info(f"Collection '{collection_name}' has {len(existing_ids)} existing chunks, resuming")
 
+        file_chunks: list[tuple[dict, list[str]]] = []
+        total_chunks = 0
+        for fi in files_info:
+            content = Path(fi["path"]).read_text(encoding="utf-8")
+            chunks = self._chunk_text(content)
+            if chunks:
+                file_chunks.append((fi, chunks))
+                total_chunks += len(chunks)
+
         write_queue, writer_thread = self._chroma.start_background_writer(collection)
 
-        logger.info(f"Saving {total_files} files to collection '{collection_name}'")
+        logger.info(f"Saving {len(files_info)} files ({total_chunks} chunks) to collection '{collection_name}'")
         added_total = 0
         skipped_total = 0
+        batch_size = self._models.batch_size
 
-        with tqdm(total=total_files, desc="Processing files", unit="file") as pbar:
-            for file_info in files_info:
+        with tqdm(total=total_chunks, desc="Embedding", unit="chunk") as pbar:
+            for file_info, chunks in file_chunks:
+                n_chunks = len(chunks)
+                chunks_accounted = 0
                 try:
-                    content = Path(file_info["path"]).read_text(encoding="utf-8")
-                    chunks = self._chunk_text(content)
-
-                    if not chunks:
-                        continue
-
                     ids, metadatas = self._chroma.build_entries(
                         chunks, file_info, self.model_name, self.current_chunking.name
                     )
@@ -170,29 +175,56 @@ class EmbeddingBuilder:
                         if cid not in existing_ids
                     ]
 
+                    n_skipped = n_chunks - len(missing)
+                    if n_skipped:
+                        skipped_total += n_skipped
+                        pbar.update(n_skipped)
+                        chunks_accounted += n_skipped
+
                     if not missing:
-                        skipped_total += len(chunks)
                         continue
 
                     missing_indices = [i for i, _ in missing]
                     missing_chunks = [chunk for _, chunk in missing]
-                    embeddings = self._generate_embeddings(missing_chunks)
-
                     missing_ids = [ids[i] for i in missing_indices]
                     missing_metas = [metadatas[i] for i in missing_indices]
 
-                    chroma_bs = min(self._chroma.chroma_batch_size, len(missing_chunks))
-                    for i in range(0, len(missing_chunks), chroma_bs):
-                        end = min(i + chroma_bs, len(missing_chunks))
-                        write_queue.put((missing_ids[i:end], embeddings[i:end].tolist(), missing_metas[i:end], missing_chunks[i:end]))
+                    for b_start in range(0, len(missing_chunks), batch_size):
+                        b_end = min(b_start + batch_size, len(missing_chunks))
+                        b_chunks = missing_chunks[b_start:b_end]
+
+                        b_embs = self._models.model.encode(
+                            b_chunks,
+                            batch_size=batch_size,
+                            show_progress_bar=False,
+                            normalize_embeddings=True,
+                        )
+                        b_embs = np.asarray(b_embs, dtype=np.float32)
+
+                        b_ids = missing_ids[b_start:b_end]
+                        b_metas = missing_metas[b_start:b_end]
+
+                        chroma_bs = min(self._chroma.chroma_batch_size, len(b_chunks))
+                        for c_start in range(0, len(b_chunks), chroma_bs):
+                            c_end = min(c_start + chroma_bs, len(b_chunks))
+                            write_queue.put((
+                                b_ids[c_start:c_end],
+                                b_embs[c_start:c_end].tolist(),
+                                b_metas[c_start:c_end],
+                                b_chunks[c_start:c_end],
+                            ))
+
+                        pbar.update(len(b_chunks))
+                        chunks_accounted += len(b_chunks)
 
                     added_total += len(missing_chunks)
-                    skipped_total += len(chunks) - len(missing_chunks)
 
                 except Exception:
                     logger.exception("Error processing %s", file_info.get('filename', 'unknown'))
                 finally:
-                    pbar.update(1)
+                    remaining = n_chunks - chunks_accounted
+                    if remaining > 0:
+                        pbar.update(remaining)
 
         logger.info("Generation complete. Waiting for final batches to be written to disk...")
         self._chroma.stop_background_writer(write_queue, writer_thread)

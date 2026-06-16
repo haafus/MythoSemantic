@@ -48,7 +48,7 @@ class ModelManager:
             self.unload_model()
 
         device = _select_device()
-        model = SentenceTransformer(model_name, device=device)
+        model = SentenceTransformer(model_name, device=device, trust_remote_code=True)
         logger.info(f"Model '{model_name}' loaded on {device}.")
         return model
 
