@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from projection.utils import _check_umap, reduce_dimensions
+from projection.utils import reduce_dimensions
 
 
 @pytest.fixture
@@ -17,10 +17,6 @@ def small_embeddings():
 
 
 class TestReduceDimensionsUMAP:
-    @pytest.fixture(autouse=True)
-    def _skip_if_no_umap(self):
-        if not _check_umap():
-            pytest.skip("umap-learn not installed")
 
     def test_basic_2d(self, random_embeddings):
         result = reduce_dimensions(random_embeddings, n_components=2)
@@ -56,11 +52,6 @@ class TestEdgeCases:
         assert result.shape == (1, 2)
         assert np.allclose(result, 0)
 
-    def test_fallback_on_error_to_pca(self, random_embeddings):
-        result = reduce_dimensions(random_embeddings, n_components=2, fallback_on_error=True)
-        assert result.shape == (50, 2)
-
-    @pytest.mark.skipif(not _check_umap(), reason="umap-learn not installed")
     def test_normalize_does_not_change_shape(self, random_embeddings):
         result_norm = reduce_dimensions(random_embeddings, n_components=2, normalize=True)
         result_raw = reduce_dimensions(random_embeddings, n_components=2, normalize=False)
