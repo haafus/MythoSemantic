@@ -797,7 +797,7 @@ async function renderProjectionPlot(data) {
         },
     };
 
-    await Plotly.newPlot(scatterPlot, traces, layout, {responsive: true, displaylogo: false, displayModeBar: false});
+    await Plotly.newPlot(scatterPlot, traces, layout, {responsive: true, displaylogo: false, displayModeBar: true, scrollZoom: true});
     scatterPlot.style.display = "block";
     scatterPlot.dataset.plotly = "1";
     bindProjectionTooltip(scatterPlot);

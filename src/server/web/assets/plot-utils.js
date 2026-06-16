@@ -83,7 +83,8 @@ export async function renderSavedPlotInto(target, url, options = {}) {
         await Plotly.newPlot(target, spec.data, layout, {
             responsive: true,
             displaylogo: false,
-            displayModeBar: false,
+            displayModeBar: true,
+            scrollZoom: true,
         });
         target.dataset.plotly = "1";
     } catch (error) {
