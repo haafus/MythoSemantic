@@ -39,10 +39,6 @@ class EmbeddingBuilder:
 
         self._models.set_model(embedding_model)
 
-    @property
-    def model_name(self) -> str | None:
-        return self._models.model_name
-
     def set_model(self, model_name: str) -> None:
         self._models.set_model(model_name)
 
@@ -76,7 +72,7 @@ class EmbeddingBuilder:
             return {
                 "chunks": [],
                 "embeddings": np.array([]),
-                "model": self.model_name,
+                "model": self._models.model_name,
                 "chunking": self.current_chunking.name,
                 "num_chunks": 0,
             }
@@ -84,7 +80,7 @@ class EmbeddingBuilder:
         return {
             "chunks": chunks,
             "embeddings": embeddings,
-            "model": self.model_name,
+            "model": self._models.model_name,
             "chunking": self.current_chunking.name,
             "num_chunks": len(chunks),
         }
@@ -92,7 +88,7 @@ class EmbeddingBuilder:
     # --- Chroma I/O --------------------------------------------------------
 
     def save_all_corpus_to_chroma(self) -> None:
-        collection_name = collection_name_for_model(self.model_name)
+        collection_name = collection_name_for_model(self._models.model_name)
         t0 = time.monotonic()
         files_info = list(iter_corpus_files(self.corpus_dir))
 
@@ -128,7 +124,7 @@ class EmbeddingBuilder:
                 chunks_accounted = 0
                 try:
                     ids, metadatas = self._chroma.build_entries(
-                        chunks, file_info, self.model_name, self.current_chunking.name
+                        chunks, file_info, self._models.model_name, self.current_chunking.name
                     )
 
                     missing = [
@@ -194,7 +190,7 @@ class EmbeddingBuilder:
         logger.info(f"Total added: {added_total}, skipped: {skipped_total} chunks in collection '{collection_name}' ({elapsed:.1f}s)")
 
     def query_chroma(self, query: str, top_k: int = 5) -> list[dict[str, Any]]:
-        collection_name = collection_name_for_model(self.model_name)
+        collection_name = collection_name_for_model(self._models.model_name)
         try:
             collection = self.chroma_client.get_collection(name=collection_name)
         except Exception as err:
