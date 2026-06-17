@@ -15,7 +15,7 @@ from .chroma_manager import (
 from .chroma_writer import ChromaWriter
 from .chunking import create_chunking_strategies
 from .corpus_iterator import iter_corpus_files
-from .model_manager import DEFAULT_BATCH_SIZE, ModelManager
+from .model_manager import ModelManager
 
 logger = logging.getLogger(__name__)
 
@@ -27,13 +27,13 @@ class EmbeddingBuilder:
         chroma_path: str | Path = "outputs/chroma_db",
         embedding_model: str = "BAAI/bge-m3",
         chunking: str = "paragraph",
-        batch_size: int | None = None,
+        batch_size: int = 32,
         chroma_batch_size: int = 100,
         queue_maxsize: int = 10,
     ):
         self.corpus_dir = Path(corpus_dir)
         self.chroma_path = ensure_chroma_writable(chroma_path)
-        self.batch_size: int = batch_size or DEFAULT_BATCH_SIZE
+        self.batch_size = batch_size
 
         self._models = ModelManager()
 

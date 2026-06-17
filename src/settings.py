@@ -23,7 +23,7 @@ class CorpusSettings(BaseModel):
 
 class EmbeddingSettings(BaseModel):
     default_chunking: str = "paragraph"
-    batch_size: int | None = None
+    batch_size: int = 32
     chroma_batch_size: int = 100
     max_workers: int = 16
     queue_maxsize: int = 10

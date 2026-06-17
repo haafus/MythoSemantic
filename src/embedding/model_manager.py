@@ -9,8 +9,6 @@ from model_registry import active_embedding_models, resolve_embedding_model
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_BATCH_SIZE = 32
-
 
 class ModelManager:
     def __init__(self) -> None:

@@ -36,7 +36,7 @@ def build_embeddings(
     active = active_embedding_models()
     MODEL_NAME = resolve_embedding_model(model_name) if model_name else active[0]
     CHUNKING = chunking or emb.default_chunking
-    BATCH_SIZE = batch_size if batch_size is not None else emb.batch_size
+    BATCH_SIZE = batch_size or emb.batch_size
 
     builder = EmbeddingBuilder(
         corpus_dir=settings.corpus_dir,
