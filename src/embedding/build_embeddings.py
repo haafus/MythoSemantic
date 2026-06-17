@@ -30,7 +30,7 @@ def build_embeddings(
     models: list | None = None,
     chunking: str | None = None,
     force: bool = False,
-):
+) -> None:
     emb = settings.embedding
 
     active = active_embedding_models()
@@ -87,5 +87,3 @@ def build_embeddings(
         builder.close()
 
     logger.info("All embeddings saved to Chroma.")
-
-    return builder
