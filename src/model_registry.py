@@ -16,8 +16,9 @@ def _load_registry() -> dict[str, Any]:
 
 def resolve_embedding_model(name: str) -> str:
     registry = _load_registry()
-    models = registry.get("embedding", {}).get("models", {})
-    return models.get(name, name)
+    emb = registry.get("embedding", {})
+    all_models = {**emb.get("models", {}), **emb.get("inactive", {})}
+    return all_models.get(name, name)
 
 
 def resolve_llm_provider(name: str) -> dict[str, str | None]:
@@ -43,11 +44,9 @@ def list_llm_providers() -> list[str]:
 
 
 def active_embedding_models() -> list[str]:
-    registry = _load_registry()
-    emb = registry.get("embedding", {})
-    models = emb.get("models", {})
-    return [models[alias] for alias in emb.get("active", []) if alias in models]
+    return list(_load_registry().get("embedding", {}).get("models", {}).values())
 
 
 def list_embedding_aliases() -> dict[str, str]:
-    return dict(_load_registry().get("embedding", {}).get("models", {}))
+    emb = _load_registry().get("embedding", {})
+    return {**emb.get("models", {}), **emb.get("inactive", {})}
