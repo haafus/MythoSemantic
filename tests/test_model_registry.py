@@ -26,7 +26,7 @@ class TestResolveEmbeddingModel:
 class TestResolveLLMProvider:
     def test_resolves_known_provider(self):
         result = resolve_llm_provider("gpt4o-mini")
-        assert result["model"] == "gpt4o-mini"
+        assert result["model"] == "gpt-4o-mini"
         assert "openai" in result["base_url"]
 
     def test_resolves_local_model(self):
