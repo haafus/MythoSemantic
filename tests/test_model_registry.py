@@ -25,8 +25,8 @@ class TestResolveEmbeddingModel:
 
 class TestResolveLLMProvider:
     def test_resolves_known_provider(self):
-        result = resolve_llm_provider("gpt-4o-mini")
-        assert result["model"] == "gpt-4o-mini"
+        result = resolve_llm_provider("gpt4o-mini")
+        assert result["model"] == "gpt4o-mini"
         assert "openai" in result["base_url"]
 
     def test_resolves_local_model(self):
@@ -42,7 +42,7 @@ class TestResolveLLMProvider:
 class TestListFunctions:
     def test_list_llm_providers(self):
         providers = list_llm_providers()
-        assert "gpt-4o-mini" in providers
+        assert "gpt4o-mini" in providers
         assert "gemini25-flash" in providers
 
     def test_list_embedding_aliases(self):
