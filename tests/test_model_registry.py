@@ -43,7 +43,7 @@ class TestListFunctions:
     def test_list_llm_providers(self):
         providers = list_llm_providers()
         assert "gpt-4o-mini" in providers
-        assert "gemini-2.5-flash" in providers
+        assert "gemini-25-flash" in providers
 
     def test_list_embedding_aliases(self):
         aliases = list_embedding_aliases()
