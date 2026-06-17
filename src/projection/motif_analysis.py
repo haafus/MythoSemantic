@@ -53,7 +53,6 @@ def generate_motif_summaries(
         base_url=cfg.base_url,
         temperature=cfg.temperature,
         max_retries=cfg.max_retries,
-        retry_backoff_factor=cfg.retry_backoff_factor,
     )
 
     cache_file = _cache_path(output_dir)

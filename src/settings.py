@@ -34,7 +34,6 @@ class LLMSettings(BaseModel):
     base_url: str = "https://api.openai.com/v1"
     temperature: float = 0.1
     max_retries: int = 5
-    retry_backoff_factor: float = 5.0
 
 
 class GraphsSettings(BaseModel):

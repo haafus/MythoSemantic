@@ -133,18 +133,16 @@ class TestCheckpoint:
 
 
 class _FakeLLM:
-    def extract_characters(self, text, prompt):
-        return [{"Name": "Zeus"}]
-
-    def extract_relations(self, text, characters, prompt):
-        assert characters == [{"Name": "Zeus"}], "relations must receive extracted characters"
-        return [{"Subject": "Zeus", "Object": "Hera", "Relation": "spouse"}]
-
-    def extract_locations(self, text, prompt):
-        return [{"Name": "Olympus"}]
-
-    def extract_time(self, text, prompt):
-        return "not-a-list"
+    def ask_json(self, system_prompt, user_content):
+        if system_prompt == "c":
+            return [{"Name": "Zeus"}]
+        if system_prompt == "r":
+            return [{"Subject": "Zeus", "Object": "Hera", "Relation": "spouse"}]
+        if system_prompt == "l":
+            return [{"Name": "Olympus"}]
+        if system_prompt == "t":
+            return "not-a-list"
+        return []
 
 
 class TestExtractFromChunk:

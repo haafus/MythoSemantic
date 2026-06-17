@@ -38,16 +38,21 @@ def extract_from_chunk(llm: LLMProcessor, chunk: str, prompts: dict) -> dict[str
     relations depend on extracted characters and run afterwards.
     """
     with ThreadPoolExecutor(max_workers=3) as pool:
-        chars_future = pool.submit(llm.extract_characters, chunk, prompts["characters"])
-        locs_future = pool.submit(llm.extract_locations, chunk, prompts["locations"])
-        times_future = pool.submit(llm.extract_time, chunk, prompts["time"])
+        chars_future = pool.submit(llm.ask_json, prompts["characters"], chunk)
+        locs_future = pool.submit(llm.ask_json, prompts["locations"], chunk)
+        times_future = pool.submit(llm.ask_json, prompts["time"], chunk)
 
         try:
             chars = chars_future.result(timeout=600)
         except Exception:
             logger.exception("Failed to extract characters from chunk")
             chars = []
-        rels = llm.extract_relations(chunk, chars, prompts["relations"])
+
+        relations_content = (
+            f"DOCUMENT 1 (Text):\n{chunk}\n\n"
+            f"DOCUMENT 2 (Characters):\n{json.dumps(chars, ensure_ascii=False)}"
+        )
+        rels = llm.ask_json(prompts["relations"], relations_content)
 
         try:
             locs = locs_future.result(timeout=600)
@@ -186,7 +191,6 @@ def run_generate_graphs(llm_model: str | None = None, force: bool = False) -> No
         use_json_mode=graphs_cfg.use_json_mode,
         temperature=llm_cfg.temperature,
         max_retries=llm_cfg.max_retries,
-        retry_backoff_factor=llm_cfg.retry_backoff_factor,
         api_key=api_key,
     )
 
