@@ -11,19 +11,6 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_BATCH_SIZE = 32
 
-DEVICE: str = (
-    "cuda" if torch.cuda.is_available()
-    else "mps" if torch.backends.mps.is_available()
-    else "cpu"
-)
-
-
-def _clear_device_cache() -> None:
-    if DEVICE == "cuda":
-        torch.cuda.empty_cache()
-    elif DEVICE == "mps":
-        torch.mps.empty_cache()
-
 
 class ModelManager:
     def __init__(self) -> None:
@@ -41,17 +28,21 @@ class ModelManager:
             return
 
         self.unload_model()
-        self.model = SentenceTransformer(model_name, device=DEVICE, trust_remote_code=True)
+        self.model = SentenceTransformer(model_name, trust_remote_code=True)
         self.model_name = model_name
         self.model_dim = self.model.get_embedding_dimension()
-        logger.info(f"Model '{model_name}' loaded on {DEVICE}.")
+        logger.info(f"Model '{model_name}' loaded on {self.model.device}.")
 
     def unload_model(self) -> None:
         if self.model is None:
             return
+        device = str(self.model.device)
         self.model = None
         self.model_name = None
         self.model_dim = 0
-        _clear_device_cache()
+        if device.startswith("cuda"):
+            torch.cuda.empty_cache()
+        elif device == "mps":
+            torch.mps.empty_cache()
         gc.collect()
         logger.info("Model unloaded from memory")
