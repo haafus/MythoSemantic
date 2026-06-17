@@ -57,5 +57,5 @@ class TestListFunctions:
         assert "Qwen/Qwen3-Embedding-4B" not in models
 
     def test_inactive_models_still_resolve(self):
-        assert resolve_embedding_model("qwen-emb-4b") == "Qwen/Qwen3-Embedding-4B"
+        assert resolve_embedding_model("qwen-4b") == "Qwen/Qwen3-Embedding-4B"
         assert resolve_embedding_model("story-emb") == "uhhlt/story-emb"
