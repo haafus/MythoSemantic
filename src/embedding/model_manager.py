@@ -22,15 +22,15 @@ def _select_device() -> str:
 
 class ModelManager:
     def __init__(self) -> None:
-        self.available_models: list[str] = active_embedding_models()
         self.model_name: str | None = None
         self.model: Any = None
         self.model_dim: int = 0
 
     def set_model(self, model_name: str) -> None:
         model_name = resolve_embedding_model(model_name)
-        if model_name not in self.available_models:
-            raise ValueError(f"Model '{model_name}' not found. Available: {self.available_models}")
+        available = active_embedding_models()
+        if model_name not in available:
+            raise ValueError(f"Model '{model_name}' not found. Available: {available}")
 
         if self.model is not None and self.model_name == model_name:
             return
