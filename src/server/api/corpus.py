@@ -30,9 +30,8 @@ def document(
 
 @router.get("/archive")
 def archive() -> StreamingResponse:
-    buf = build_corpus_archive()
     return StreamingResponse(
-        buf,
+        build_corpus_archive(),
         media_type="application/zip",
         headers={"Content-Disposition": 'attachment; filename="mythoscope_corpus.zip"'},
     )

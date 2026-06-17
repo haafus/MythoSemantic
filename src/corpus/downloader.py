@@ -82,5 +82,4 @@ def download_file(url: str) -> bytes:
     }
     response = _get_http_session().get(url, headers=headers, timeout=(settings.corpus.timeout_connect, settings.corpus.timeout_read))
     response.raise_for_status()
-    content: bytes = response.content
-    return content
+    return response.content

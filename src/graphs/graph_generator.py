@@ -110,6 +110,5 @@ def generate_and_save_graph(personas_data: list, relations_data: list, output_di
         {"source": str(u), "target": str(v), "relation": d.get("relation", "")} for u, v, d in G.edges(data=True)
     ]
 
-    html_target = output_dir / "characters.html"
-    create_webpage(nodes_for_js, edges_for_js, html_target)
-    logger.info(f"Character graph saved successfully: {html_target}")
+    create_webpage(nodes_for_js, edges_for_js, output_dir / "characters.html")
+    logger.info(f"Character graph saved successfully: {output_dir / 'characters.html'}")

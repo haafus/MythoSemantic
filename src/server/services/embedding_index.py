@@ -149,8 +149,7 @@ class EmbeddingIndexService:
     def _normalize_matrix(matrix: np.ndarray) -> np.ndarray:
         norms = np.linalg.norm(matrix, axis=1, keepdims=True)
         norms[norms == 0] = 1
-        result: np.ndarray = matrix / norms
-        return result
+        return matrix / norms
 
     @staticmethod
     def _top_results(index: ModelIndex, similarities: np.ndarray, limit: int) -> list[dict]:
