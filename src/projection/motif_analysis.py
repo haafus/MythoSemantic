@@ -101,7 +101,6 @@ def run_motif_analysis(
     output_dir: Path,
     embedding_model: str,
     model_name: str | None = None,
-    reducer_kwargs: dict | None = None,
 ) -> None:
     from .visualization import _plot_umap_scatter
 
@@ -124,6 +123,5 @@ def run_motif_analysis(
         save_html=True,
         output_dir=output_dir,
         model_name=model_name,
-        reducer_kwargs=reducer_kwargs,
     )
     logger.info("Motif UMAP projection saved")

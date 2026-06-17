@@ -63,10 +63,16 @@ def _get_color_map(data: list[dict]) -> dict[str, str]:
 
 
 def _reduce_dimensions_safe(
-    embeddings: np.ndarray, n_components: int = 2, reducer_kwargs: dict[str, Any] | None = None
+    embeddings: np.ndarray, n_components: int = 2,
 ) -> np.ndarray | None:
+    from settings import settings
+
+    cfg = settings.projection
     try:
-        return reduce_dimensions(embeddings, n_components=n_components, **(reducer_kwargs or {}))
+        return reduce_dimensions(
+            embeddings, n_components=n_components,
+            n_neighbors=cfg.umap_n_neighbors, min_dist=cfg.umap_min_dist,
+        )
     except Exception:
         logger.exception("Dimension reduction failed")
         return None
@@ -148,12 +154,11 @@ def _plot_umap_scatter(
     save_html: bool = True,
     output_dir: Path | None = None,
     model_name: str | None = None,
-    reducer_kwargs: dict[str, Any] | None = None,
 ) -> go.Figure | None:
     if output_dir is None:
         output_dir = settings.analysis_dir
 
-    embedding_2d = _reduce_dimensions_safe(embeddings, n_components=2, reducer_kwargs=reducer_kwargs or {})
+    embedding_2d = _reduce_dimensions_safe(embeddings, n_components=2)
     if embedding_2d is None:
         return None
 
@@ -228,7 +233,6 @@ def plot_interactive_2d(
     save_html: bool = True,
     output_dir: Path | None = None,
     model_name: str | None = None,
-    reducer_kwargs: dict[str, Any] | None = None,
 ) -> go.Figure | None:
     embeddings = np.stack([item["embedding"] for item in data])
     return _plot_umap_scatter(
@@ -237,7 +241,7 @@ def plot_interactive_2d(
         filename="umap_2d_traditions.html",
         axis_prefix="UMAP",
         save_html=save_html, output_dir=output_dir,
-        model_name=model_name, reducer_kwargs=reducer_kwargs,
+        model_name=model_name,
     )
 
 
@@ -246,7 +250,6 @@ def plot_residual_umap(
     save_html: bool = True,
     output_dir: Path | None = None,
     model_name: str | None = None,
-    reducer_kwargs: dict[str, Any] | None = None,
 ) -> go.Figure | None:
     embeddings = np.stack([item["embedding"] for item in data])
     residuals = _compute_tradition_residuals(data, embeddings)
@@ -256,7 +259,7 @@ def plot_residual_umap(
         filename="residual_umap_2d.html",
         axis_prefix="Residual UMAP",
         save_html=save_html, output_dir=output_dir,
-        model_name=model_name, reducer_kwargs=reducer_kwargs,
+        model_name=model_name,
     )
 
 
@@ -265,7 +268,6 @@ def plot_residual_normalized_umap(
     save_html: bool = True,
     output_dir: Path | None = None,
     model_name: str | None = None,
-    reducer_kwargs: dict[str, Any] | None = None,
 ) -> go.Figure | None:
     embeddings = np.stack([item["embedding"] for item in data])
     residuals = _compute_tradition_residuals(data, embeddings)
@@ -276,7 +278,7 @@ def plot_residual_normalized_umap(
         filename="residual_normalized_umap_2d.html",
         axis_prefix="Residual Normalized UMAP",
         save_html=save_html, output_dir=output_dir,
-        model_name=model_name, reducer_kwargs=reducer_kwargs,
+        model_name=model_name,
     )
 
 
@@ -285,7 +287,6 @@ def plot_rlace_umap(
     save_html: bool = True,
     output_dir: Path | None = None,
     model_name: str | None = None,
-    reducer_kwargs: dict[str, Any] | None = None,
 ) -> go.Figure | None:
     embeddings = np.stack([item["embedding"] for item in data])
     erased = _concept_erasure(data, embeddings)
@@ -295,7 +296,7 @@ def plot_rlace_umap(
         filename="rlace_umap_2d.html",
         axis_prefix="RLACE UMAP",
         save_html=save_html, output_dir=output_dir,
-        model_name=model_name, reducer_kwargs=reducer_kwargs,
+        model_name=model_name,
     )
 
 

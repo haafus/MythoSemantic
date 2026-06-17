@@ -2,7 +2,6 @@ import logging
 from pathlib import Path
 
 from model_registry import resolve_embedding_model
-from settings import settings
 
 from .analyzer import EmbeddingAnalyzer
 from .visualization import (
@@ -72,9 +71,7 @@ def analyze_embeddings(
 
 def _generate_all_plots(analyzer: EmbeddingAnalyzer, force: bool = False) -> None:
     data = analyzer.filter_by_model()
-    cfg = settings.projection
     out = analyzer.output_dir
-    reducer_kwargs = {"n_neighbors": cfg.umap_n_neighbors, "min_dist": cfg.umap_min_dist}
 
     umap_plots = [
         ("UMAP projection", "umap_2d_traditions.html", plot_interactive_2d),
@@ -94,7 +91,7 @@ def _generate_all_plots(analyzer: EmbeddingAnalyzer, force: bool = False) -> Non
             continue
         logger.info("Generating %s...", label)
         try:
-            plot_fn(data, output_dir=out, model_name=analyzer.model_name, reducer_kwargs=reducer_kwargs)
+            plot_fn(data, output_dir=out, model_name=analyzer.model_name)
             generated = True
         except Exception:
             logger.exception("Error creating %s", label)
@@ -128,7 +125,6 @@ def _generate_motif_plot(analyzer: EmbeddingAnalyzer, force: bool = False) -> No
     from .motif_analysis import run_motif_analysis
 
     data = analyzer.filter_by_model()
-    cfg = settings.projection
 
     logger.info("Generating Motif UMAP projection (LLM summaries)...")
     try:
@@ -137,7 +133,6 @@ def _generate_motif_plot(analyzer: EmbeddingAnalyzer, force: bool = False) -> No
             output_dir=analyzer.output_dir,
             embedding_model=analyzer.model_name,
             model_name=analyzer.model_name,
-            reducer_kwargs={"n_neighbors": cfg.umap_n_neighbors, "min_dist": cfg.umap_min_dist},
         )
     except Exception:
         logger.exception("Error creating Motif UMAP plot")
