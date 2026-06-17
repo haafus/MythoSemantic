@@ -25,29 +25,15 @@ def _count_corpus_chunks(corpus_dir: Path, chunking: str) -> int:
 
 
 def build_embeddings(
-    batch_size: int | None = None,
     model_name: str | None = None,
     models: list | None = None,
-    chunking: str | None = None,
     force: bool = False,
 ) -> None:
-    emb = settings.embedding
-
     active = active_embedding_models()
-    MODEL_NAME = resolve_embedding_model(model_name) if model_name else active[0]
-    CHUNKING = chunking or emb.default_chunking
-    BATCH_SIZE = batch_size or emb.batch_size
+    resolved = resolve_embedding_model(model_name) if model_name else active[0]
 
-    builder = EmbeddingBuilder(
-        corpus_dir=settings.corpus_dir,
-        embedding_model=MODEL_NAME,
-        chunking=CHUNKING,
-        chroma_path=settings.chroma_dir,
-        batch_size=BATCH_SIZE,
-        chroma_batch_size=emb.chroma_batch_size,
-    )
-
-    models_to_run = models or ([MODEL_NAME] if model_name else active)
+    builder = EmbeddingBuilder(embedding_model=resolved)
+    models_to_run = models or ([resolved] if model_name else active)
 
     logger.info("Starting embedding generation...")
     logger.info(f"   Source: {settings.corpus_dir}")
@@ -67,7 +53,9 @@ def build_embeddings(
                     count = coll.count()
                     if count > 0:
                         if expected_chunks is None:
-                            expected_chunks = _count_corpus_chunks(settings.corpus_dir, CHUNKING)
+                            expected_chunks = _count_corpus_chunks(
+                                settings.corpus_dir, settings.embedding.default_chunking,
+                            )
                         if count >= expected_chunks:
                             logger.info(f"   Skipping {model}: collection complete ({count} chunks)")
                             continue

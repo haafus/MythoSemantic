@@ -6,37 +6,17 @@ from model_registry import active_embedding_models, resolve_embedding_model
 from settings import settings
 
 from .build_embeddings import build_embeddings
-from .builder import EmbeddingBuilder
 from .chroma_manager import collection_name_for_model, delete_collection, ensure_chroma_writable
-
-
-def _create_builder(*, model: str | None = None, chunking: str | None = None) -> EmbeddingBuilder:
-    emb = settings.embedding
-    resolved = resolve_embedding_model(model) if model else active_embedding_models()[0]
-    return EmbeddingBuilder(
-        corpus_dir=settings.corpus_dir,
-        chroma_path=settings.chroma_dir,
-        embedding_model=resolved,
-        chunking=chunking or emb.default_chunking,
-        batch_size=emb.batch_size,
-    )
 
 
 @click.command()
 @click.option("--model", "-m", default=None, help="Embedding model to use")
-@click.option("--chunking", "-ch", default=None, help="Chunking strategy")
-@click.option("--batch-size", "-b", default=None, type=int, help="Batch size for encoding")
 @click.option("--force", is_flag=True, help="Regenerate even if collection exists.")
 @click.pass_context
-def generate(ctx, model: str | None, chunking: str | None, batch_size: int | None, force: bool):
+def generate(ctx, model: str | None, force: bool):
     t0 = time.monotonic()
     try:
-        build_embeddings(
-            model_name=model,
-            chunking=chunking,
-            batch_size=batch_size,
-            force=force,
-        )
+        build_embeddings(model_name=model, force=force)
         elapsed = time.monotonic() - t0
         click.echo(click.style(f"Embeddings generated successfully in {elapsed:.1f}s", fg="green"))
     except Exception as e:
@@ -50,7 +30,10 @@ def generate(ctx, model: str | None, chunking: str | None, batch_size: int | Non
 @click.option("--model", "-m", default=None, help="Model to use for query encoding")
 @click.pass_context
 def query(ctx, query: str, top_k: int, model: str | None):
-    builder = _create_builder(model=model)
+    from .builder import EmbeddingBuilder
+
+    resolved = resolve_embedding_model(model) if model else active_embedding_models()[0]
+    builder = EmbeddingBuilder(embedding_model=resolved)
 
     try:
         results = builder.query_chroma(query, top_k=top_k)
@@ -66,7 +49,6 @@ def query(ctx, query: str, top_k: int, model: str | None):
             click.echo()
     except Exception as e:
         click.echo(click.style(f"Error: {e}", fg="red"), err=True)
-
 
 
 @click.command("remove")

@@ -21,27 +21,21 @@ logger = logging.getLogger(__name__)
 
 
 class EmbeddingBuilder:
-    def __init__(
-        self,
-        corpus_dir: str | Path,
-        chroma_path: str | Path = "outputs/chroma_db",
-        embedding_model: str = "BAAI/bge-m3",
-        chunking: str = "paragraph",
-        batch_size: int = 32,
-        chroma_batch_size: int = 100,
-        queue_maxsize: int = 10,
-    ):
-        self.corpus_dir = Path(corpus_dir)
-        self.chroma_path = ensure_chroma_writable(chroma_path)
-        self.batch_size = batch_size
+    def __init__(self, embedding_model: str = "BAAI/bge-m3"):
+        from settings import settings
+
+        emb = settings.embedding
+        self.corpus_dir = Path(settings.corpus_dir)
+        self.chroma_path = ensure_chroma_writable(settings.chroma_dir)
+        self.batch_size = emb.batch_size
 
         self._models = ModelManager()
 
         self.chroma_client = chromadb.PersistentClient(path=str(self.chroma_path))
-        self._chroma = ChromaWriter(self.chroma_client, chroma_batch_size, queue_maxsize)
+        self._chroma = ChromaWriter(self.chroma_client, emb.chroma_batch_size, emb.queue_maxsize)
 
         self.chunking_strategies = create_chunking_strategies()
-        self.set_chunking_strategy(chunking)
+        self.set_chunking_strategy(emb.default_chunking)
 
         self._models.set_model(embedding_model)
 
@@ -88,37 +82,24 @@ class EmbeddingBuilder:
         )
         return np.asarray(embeddings, dtype=np.float32)
 
-    def build_embeddings(self, text: str, chunking_strategy: str | None = None, batch_size: int | None = None) -> dict[str, Any]:
-        if chunking_strategy:
-            self.set_chunking_strategy(chunking_strategy)
-
-        original_batch_size = self.batch_size
-        if batch_size is not None:
-            self.batch_size = batch_size
-
-        try:
-            chunks = self._chunk_text(text)
-            if not chunks:
-                return {
-                    "chunks": [],
-                    "embeddings": np.array([]),
-                    "model": self.model_name,
-                    "chunking": self.current_chunking.name,
-                    "num_chunks": 0,
-                    "batch_size_used": self.batch_size,
-                }
-            embeddings = self._generate_embeddings(chunks)
+    def build_embeddings(self, text: str) -> dict[str, Any]:
+        chunks = self._chunk_text(text)
+        if not chunks:
             return {
-                "chunks": chunks,
-                "embeddings": embeddings,
+                "chunks": [],
+                "embeddings": np.array([]),
                 "model": self.model_name,
                 "chunking": self.current_chunking.name,
-                "num_chunks": len(chunks),
-                "batch_size_used": self.batch_size,
+                "num_chunks": 0,
             }
-        finally:
-            if batch_size is not None:
-                self.batch_size = original_batch_size
+        embeddings = self._generate_embeddings(chunks)
+        return {
+            "chunks": chunks,
+            "embeddings": embeddings,
+            "model": self.model_name,
+            "chunking": self.current_chunking.name,
+            "num_chunks": len(chunks),
+        }
 
     # --- Chroma I/O --------------------------------------------------------
 
