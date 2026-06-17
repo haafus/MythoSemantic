@@ -1,0 +1,62 @@
+{
+  "llm": {
+    "gpt-4o-mini": {
+      "base_url": "https://api.openai.com/v1",
+      "model": "gpt-4o-mini",
+      "env_key": "OPENAI_API_KEY"
+    },
+    "gpt-4o": {
+      "base_url": "https://api.openai.com/v1",
+      "model": "gpt-4o",
+      "env_key": "OPENAI_API_KEY"
+    },
+    "gemini-2.5-flash": {
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
+      "model": "gemini-2.5-flash",
+      "env_key": "GEMINI_API_KEY"
+    },
+    "gemini-2.5-pro": {
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
+      "model": "gemini-2.5-pro",
+      "env_key": "GEMINI_API_KEY"
+    },
+    "deepseek-v3": {
+      "base_url": "https://api.deepseek.com",
+      "model": "deepseek-chat",
+      "env_key": "DEEPSEEK_API_KEY"
+    },
+    "qwen3-8b": {
+      "base_url": "http://localhost:11434/v1",
+      "model": "qwen3:8b",
+      "env_key": null
+    },
+    "qwen3-32b": {
+      "base_url": "http://localhost:11434/v1",
+      "model": "qwen3:32b",
+      "env_key": null
+    },
+    "gemma3-12b": {
+      "base_url": "http://localhost:11434/v1",
+      "model": "gemma3:12b",
+      "env_key": null
+    },
+    "gemma3-27b": {
+      "base_url": "http://localhost:11434/v1",
+      "model": "gemma3:27b",
+      "env_key": null
+    },
+    "llama3.1-8b": {
+      "base_url": "http://localhost:11434/v1",
+      "model": "llama3.1:8b",
+      "env_key": null
+    }
+  },
+  "embedding": {
+    "bge-m3": "BAAI/bge-m3",
+    "labse": "sentence-transformers/LaBSE",
+    "e5-large": "intfloat/e5-large-v2",
+    "qwen-emb": "Qwen/Qwen3-Embedding-0.6B",
+    "qwen-emb-4b": "Qwen/Qwen3-Embedding-4B",
+    "story-emb": "uhhlt/story-emb"
+  }
+}

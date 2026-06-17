@@ -51,5 +51,5 @@ def test_default_embedding_model():
     from settings import Settings
 
     s = Settings()
-    assert s.embedding.models[0] == "BAAI/bge-m3"
+    assert s.embedding.models[0] == "bge-m3"
     assert s.embedding.default_chunking == "paragraph"

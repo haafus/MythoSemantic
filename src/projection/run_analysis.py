@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
 
+from model_registry import resolve_embedding_model
 from settings import settings
 
 from .analyzer import EmbeddingAnalyzer
@@ -43,7 +44,7 @@ def analyze_embeddings(
             logger.error("ERROR: No available models in the Chroma database!")
             return None
 
-        models_to_analyze = [model_name] if model_name else available_models
+        models_to_analyze = [resolve_embedding_model(model_name)] if model_name else available_models
         logger.info(f"Models queued for analysis: {models_to_analyze}")
 
         analyzer: EmbeddingAnalyzer | None = None

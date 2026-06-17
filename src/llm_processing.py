@@ -22,6 +22,7 @@ class LLMProcessor:
         max_retries: int = 5,
         retry_backoff_factor: float = 5.0,
         request_timeout: float = 120.0,
+        api_key: str | None = None,
     ):
         self.model_name = model_name
         self.use_json_mode = use_json_mode
@@ -30,7 +31,10 @@ class LLMProcessor:
         self.retry_backoff_factor = retry_backoff_factor
         self.request_timeout = request_timeout
 
-        self.client = OpenAI(base_url=base_url, timeout=request_timeout)
+        kwargs: dict = {"base_url": base_url, "timeout": request_timeout}
+        if api_key:
+            kwargs["api_key"] = api_key
+        self.client = OpenAI(**kwargs)
 
     def _call_with_retries(self, fn: Callable[[], T], default: T) -> T:
         retries = 0

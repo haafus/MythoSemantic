@@ -28,12 +28,12 @@ class EmbeddingSettings(BaseModel):
     max_workers: int = 16
     queue_maxsize: int = 10
     models: list[str] = [
-        "BAAI/bge-m3",
-        "sentence-transformers/LaBSE",
-        "intfloat/e5-large-v2",
-        "Qwen/Qwen3-Embedding-0.6B",
-        # "Qwen/Qwen3-Embedding-4B",
-        # "uhhlt/story-emb",
+        "bge-m3",
+        "labse",
+        "e5-large",
+        "qwen-emb",
+        # "qwen-emb-4b",
+        # "story-emb",
     ]
 
 

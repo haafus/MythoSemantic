@@ -6,6 +6,7 @@ from pathlib import Path
 
 from json_utils import load_json, save_json
 from llm_processing import LLMProcessor
+from model_registry import resolve_llm_provider
 from settings import settings
 
 from .graph_generator import generate_and_save_graph
@@ -156,11 +157,21 @@ def deduplicate_relations(relations: list[dict]) -> list[dict]:
     return deduplicated
 
 
-def run_generate_graphs(force: bool = False) -> None:
+def run_generate_graphs(llm_model: str | None = None, force: bool = False) -> None:
     llm_cfg = settings.llm
     graphs_cfg = settings.graphs
 
-    logger.info(f"Starting graph generation process (force={force})...")
+    if llm_model:
+        provider = resolve_llm_provider(llm_model)
+        model_name = provider["model"]
+        base_url = provider["base_url"]
+        api_key = provider.get("api_key")
+    else:
+        model_name = llm_cfg.model_name
+        base_url = llm_cfg.base_url
+        api_key = None
+
+    logger.info(f"Starting graph generation (model={model_name}, force={force})...")
 
     prompts_path = settings.project_root / "config" / "graphs_prompts.json"
     try:
@@ -170,12 +181,13 @@ def run_generate_graphs(force: bool = False) -> None:
         return
 
     llm = LLMProcessor(
-        model_name=llm_cfg.model_name,
-        base_url=llm_cfg.base_url,
+        model_name=model_name,
+        base_url=base_url,
         use_json_mode=graphs_cfg.use_json_mode,
         temperature=llm_cfg.temperature,
         max_retries=llm_cfg.max_retries,
         retry_backoff_factor=llm_cfg.retry_backoff_factor,
+        api_key=api_key,
     )
 
     metadata_path = settings.corpus_metadata_path
