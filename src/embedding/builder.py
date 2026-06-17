@@ -66,25 +66,6 @@ class EmbeddingBuilder:
         )
         return np.asarray(embeddings, dtype=np.float32)
 
-    def build_embeddings(self, text: str) -> dict[str, Any]:
-        chunks = self._chunk_text(text)
-        if not chunks:
-            return {
-                "chunks": [],
-                "embeddings": np.array([]),
-                "model": self._models.model_name,
-                "chunking": self.current_chunking.name,
-                "num_chunks": 0,
-            }
-        embeddings = self._generate_embeddings(chunks)
-        return {
-            "chunks": chunks,
-            "embeddings": embeddings,
-            "model": self._models.model_name,
-            "chunking": self.current_chunking.name,
-            "num_chunks": len(chunks),
-        }
-
     # --- Chroma I/O --------------------------------------------------------
 
     def save_all_corpus_to_chroma(self) -> None:
