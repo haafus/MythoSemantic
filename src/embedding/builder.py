@@ -219,4 +219,4 @@ class EmbeddingBuilder:
 
     def close(self) -> None:
         if hasattr(self, "_models"):
-            self._models._unload()
+            self._models.close()

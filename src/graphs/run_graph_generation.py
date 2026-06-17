@@ -162,15 +162,6 @@ def deduplicate_relations(relations: list[dict]) -> list[dict]:
 
 
 def run_generate_graphs(llm_model: str | None = None, force: bool = False) -> None:
-    graphs_cfg = settings.graphs
-
-    llm = LLMProcessor(
-        model_alias=llm_model,
-        use_json_mode=graphs_cfg.use_json_mode,
-    )
-
-    logger.info(f"Starting graph generation (model={llm.model_name}, force={force})...")
-
     prompts_path = settings.project_root / "config" / "graphs_prompts.json"
     try:
         prompts = json.loads(prompts_path.read_text(encoding="utf-8"))
@@ -189,6 +180,14 @@ def run_generate_graphs(llm_model: str | None = None, force: bool = False) -> No
     except Exception:
         logger.exception("Failed to read metadata")
         return
+
+    graphs_cfg = settings.graphs
+    llm = LLMProcessor(
+        model_alias=llm_model,
+        use_json_mode=graphs_cfg.use_json_mode,
+    )
+
+    logger.info(f"Starting graph generation (model={llm.model_name}, force={force})...")
 
     for book in corpus:
         book_id = book.get("id", "unknown_book")

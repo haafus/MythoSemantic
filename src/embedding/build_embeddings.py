@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from model_registry import active_embedding_models, resolve_embedding_model
+from model_registry import active_embedding_models, default_embedding_model
 from settings import settings
 
 from .builder import EmbeddingBuilder
@@ -29,11 +29,10 @@ def build_embeddings(
     models: list | None = None,
     force: bool = False,
 ) -> None:
-    active = active_embedding_models()
-    resolved = resolve_embedding_model(model_name) if model_name else active[0]
+    resolved = default_embedding_model(model_name)
 
     builder = EmbeddingBuilder(embedding_model=resolved)
-    models_to_run = models or ([resolved] if model_name else active)
+    models_to_run = models or ([resolved] if model_name else active_embedding_models())
 
     logger.info("Starting embedding generation...")
     logger.info(f"   Source: {settings.corpus_dir}")

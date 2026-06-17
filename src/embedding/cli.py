@@ -2,7 +2,7 @@ import time
 
 import click
 
-from model_registry import active_embedding_models, resolve_embedding_model
+from model_registry import default_embedding_model
 from settings import settings
 
 from .build_embeddings import build_embeddings
@@ -32,8 +32,7 @@ def generate(ctx, model: str | None, force: bool):
 def query(ctx, query: str, top_k: int, model: str | None):
     from .builder import EmbeddingBuilder
 
-    resolved = resolve_embedding_model(model) if model else active_embedding_models()[0]
-    builder = EmbeddingBuilder(embedding_model=resolved)
+    builder = EmbeddingBuilder(embedding_model=default_embedding_model(model))
 
     try:
         results = builder.query_chroma(query, top_k=top_k)
@@ -56,7 +55,7 @@ def query(ctx, query: str, top_k: int, model: str | None):
 @click.option("--yes", is_flag=True, help="Skip confirmation")
 @click.pass_context
 def delete_chroma_collection(ctx, model: str | None, yes: bool):
-    model_name = resolve_embedding_model(model) if model else active_embedding_models()[0]
+    model_name = default_embedding_model(model)
     collection = collection_name_for_model(model_name)
 
     if not yes:

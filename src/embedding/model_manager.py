@@ -25,13 +25,13 @@ class ModelManager:
         if self.model is not None and self.model_name == model_name:
             return
 
-        self._unload()
+        self.close()
         self.model = SentenceTransformer(model_name, trust_remote_code=True)
         self.model_name = model_name
         self.model_dim = self.model.get_embedding_dimension()
         logger.info(f"Model '{model_name}' loaded on {self.model.device}.")
 
-    def _unload(self) -> None:
+    def close(self) -> None:
         if self.model is None:
             return
         device = str(self.model.device)
