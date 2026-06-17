@@ -61,9 +61,6 @@ class EmbeddingBuilder:
 
     # --- Model management (delegated) --------------------------------------
 
-    def unload_model(self) -> None:
-        self._models.unload_model()
-
     def set_model(self, model_name: str) -> None:
         self._models.set_model(model_name)
 
@@ -241,7 +238,7 @@ class EmbeddingBuilder:
 
     def close(self) -> None:
         if hasattr(self, "_models"):
-            self._models.unload_model()
+            self._models._unload()
 
     def __del__(self) -> None:
         self.close()
