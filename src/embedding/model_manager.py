@@ -2,7 +2,6 @@ import gc
 import logging
 from typing import Any
 
-import torch
 from sentence_transformers import SentenceTransformer
 
 from model_registry import active_embedding_models, resolve_embedding_model
@@ -36,13 +35,8 @@ class ModelManager:
     def unload_model(self) -> None:
         if self.model is None:
             return
-        device = str(self.model.device)
         self.model = None
         self.model_name = None
         self.model_dim = 0
-        if device.startswith("cuda"):
-            torch.cuda.empty_cache()
-        elif device == "mps":
-            torch.mps.empty_cache()
         gc.collect()
         logger.info("Model unloaded from memory")
