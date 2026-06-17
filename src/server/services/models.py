@@ -41,14 +41,11 @@ def list_models_raw() -> list[str]:
 
 
 def list_model_summaries() -> list[dict[str, str]]:
-    return [
-        {
-            "name": model,
-            "key": model_to_key(model),
-            "safe_dir": model_to_key(model),
-        }
-        for model in list_models_raw()
-    ]
+    result = []
+    for model in list_models_raw():
+        key = model_to_key(model)
+        result.append({"name": model, "key": key, "safe_dir": key})
+    return result
 
 
 def get_model_output_dir(model_key: str):

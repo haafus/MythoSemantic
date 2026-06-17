@@ -48,7 +48,7 @@ def get_projection_data(model_key: str, method: str) -> dict | None:
                 return result
 
     if method in INTERACTIVE_SAVED_HTML_METHODS:
-        saved_html_plot = get_saved_html_plot(model_key, method)
+        saved_html_plot = get_saved_html_plot(model_key, method, output_dir=output_dir)
         saved_html_path = saved_html_plot.get("path")
         if saved_html_plot.get("exists") and saved_html_path:
             path = Path(saved_html_path)
@@ -63,10 +63,10 @@ def get_projection_data(model_key: str, method: str) -> dict | None:
     return None
 
 
-def get_saved_html_plot(model_key: str, method: str) -> dict:
-    model_name = key_to_model(model_key)
-    safe_dir = model_to_key(model_name)
-    output_dir = get_model_output_dir(model_key)
+def get_saved_html_plot(model_key: str, method: str, output_dir: Path | None = None) -> dict:
+    safe_dir = model_to_key(key_to_model(model_key))
+    if output_dir is None:
+        output_dir = get_model_output_dir(model_key)
     filename = SAVED_HTML_METHOD_FILES.get(method, f"{method}.html")
     html_path = output_dir / filename
 

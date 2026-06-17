@@ -13,8 +13,6 @@ import pymupdf
 import trafilatura
 from bs4 import BeautifulSoup
 
-from .utils import normalize_text
-
 logger = logging.getLogger(__name__)
 
 
@@ -44,7 +42,7 @@ def html_to_text(
         )
         if text:
             logger.debug("HTML processed with Trafilatura")
-            return normalize_text(text)
+            return text
     except Exception as e:
         logger.warning(f"Trafilatura failed, falling back to BeautifulSoup: {e}")
 
@@ -66,7 +64,7 @@ def html_to_text(
 
         text = main_content.get_text(separator="\n") if main_content else soup.get_text(separator="\n")
         logger.debug("HTML processed with BeautifulSoup")
-        return normalize_text(text)
+        return text
 
     except Exception:
         logger.exception("Critical HTML extraction error")
@@ -115,7 +113,7 @@ def pdf_to_text(
 
         if text_parts:
             logger.debug(f"PDF processed with PyMuPDF ({len(text_parts)} pages)")
-            return normalize_text("\n\n".join(text_parts))
+            return "\n\n".join(text_parts)
         else:
             logger.warning("Failed to extract text from PDF")
             return ""

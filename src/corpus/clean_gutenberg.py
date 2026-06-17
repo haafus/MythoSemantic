@@ -134,9 +134,6 @@ def is_gutenberg_text(text: str) -> bool:
 
 
 def clean_gutenberg_in_builder(original_text: str, url: str = "", tid: str = "") -> str:
-    if not original_text:
-        return original_text
-
     if url and ("gutenberg.org" in url or "gutenberg" in url.lower()):
         logger.debug(f"{tid}: Project Gutenberg URL detected, applying cleanup")
         return clean_gutenberg_text(original_text, tid or url)

@@ -86,8 +86,6 @@ class EmbeddingBuilder:
     # --- Embeddings --------------------------------------------------------
 
     def _generate_embeddings(self, sentences: list[str]) -> np.ndarray:
-        if not sentences:
-            return np.array([])
         embeddings = self._models.model.encode(
             sentences,
             batch_size=self._models.batch_size,

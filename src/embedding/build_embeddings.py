@@ -1,10 +1,7 @@
 from __future__ import annotations
 
-import gc
 import logging
 from pathlib import Path
-
-import torch
 
 from settings import settings
 
@@ -86,11 +83,6 @@ def build_embeddings(
         raise
     finally:
         builder.close()
-        gc.collect()
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
-        elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
-            torch.mps.empty_cache()
 
     logger.info("All embeddings saved to Chroma.")
 

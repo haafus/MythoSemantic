@@ -21,8 +21,6 @@ def create_webpage(nodes_for_js, edges_for_js, output_html_path: Path):
 
 
 def generate_and_save_graph(personas_data: list, relations_data: list, output_dir: Path):
-    output_dir.mkdir(parents=True, exist_ok=True)
-
     personas = pd.DataFrame(personas_data)
     relations = pd.DataFrame(relations_data)
 

@@ -46,7 +46,6 @@ def extract_from_chunk(llm: LLMProcessor, chunk: str, prompts: dict) -> dict[str
         except Exception:
             logger.exception("Failed to extract characters from chunk")
             chars = []
-        chars = chars if isinstance(chars, list) else []
         rels = llm.extract_relations(chunk, chars, prompts["relations"])
 
         try:
@@ -62,7 +61,7 @@ def extract_from_chunk(llm: LLMProcessor, chunk: str, prompts: dict) -> dict[str
             times = []
 
     return {
-        "characters": chars,
+        "characters": chars if isinstance(chars, list) else [],
         "relations": rels if isinstance(rels, list) else [],
         "locations": locs if isinstance(locs, list) else [],
         "times": times if isinstance(times, list) else [],
