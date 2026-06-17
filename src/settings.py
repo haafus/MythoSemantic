@@ -30,8 +30,7 @@ class EmbeddingSettings(BaseModel):
 
 
 class LLMSettings(BaseModel):
-    model_name: str = "gpt-4o-mini"
-    base_url: str = "https://api.openai.com/v1"
+    model: str = "gpt4o-mini"
     temperature: float = 0.1
     max_retries: int = 5
 

@@ -166,15 +166,10 @@ def run_generate_graphs(llm_model: str | None = None, force: bool = False) -> No
     llm_cfg = settings.llm
     graphs_cfg = settings.graphs
 
-    if llm_model:
-        provider = resolve_llm_provider(llm_model)
-        model_name = provider["model"]
-        base_url = provider["base_url"]
-        api_key = provider.get("api_key")
-    else:
-        model_name = llm_cfg.model_name
-        base_url = llm_cfg.base_url
-        api_key = None
+    provider = resolve_llm_provider(llm_model or llm_cfg.model)
+    model_name = provider["model"]
+    base_url = provider["base_url"]
+    api_key = provider.get("api_key")
 
     logger.info(f"Starting graph generation (model={model_name}, force={force})...")
 

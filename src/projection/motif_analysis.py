@@ -46,13 +46,16 @@ def generate_motif_summaries(
     output_dir: Path,
 ) -> list[str]:
     from llm_processing import LLMProcessor
+    from model_registry import resolve_llm_provider
 
     cfg = settings.llm
+    provider = resolve_llm_provider(cfg.model)
     llm = LLMProcessor(
-        model_name=cfg.model_name,
-        base_url=cfg.base_url,
+        model_name=provider["model"],
+        base_url=provider["base_url"],
         temperature=cfg.temperature,
         max_retries=cfg.max_retries,
+        api_key=provider.get("api_key"),
     )
 
     cache_file = _cache_path(output_dir)
