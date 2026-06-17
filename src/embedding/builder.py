@@ -239,12 +239,3 @@ class EmbeddingBuilder:
     def close(self) -> None:
         if hasattr(self, "_models"):
             self._models._unload()
-
-    def __del__(self) -> None:
-        self.close()
-
-    def __enter__(self) -> "EmbeddingBuilder":
-        return self
-
-    def __exit__(self, exc_type: type | None, exc_val: BaseException | None, exc_tb: Any) -> None:
-        self.close()
