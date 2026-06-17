@@ -9,25 +9,27 @@ logger = logging.getLogger(__name__)
 class LLMProcessor:
     def __init__(
         self,
-        model_name: str,
-        base_url: str,
+        model_alias: str | None = None,
         use_json_mode: bool = True,
-        temperature: float = 0.1,
-        max_retries: int = 5,
         request_timeout: float = 120.0,
-        api_key: str | None = None,
     ):
-        self.model_name = model_name
+        from model_registry import resolve_llm_provider
+        from settings import settings
+
+        cfg = settings.llm
+        provider = resolve_llm_provider(model_alias or cfg.model)
+
+        self.model_name = provider["model"]
         self.use_json_mode = use_json_mode
-        self.temperature = temperature
+        self.temperature = cfg.temperature
 
         kwargs: dict = {
-            "base_url": base_url,
+            "base_url": provider["base_url"],
             "timeout": request_timeout,
-            "max_retries": max_retries,
+            "max_retries": cfg.max_retries,
         }
-        if api_key:
-            kwargs["api_key"] = api_key
+        if provider.get("api_key"):
+            kwargs["api_key"] = provider["api_key"]
         self.client = OpenAI(**kwargs)
 
     def ask_text(self, system_prompt: str, user_content: str) -> str:
