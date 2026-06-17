@@ -63,9 +63,7 @@ def delete_chroma_collection(ctx, model: str | None, yes: bool):
 
     import chromadb
 
-    chroma_dir = settings.chroma_dir
-    chroma_dir.mkdir(parents=True, exist_ok=True)
-    client = chromadb.PersistentClient(path=str(chroma_dir))
+    client = chromadb.PersistentClient(path=str(settings.chroma_dir))
 
     try:
         deleted = delete_collection(client, collection)
