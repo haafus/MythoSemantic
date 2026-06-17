@@ -70,7 +70,7 @@ def analyze_embeddings(
 
 
 def _generate_all_plots(analyzer: EmbeddingAnalyzer, force: bool = False) -> None:
-    data = analyzer.filter_by_model()
+    data = analyzer.data
     out = analyzer.output_dir
 
     umap_plots = [
@@ -124,7 +124,7 @@ def _generate_motif_plot(analyzer: EmbeddingAnalyzer, force: bool = False) -> No
 
     from .motif_analysis import run_motif_analysis
 
-    data = analyzer.filter_by_model()
+    data = analyzer.data
 
     logger.info("Generating Motif UMAP projection (LLM summaries)...")
     try:

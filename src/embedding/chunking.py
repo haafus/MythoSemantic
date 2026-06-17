@@ -1,50 +1,11 @@
-import hashlib
 import logging
 import re
-from dataclasses import dataclass
 from typing import Callable
 
 logger = logging.getLogger(__name__)
 
 
-@dataclass
-class ChunkMetadata:
-    chunk_id: str
-    index: int
-    start_pos: int
-    end_pos: int
-    chunk_type: str
-    strategy_used: str
-    overlap_with_prev: bool = False
-    overlap_with_next: bool = False
-    word_count: int = 0
-    char_count: int = 0
-    has_code: bool = False
-    has_markdown: bool = False
-    parent_doc_hash: str | None = None
-
-
-
-class ChunkWithMetadata:
-    def __init__(self, text: str, metadata: ChunkMetadata):
-        self.text = text
-        self.metadata = metadata
-
-
 class RegexPatterns:
-    CODE_PATTERN = re.compile(
-        r"```[\s\S]*?```|"
-        r"^\s*(def|class|import|from|return|if|else|for|while)\s|"
-        r"^\s*(function|const|let|var|if|else|for|while|switch)\s|"
-        r"^\s*(public|private|protected|static|void|int|string)\s|"
-        r"^\s*(#include|#define|int main|printf|scanf)\s",
-        re.MULTILINE,
-    )
-    MARKDOWN_PATTERN = re.compile(r"[#*`\[\]\(\)]|^>", re.MULTILINE)
-    CODE_BLOCK_PATTERN = re.compile(r"```[\s\S]*?```")
-    HEADER_PATTERN = re.compile(r"^#{1,6}\s", re.MULTILINE)
-    LIST_PATTERN = re.compile(r"^\s*[-*+]\s", re.MULTILINE)
-
     SENTENCE_SPLITTER = re.compile(r"(?<=[.!?])\s+|(?<=[。！？।])\s*")
     PARAGRAPH_SPLITTER = re.compile(r"\n\s*\n")
 
@@ -231,7 +192,6 @@ class ChunkingStrategy:
         chunk_size: int = 512,
         chunk_overlap: int = 64,
         chunking_func: Callable | None = None,
-        return_metadata: bool = False,
     ):
         if chunk_size < 10:
             raise ValueError("chunk_size must be at least 10 characters")
@@ -244,72 +204,11 @@ class ChunkingStrategy:
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
         self.chunking_func = chunking_func or character_based_chunking
-        self.return_metadata = return_metadata
 
     def __call__(self, text: str) -> list[str]:
         if not text or not text.strip():
             return []
         return self.chunking_func(text, self.chunk_size, self.chunk_overlap)
-
-    def call_with_metadata(self, text: str, doc_hash: str | None = None) -> list[ChunkWithMetadata]:
-        if not text or not text.strip():
-            return []
-        if doc_hash is None:
-            doc_hash = hashlib.md5(text.encode("utf-8")).hexdigest()[:8]
-
-        chunks = self.chunking_func(text, self.chunk_size, self.chunk_overlap)
-        chunks_with_metadata = []
-        position_tracker = 0
-
-        for i, chunk_text in enumerate(chunks):
-            start_pos = text.find(chunk_text, position_tracker)
-            if start_pos == -1:
-                start_pos = text.find(chunk_text)
-            if start_pos == -1:
-                start_pos = position_tracker
-
-            end_pos = start_pos + len(chunk_text)
-
-            if i < len(chunks) - 1:
-                position_tracker = max(position_tracker + 1, end_pos - self.chunk_overlap)
-            else:
-                position_tracker = end_pos
-
-            chunk_id = hashlib.md5(f"{doc_hash}_{i}_{start_pos}".encode()).hexdigest()[:12]
-            has_code = bool(RegexPatterns.CODE_PATTERN.search(chunk_text))
-            has_markdown = bool(RegexPatterns.MARKDOWN_PATTERN.search(chunk_text))
-
-            metadata = ChunkMetadata(
-                chunk_id=chunk_id,
-                index=i,
-                start_pos=start_pos,
-                end_pos=end_pos,
-                chunk_type=self._determine_chunk_type(chunk_text),
-                strategy_used=self.name,
-                overlap_with_prev=(i > 0 and self.chunk_overlap > 0),
-                overlap_with_next=(i < len(chunks) - 1 and self.chunk_overlap > 0),
-                word_count=len(chunk_text.split()),
-                char_count=len(chunk_text),
-                has_code=has_code,
-                has_markdown=has_markdown,
-                parent_doc_hash=doc_hash,
-            )
-            chunks_with_metadata.append(ChunkWithMetadata(chunk_text, metadata))
-        return chunks_with_metadata
-
-    def _determine_chunk_type(self, text: str) -> str:
-        if RegexPatterns.CODE_BLOCK_PATTERN.search(text):
-            return "code_block"
-        elif RegexPatterns.HEADER_PATTERN.search(text):
-            return "markdown_with_headers"
-        elif RegexPatterns.LIST_PATTERN.search(text):
-            return "list"
-        elif "\n\n" in text:
-            return "multi_paragraph"
-        elif ". " in text and len(text.split(". ")) > 2:
-            return "multi_sentence"
-        else:
-            return "text"
 
 
 def create_chunking_strategies() -> dict[str, ChunkingStrategy]:

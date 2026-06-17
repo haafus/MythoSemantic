@@ -128,25 +128,6 @@ class TestChunkingStrategy:
         assert strategy("") == []
         assert strategy("   ") == []
 
-    def test_call_with_metadata(self):
-        strategy = ChunkingStrategy(name="test", chunk_size=100, chunk_overlap=10)
-        text = "First chunk of text. " * 20
-        results = strategy.call_with_metadata(text)
-        assert len(results) >= 1
-        meta = results[0].metadata
-        assert meta.strategy_used == "test"
-        assert meta.word_count > 0
-        assert meta.char_count > 0
-        assert meta.chunk_id is not None
-        assert meta.index == 0
-
-    def test_metadata_indices_sequential(self):
-        strategy = ChunkingStrategy(name="test", chunk_size=50, chunk_overlap=10)
-        text = "Word " * 100
-        results = strategy.call_with_metadata(text)
-        indices = [r.metadata.index for r in results]
-        assert indices == list(range(len(results)))
-
 
 class TestCreateChunkingStrategies:
     def test_returns_three_strategies(self):

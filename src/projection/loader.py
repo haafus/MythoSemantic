@@ -15,7 +15,6 @@ class EmbeddingDataLoader:
     def __init__(self, auto_migrate: bool = True):
         self.client = chromadb.PersistentClient(path=str(settings.chroma_dir))
         self._metadata_map: dict[str, str] | None = None
-        self._collection = None
         self._collection_names_cache: dict[str, list[str]] = {}
 
         if auto_migrate:
@@ -58,22 +57,6 @@ class EmbeddingDataLoader:
                 yield self.client.get_collection(name=name)
             except Exception as e:
                 logger.warning(f"Failed to get collection '{name}': {e}")
-
-    @property
-    def collection(self):
-        if self._collection is None:
-            try:
-                names = self._resolve_collection_names()
-                if not names:
-                    raise ValueError("Model-based Chroma collections do not exist")
-                self._collection = self.client.get_collection(name=names[0])
-            except ValueError as err:
-                logger.warning("Model-based Chroma collections do not exist. Data may not have been generated yet.")
-                raise RuntimeError("Model-based Chroma collections not found") from err
-            except Exception as e:
-                logger.error(f"Failed to get model-based collection: {e}")
-                raise
-        return self._collection
 
     def _load_metadata_map(self) -> dict[str, str]:
         if self._metadata_map is not None:
@@ -287,7 +270,6 @@ class EmbeddingDataLoader:
 
     def close(self):
         if hasattr(self, "client"):
-            self._collection = None
             self.client = None
 
     def __enter__(self):

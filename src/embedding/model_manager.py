@@ -14,7 +14,6 @@ class ModelManager:
     def __init__(self) -> None:
         self.model_name: str | None = None
         self.model: Any = None
-        self.model_dim: int = 0
 
     def set_model(self, model_name: str) -> None:
         model_name = resolve_embedding_model(model_name)
@@ -28,7 +27,6 @@ class ModelManager:
         self.close()
         self.model = SentenceTransformer(model_name, trust_remote_code=True)
         self.model_name = model_name
-        self.model_dim = self.model.get_embedding_dimension()
         logger.info(f"Model '{model_name}' loaded on {self.model.device}.")
 
     def close(self) -> None:
@@ -37,7 +35,6 @@ class ModelManager:
         device = str(self.model.device)
         self.model = None
         self.model_name = None
-        self.model_dim = 0
         gc.collect()
         if device.startswith("cuda"):
             torch.cuda.empty_cache()

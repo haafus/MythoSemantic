@@ -19,8 +19,7 @@ def _safe_meta(val: Any) -> str:
 
 
 class ChromaWriter:
-    def __init__(self, chroma_client: Any, chroma_batch_size: int = 100, queue_maxsize: int = 10):
-        self.chroma_client = chroma_client
+    def __init__(self, chroma_batch_size: int = 100, queue_maxsize: int = 10):
         self.chroma_batch_size = chroma_batch_size
         self.queue_maxsize = queue_maxsize
         self._write_error: Exception | None = None

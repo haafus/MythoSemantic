@@ -26,34 +26,22 @@ class EmbeddingBuilder:
 
         emb = settings.embedding
         self.corpus_dir = Path(settings.corpus_dir)
-        self.chroma_path = ensure_chroma_writable(settings.chroma_dir)
         self.batch_size = emb.batch_size
 
         self._models = ModelManager()
 
-        self.chroma_client = chromadb.PersistentClient(path=str(self.chroma_path))
-        self._chroma = ChromaWriter(self.chroma_client, emb.chroma_batch_size, emb.queue_maxsize)
+        chroma_path = ensure_chroma_writable(settings.chroma_dir)
+        self.chroma_client = chromadb.PersistentClient(path=str(chroma_path))
+        self._chroma = ChromaWriter(emb.chroma_batch_size, emb.queue_maxsize)
 
-        self.chunking_strategies = create_chunking_strategies()
+        self._chunking_strategies = create_chunking_strategies()
         self.set_chunking_strategy(emb.default_chunking)
 
         self._models.set_model(embedding_model)
 
-    # --- Delegated properties for backward compat --------------------------
-
     @property
     def model_name(self) -> str | None:
         return self._models.model_name
-
-    @property
-    def model(self) -> Any:
-        return self._models.model
-
-    @property
-    def model_dim(self) -> int:
-        return self._models.model_dim
-
-    # --- Model management (delegated) --------------------------------------
 
     def set_model(self, model_name: str) -> None:
         self._models.set_model(model_name)
@@ -61,10 +49,10 @@ class EmbeddingBuilder:
     # --- Chunking ----------------------------------------------------------
 
     def set_chunking_strategy(self, strategy_name: str) -> None:
-        if strategy_name not in self.chunking_strategies:
-            available = list(self.chunking_strategies.keys())
+        if strategy_name not in self._chunking_strategies:
+            available = list(self._chunking_strategies.keys())
             raise ValueError(f"Strategy '{strategy_name}' not found. Available: {available}")
-        self.current_chunking = self.chunking_strategies[strategy_name]
+        self.current_chunking = self._chunking_strategies[strategy_name]
 
     def _chunk_text(self, text: str) -> list[str]:
         if not text or not text.strip():

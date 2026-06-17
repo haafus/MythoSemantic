@@ -39,7 +39,7 @@ class TestSafeMeta:
 class TestBuildEntries:
     @pytest.fixture
     def writer(self):
-        return ChromaWriter(chroma_client=None, chroma_batch_size=100)
+        return ChromaWriter(chroma_batch_size=100)
 
     def test_ids_format(self, writer):
         chunks = ["chunk1", "chunk2", "chunk3"]
