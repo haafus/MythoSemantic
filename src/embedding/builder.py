@@ -9,7 +9,6 @@ from tqdm import tqdm
 
 from .chroma_manager import (
     collection_name_for_model,
-    ensure_chroma_writable,
     query_chroma_collection,
 )
 from .chroma_writer import ChromaWriter
@@ -30,8 +29,9 @@ class EmbeddingBuilder:
 
         self._models = ModelManager()
 
-        chroma_path = ensure_chroma_writable(settings.chroma_dir)
-        self.chroma_client = chromadb.PersistentClient(path=str(chroma_path))
+        chroma_dir = Path(settings.chroma_dir)
+        chroma_dir.mkdir(parents=True, exist_ok=True)
+        self.chroma_client = chromadb.PersistentClient(path=str(chroma_dir))
         self._chroma = ChromaWriter(emb.chroma_batch_size, emb.queue_maxsize)
 
         self._chunking_strategies = create_chunking_strategies()

@@ -6,7 +6,7 @@ from model_registry import default_embedding_model
 from settings import settings
 
 from .build_embeddings import build_embeddings
-from .chroma_manager import collection_name_for_model, delete_collection, ensure_chroma_writable
+from .chroma_manager import collection_name_for_model, delete_collection
 
 
 @click.command()
@@ -63,8 +63,9 @@ def delete_chroma_collection(ctx, model: str | None, yes: bool):
 
     import chromadb
 
-    chroma_path = ensure_chroma_writable(str(settings.chroma_dir))
-    client = chromadb.PersistentClient(path=str(chroma_path))
+    chroma_dir = settings.chroma_dir
+    chroma_dir.mkdir(parents=True, exist_ok=True)
+    client = chromadb.PersistentClient(path=str(chroma_dir))
 
     try:
         deleted = delete_collection(client, collection)

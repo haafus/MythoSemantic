@@ -1,8 +1,6 @@
 import hashlib
 import logging
 import re
-import stat
-from pathlib import Path
 from typing import Any
 
 import chromadb
@@ -39,42 +37,6 @@ def is_model_collection_name(collection_name: str) -> bool:
         return False
     return bool(re.fullmatch(r"[a-z0-9][a-z0-9_-]{2,53}_[0-9a-f]{8}", collection_name))
 
-
-def _add_owner_write_permission(path: Path) -> None:
-    try:
-        mode = path.stat().st_mode
-        extra_bits = stat.S_IRUSR | stat.S_IWUSR
-        if path.is_dir():
-            extra_bits |= stat.S_IXUSR
-        path.chmod(mode | extra_bits)
-    except OSError as e:
-        logger.debug("Could not set write permission on %s: %s", path, e)
-
-
-def ensure_chroma_writable(chroma_path: Any) -> Path:
-    path = Path(chroma_path)
-    try:
-        path.mkdir(parents=True, exist_ok=True)
-    except OSError as error:
-        raise RuntimeError(f"Cannot create Chroma path '{path}': {error}") from error
-
-    _add_owner_write_permission(path)
-
-    db_files = list(path.glob("*.sqlite*")) + list(path.glob("*.db*"))
-    for db_file in db_files:
-        if not db_file.is_file():
-            continue
-        _add_owner_write_permission(db_file)
-        try:
-            with open(db_file, "ab"):
-                pass
-        except OSError as error:
-            raise RuntimeError(
-                f"Chroma database file '{db_file}' is not writable. "
-                "Fix its permissions or remove/recreate the Chroma DB in a writable location."
-            ) from error
-
-    return path
 
 
 def save_to_chroma_collection(
