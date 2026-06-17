@@ -28,14 +28,6 @@ AXIS_LINE_COLOR = "rgba(120,130,140,0.65)"
 logger = logging.getLogger(__name__)
 
 
-def _sample_for_visualization(data: list[dict], sample_size: int | None, reason: str) -> list[dict]:
-    if sample_size is None or len(data) <= sample_size:
-        return data
-
-    logger.info(f"Sampling {sample_size} of {len(data)} records for {reason}")
-    indices = np.random.default_rng(RANDOM_SEED).choice(len(data), sample_size, replace=False)
-    return [data[i] for i in indices]
-
 
 def _get_color_map(data: list[dict]) -> dict[str, str]:
     traditions_path = settings.corpus_dir / "traditions.json"

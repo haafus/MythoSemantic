@@ -67,7 +67,3 @@ def _index_response() -> FileResponse:
 def run_server() -> None:
     srv = settings.server
     uvicorn.run("main:app", host=srv.host, port=srv.port, reload=False)
-
-
-def main() -> None:
-    run_server()
