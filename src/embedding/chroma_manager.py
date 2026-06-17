@@ -60,17 +60,6 @@ def ensure_chroma_writable(chroma_path: Any) -> Path:
 
     _add_owner_write_permission(path)
 
-    probe_path = path / ".chroma_write_probe"
-    try:
-        with open(probe_path, "w", encoding="utf-8") as probe:
-            probe.write("ok")
-        probe_path.unlink(missing_ok=True)
-    except OSError as error:
-        raise RuntimeError(
-            f"Chroma path '{path}' is not writable. "
-            "Move chroma_path to a writable directory or fix filesystem permissions."
-        ) from error
-
     db_files = list(path.glob("*.sqlite*")) + list(path.glob("*.db*"))
     for db_file in db_files:
         if not db_file.is_file():
