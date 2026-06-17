@@ -24,10 +24,11 @@ def resolve_embedding_model(name: str) -> str:
 def resolve_llm_provider(name: str) -> dict[str, str | None]:
     registry = _load_registry()
     llm = registry.get("llm", {})
-    if name not in llm:
-        available = ", ".join(sorted(llm.keys()))
+    all_models = {**llm.get("models", {}), **llm.get("inactive", {})}
+    if name not in all_models:
+        available = ", ".join(sorted(all_models.keys()))
         raise ValueError(f"LLM provider '{name}' not found. Available: {available}")
-    entry = llm[name]
+    entry = all_models[name]
     api_key = None
     env_key = entry.get("env_key")
     if env_key:
@@ -40,7 +41,7 @@ def resolve_llm_provider(name: str) -> dict[str, str | None]:
 
 
 def list_llm_providers() -> list[str]:
-    return sorted(_load_registry().get("llm", {}).keys())
+    return sorted(_load_registry().get("llm", {}).get("models", {}).keys())
 
 
 def active_embedding_models() -> list[str]:

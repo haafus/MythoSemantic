@@ -29,21 +29,22 @@ class TestResolveLLMProvider:
         assert result["model"] == "gpt-4o-mini"
         assert "openai" in result["base_url"]
 
-    def test_resolves_local_model(self):
-        result = resolve_llm_provider("qwen3-8b")
-        assert result["model"] == "qwen3:8b"
-        assert "localhost" in result["base_url"]
-
     def test_unknown_provider_raises(self):
         with pytest.raises(ValueError, match="not found"):
             resolve_llm_provider("nonexistent-model")
 
 
 class TestListFunctions:
-    def test_list_llm_providers(self):
+    def test_list_llm_providers_returns_active_only(self):
         providers = list_llm_providers()
         assert "gpt4o-mini" in providers
         assert "gemini25-flash" in providers
+        assert "qwen3-8b" not in providers
+
+    def test_inactive_llm_still_resolves(self):
+        result = resolve_llm_provider("qwen3-8b")
+        assert result["model"] == "qwen3:8b"
+        assert "localhost" in result["base_url"]
 
     def test_list_embedding_aliases(self):
         aliases = list_embedding_aliases()
@@ -56,6 +57,6 @@ class TestListFunctions:
         assert models[0] == "BAAI/bge-m3"
         assert "Qwen/Qwen3-Embedding-4B" not in models
 
-    def test_inactive_models_still_resolve(self):
+    def test_inactive_embedding_still_resolves(self):
         assert resolve_embedding_model("qwen-4b") == "Qwen/Qwen3-Embedding-4B"
         assert resolve_embedding_model("story-emb") == "uhhlt/story-emb"
