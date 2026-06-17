@@ -15,7 +15,7 @@ from .chroma_manager import (
 from .chroma_writer import ChromaWriter
 from .chunking import create_chunking_strategies
 from .corpus_iterator import iter_corpus_files
-from .model_manager import ModelManager
+from .model_manager import DEFAULT_BATCH_SIZE, ModelManager
 
 logger = logging.getLogger(__name__)
 
@@ -33,8 +33,9 @@ class EmbeddingBuilder:
     ):
         self.corpus_dir = Path(corpus_dir)
         self.chroma_path = ensure_chroma_writable(chroma_path)
+        self.batch_size: int = batch_size or DEFAULT_BATCH_SIZE
 
-        self._models = ModelManager(batch_size=batch_size)
+        self._models = ModelManager()
 
         self.chroma_client = chromadb.PersistentClient(path=str(self.chroma_path))
         self._chroma = ChromaWriter(self.chroma_client, chroma_batch_size, queue_maxsize)
@@ -57,10 +58,6 @@ class EmbeddingBuilder:
     @property
     def model_dim(self) -> int:
         return self._models.model_dim
-
-    @property
-    def batch_size(self) -> int:
-        return self._models.batch_size
 
     # --- Model management (delegated) --------------------------------------
 
@@ -88,7 +85,7 @@ class EmbeddingBuilder:
     def _generate_embeddings(self, sentences: list[str]) -> np.ndarray:
         embeddings = self._models.model.encode(
             sentences,
-            batch_size=self._models.batch_size,
+            batch_size=self.batch_size,
             show_progress_bar=False,
             normalize_embeddings=True,
         )
@@ -98,9 +95,9 @@ class EmbeddingBuilder:
         if chunking_strategy:
             self.set_chunking_strategy(chunking_strategy)
 
-        original_batch_size = self._models.batch_size
+        original_batch_size = self.batch_size
         if batch_size is not None:
-            self._models.batch_size = batch_size
+            self.batch_size = batch_size
 
         try:
             chunks = self._chunk_text(text)
@@ -111,7 +108,7 @@ class EmbeddingBuilder:
                     "model": self.model_name,
                     "chunking": self.current_chunking.name,
                     "num_chunks": 0,
-                    "batch_size_used": self._models.batch_size,
+                    "batch_size_used": self.batch_size,
                 }
             embeddings = self._generate_embeddings(chunks)
             return {
@@ -120,11 +117,11 @@ class EmbeddingBuilder:
                 "model": self.model_name,
                 "chunking": self.current_chunking.name,
                 "num_chunks": len(chunks),
-                "batch_size_used": self._models.batch_size,
+                "batch_size_used": self.batch_size,
             }
         finally:
             if batch_size is not None:
-                self._models.batch_size = original_batch_size
+                self.batch_size = original_batch_size
 
     # --- Chroma I/O --------------------------------------------------------
 
@@ -157,7 +154,7 @@ class EmbeddingBuilder:
         logger.info(f"Saving {len(files_info)} files ({total_chunks} chunks) to collection '{collection_name}'")
         added_total = 0
         skipped_total = 0
-        batch_size = self._models.batch_size
+        batch_size = self.batch_size
 
         with tqdm(total=total_chunks, desc="Embedding", unit="chunk") as pbar:
             for file_info, chunks in file_chunks:
@@ -244,7 +241,7 @@ class EmbeddingBuilder:
 
     def close(self) -> None:
         if hasattr(self, "_models"):
-            self._models.close()
+            self._models.unload_model()
 
     def __del__(self) -> None:
         self.close()
