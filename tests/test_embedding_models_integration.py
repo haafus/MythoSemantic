@@ -10,8 +10,7 @@ import unittest
 import numpy as np
 import pytest
 
-from model_registry import resolve_embedding_model
-from settings import settings
+from model_registry import active_embedding_models
 
 SentenceTransformer = pytest.importorskip("sentence_transformers").SentenceTransformer
 
@@ -20,7 +19,7 @@ try:
 except ImportError:
     torch = None
 
-MODELS = [resolve_embedding_model(m) for m in settings.embedding.models]
+MODELS = active_embedding_models()
 
 
 class TestEmbeddingModels(unittest.TestCase):

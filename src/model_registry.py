@@ -16,7 +16,8 @@ def _load_registry() -> dict[str, Any]:
 
 def resolve_embedding_model(name: str) -> str:
     registry = _load_registry()
-    return registry.get("embedding", {}).get(name, name)
+    models = registry.get("embedding", {}).get("models", {})
+    return models.get(name, name)
 
 
 def resolve_llm_provider(name: str) -> dict[str, str | None]:
@@ -41,5 +42,12 @@ def list_llm_providers() -> list[str]:
     return sorted(_load_registry().get("llm", {}).keys())
 
 
+def active_embedding_models() -> list[str]:
+    registry = _load_registry()
+    emb = registry.get("embedding", {})
+    models = emb.get("models", {})
+    return [models[alias] for alias in emb.get("active", []) if alias in models]
+
+
 def list_embedding_aliases() -> dict[str, str]:
-    return dict(_load_registry().get("embedding", {}))
+    return dict(_load_registry().get("embedding", {}).get("models", {}))

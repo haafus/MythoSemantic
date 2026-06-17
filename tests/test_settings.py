@@ -47,9 +47,16 @@ def test_env_override_chroma(monkeypatch):
     assert s.chroma_dir == Path("/data/chroma")
 
 
-def test_default_embedding_model():
+def test_default_embedding_settings():
     from settings import Settings
 
     s = Settings()
-    assert s.embedding.models[0] == "bge-m3"
     assert s.embedding.default_chunking == "paragraph"
+
+
+def test_active_embedding_models():
+    from model_registry import active_embedding_models
+
+    models = active_embedding_models()
+    assert len(models) == 4
+    assert models[0] == "BAAI/bge-m3"

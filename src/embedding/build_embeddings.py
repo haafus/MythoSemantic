@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from model_registry import resolve_embedding_model
+from model_registry import active_embedding_models, resolve_embedding_model
 from settings import settings
 
 from .builder import EmbeddingBuilder
@@ -33,7 +33,8 @@ def build_embeddings(
 ):
     emb = settings.embedding
 
-    MODEL_NAME = resolve_embedding_model(model_name or emb.models[0])
+    active = active_embedding_models()
+    MODEL_NAME = resolve_embedding_model(model_name) if model_name else active[0]
     CHUNKING = chunking or emb.default_chunking
     BATCH_SIZE = batch_size if batch_size is not None else emb.batch_size
 
@@ -46,7 +47,7 @@ def build_embeddings(
         chroma_batch_size=emb.chroma_batch_size,
     )
 
-    models_to_run = models or ([MODEL_NAME] if model_name else [resolve_embedding_model(m) for m in emb.models] or [MODEL_NAME])
+    models_to_run = models or ([MODEL_NAME] if model_name else active)
 
     logger.info("Starting embedding generation...")
     logger.info(f"   Source: {settings.corpus_dir}")

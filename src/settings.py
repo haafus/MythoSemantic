@@ -27,14 +27,6 @@ class EmbeddingSettings(BaseModel):
     chroma_batch_size: int = 100
     max_workers: int = 16
     queue_maxsize: int = 10
-    models: list[str] = [
-        "bge-m3",
-        "labse",
-        "e5-large",
-        "qwen-emb",
-        # "qwen-emb-4b",
-        # "story-emb",
-    ]
 
 
 class LLMSettings(BaseModel):

@@ -52,11 +52,14 @@
     }
   },
   "embedding": {
-    "bge-m3": "BAAI/bge-m3",
-    "labse": "sentence-transformers/LaBSE",
-    "e5-large": "intfloat/e5-large-v2",
-    "qwen-emb": "Qwen/Qwen3-Embedding-0.6B",
-    "qwen-emb-4b": "Qwen/Qwen3-Embedding-4B",
-    "story-emb": "uhhlt/story-emb"
+    "models": {
+      "bge-m3": "BAAI/bge-m3",
+      "labse": "sentence-transformers/LaBSE",
+      "e5-large": "intfloat/e5-large-v2",
+      "qwen-emb": "Qwen/Qwen3-Embedding-0.6B",
+      "qwen-emb-4b": "Qwen/Qwen3-Embedding-4B",
+      "story-emb": "uhhlt/story-emb"
+    },
+    "active": ["bge-m3", "labse", "e5-large", "qwen-emb"]
   }
 }

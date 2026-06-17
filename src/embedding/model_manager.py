@@ -5,8 +5,7 @@ from typing import Any
 import torch
 from sentence_transformers import SentenceTransformer
 
-from model_registry import resolve_embedding_model
-from settings import settings
+from model_registry import active_embedding_models, resolve_embedding_model
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +22,7 @@ def _select_device() -> str:
 
 class ModelManager:
     def __init__(self, *, batch_size: int | None = None):
-        self.available_models: list[str] = [resolve_embedding_model(m) for m in settings.embedding.models]
+        self.available_models: list[str] = active_embedding_models()
         self.model_name: str | None = None
         self.model: Any = None
         self.model_dim: int = 0

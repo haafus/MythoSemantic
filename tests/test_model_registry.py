@@ -1,6 +1,7 @@
 import pytest
 
 from model_registry import (
+    active_embedding_models,
     list_embedding_aliases,
     list_llm_providers,
     resolve_embedding_model,
@@ -48,3 +49,13 @@ class TestListFunctions:
         aliases = list_embedding_aliases()
         assert aliases["bge-m3"] == "BAAI/bge-m3"
         assert "labse" in aliases
+
+    def test_active_embedding_models(self):
+        models = active_embedding_models()
+        assert len(models) == 4
+        assert models[0] == "BAAI/bge-m3"
+        assert "Qwen/Qwen3-Embedding-4B" not in models
+
+    def test_inactive_models_still_resolve(self):
+        assert resolve_embedding_model("qwen-emb-4b") == "Qwen/Qwen3-Embedding-4B"
+        assert resolve_embedding_model("story-emb") == "uhhlt/story-emb"
