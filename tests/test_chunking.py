@@ -49,15 +49,15 @@ class TestCharacterChunking:
 
     def test_validation_chunk_size_too_small(self):
         with pytest.raises(ValueError, match="chunk_size must be at least 10"):
-            character_based_chunking("text", chunk_size=5)
+            ChunkingStrategy(name="test", chunk_size=5)
 
     def test_validation_overlap_exceeds_size(self):
         with pytest.raises(ValueError, match="chunk_overlap cannot be greater"):
-            character_based_chunking("text", chunk_size=100, chunk_overlap=100)
+            ChunkingStrategy(name="test", chunk_size=100, chunk_overlap=100)
 
     def test_validation_negative_overlap(self):
         with pytest.raises(ValueError, match="chunk_overlap cannot be negative"):
-            character_based_chunking("text", chunk_size=100, chunk_overlap=-1)
+            ChunkingStrategy(name="test", chunk_size=100, chunk_overlap=-1)
 
 
 class TestSentenceChunking:

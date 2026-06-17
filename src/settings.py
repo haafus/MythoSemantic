@@ -121,14 +121,4 @@ class Settings(BaseSettings):
     def model_output_dir(self, model_name: str) -> Path:
         return self.analysis_dir / self.safe_model_name(model_name)
 
-    def ensure_dirs(self) -> None:
-        for d in (
-            self.corpus_dir,
-            self.analysis_dir,
-            self.logs_dir,
-            self.graphs_dir,
-        ):
-            d.mkdir(parents=True, exist_ok=True)
-
-
 settings = Settings()

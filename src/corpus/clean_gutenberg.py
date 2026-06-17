@@ -77,7 +77,6 @@ def _remove_gutenberg_footer_notes_with_count(text: str) -> tuple[str, int]:
 
 
 def _normalize_gutenberg_whitespace(text: str) -> str:
-    text = re.sub(r"\n{3,}", "\n\n", text)
     text = re.sub(r"[ \t]+\n", "\n", text)
 
     lines = text.split("\n")

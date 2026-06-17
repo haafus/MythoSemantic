@@ -52,13 +52,6 @@ class RegexPatterns:
 def character_based_chunking(
     text: str, chunk_size: int = 512, chunk_overlap: int = 64, separators: list[str] | None = None
 ) -> list[str]:
-    if chunk_size < 10:
-        raise ValueError("chunk_size must be at least 10 characters")
-    if chunk_overlap >= chunk_size:
-        raise ValueError("chunk_overlap cannot be greater than or equal to chunk_size")
-    if chunk_overlap < 0:
-        raise ValueError("chunk_overlap cannot be negative")
-
     if separators is None:
         separators = ["\n\n", "\n", ". ", "! ", "? ", "。", "！", "？", "।", "; ", ", ", "、", " ", ""]
 
@@ -156,11 +149,6 @@ def character_based_chunking(
 
 
 def sentence_based_chunking(text: str, chunk_size: int = 512, chunk_overlap: int = 64) -> list[str]:
-    if chunk_size < 10:
-        raise ValueError("chunk_size must be at least 10 characters")
-    if chunk_overlap >= chunk_size:
-        raise ValueError("chunk_overlap cannot be greater than or equal to chunk_size")
-
     if not text:
         return []
     sentences = RegexPatterns.SENTENCE_SPLITTER.split(text)
@@ -199,11 +187,6 @@ def sentence_based_chunking(text: str, chunk_size: int = 512, chunk_overlap: int
 
 
 def paragraph_based_chunking(text: str, chunk_size: int = 1024, chunk_overlap: int = 128) -> list[str]:
-    if chunk_size < 10:
-        raise ValueError("chunk_size must be at least 10 characters")
-    if chunk_overlap >= chunk_size:
-        raise ValueError("chunk_overlap cannot be greater than or equal to chunk_size")
-
     if not text:
         return []
     paragraphs = RegexPatterns.PARAGRAPH_SPLITTER.split(text)

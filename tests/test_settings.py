@@ -53,20 +53,3 @@ def test_default_embedding_model():
     s = Settings()
     assert s.embedding.models[0] == "BAAI/bge-m3"
     assert s.embedding.default_chunking == "paragraph"
-
-
-def test_ensure_dirs(tmp_path, monkeypatch):
-    monkeypatch.setenv("MYTHO_CORPUS_DIR", str(tmp_path / "corpus"))
-    monkeypatch.setenv("MYTHO_ANALYSIS_DIR", str(tmp_path / "analysis"))
-    monkeypatch.setenv("MYTHO_LOGS_DIR", str(tmp_path / "logs"))
-    monkeypatch.setenv("MYTHO_GRAPHS_DIR", str(tmp_path / "graphs"))
-
-    from settings import Settings
-
-    s = Settings()
-    s.ensure_dirs()
-
-    assert (tmp_path / "corpus").is_dir()
-    assert (tmp_path / "analysis").is_dir()
-    assert (tmp_path / "logs").is_dir()
-    assert (tmp_path / "graphs").is_dir()

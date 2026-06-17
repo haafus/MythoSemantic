@@ -93,12 +93,6 @@ class TestCleanGutenbergText:
 
 
 class TestNormalizeWhitespace:
-    def test_collapses_multiple_blank_lines(self):
-        text = "Line one.\n\n\n\n\nLine two."
-        result = _normalize_gutenberg_whitespace(text)
-        assert "\n\n\n" not in result
-        assert result == "Line one.\n\nLine two."
-
     def test_removes_decorative_lines(self):
         text = "Before.\n**********\nAfter."
         result = _normalize_gutenberg_whitespace(text)
