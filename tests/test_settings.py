@@ -6,7 +6,7 @@ def test_default_paths():
 
     s = Settings()
     assert s.corpus_dir == Path("outputs/corpus")
-    assert s.chroma_dir == Path("outputs/chroma_db")
+    assert s.chroma_dir == Path("outputs/chroma")
     assert s.analysis_dir == Path("outputs/analysis")
     assert s.logs_dir == Path("outputs/logs")
 

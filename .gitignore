@@ -3,7 +3,7 @@ __pycache__/
 *.pyc
 
 # generated artifacts — reproduce via pipeline, store outside git
-outputs/chroma_db/
+outputs/chroma/
 outputs/analysis/
 outputs/logs/
 outputs/graphs/

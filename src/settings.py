@@ -64,7 +64,7 @@ class Settings(BaseSettings):
     project_root: Path = Field(default_factory=lambda: Path(__file__).resolve().parent.parent)
 
     corpus_dir: Path = Path("outputs/corpus")
-    chroma_dir: Path = Path("outputs/chroma_db")
+    chroma_dir: Path = Path("outputs/chroma")
     analysis_dir: Path = Path("outputs/analysis")
     logs_dir: Path = Path("outputs/logs")
     graphs_dir: Path = Path("outputs/graphs")

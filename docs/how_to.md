@@ -23,13 +23,13 @@ pip install --upgrade pip
 pip install -e ".[all,dev]"
 ```
 
-Часть команд скачивает модели, обращается к внешним сайтам или пишет большие артефакты в `outputs/cache/`, `outputs/chroma_db/`, `outputs/analysis/`, `outputs/corpus_chunked/`, `outputs/graphs/` и `outputs/logs/`.
+Часть команд скачивает модели, обращается к внешним сайтам или пишет большие артефакты в `outputs/cache/`, `outputs/chroma/`, `outputs/analysis/`, `outputs/corpus_chunked/`, `outputs/graphs/` и `outputs/logs/`.
 
 ## Конфигурация
 
 Конфигурация устроена в два слоя:
 
-- **`src/settings.py`** — единый источник путей и окружения. Все директории (`outputs/corpus`, `outputs/chroma_db`, …), модель и chunking по умолчанию. Переопределяется через переменные окружения с префиксом `MYTHO_` или файл `.env` (например, `MYTHO_CORPUS_DIR=/data/corpus`).
+- **`src/settings.py`** — единый источник путей и окружения. Все директории (`outputs/corpus`, `outputs/chroma`, …), модель и chunking по умолчанию. Переопределяется через переменные окружения с префиксом `MYTHO_` или файл `.env` (например, `MYTHO_CORPUS_DIR=/data/corpus`).
 - **`config/*.yaml`** — доменные параметры каждого модуля (батчи, ретраи, LLM-эндпоинты). Файлы поставляются полностью закомментированными: раскомментируйте ключ, чтобы переопределить значение из кода. Пути в YAML дублировать не нужно — модульные конфиги берут их из `settings.py`.
 
 ## CLI
@@ -94,7 +94,7 @@ mytho corpus --type all --force
 Возможности:
 - Построить эмбеддинги для нескольких моделей.
 - Сохранить чанки в `outputs/corpus_chunked/`.
-- Сохранить индекс в `outputs/chroma_db/`.
+- Сохранить индекс в `outputs/chroma/`.
 - Кешировать эмбеддинги в `outputs/cache/`.
 - Делать запросы к Chroma.
 
@@ -264,7 +264,7 @@ mytho server
 
 - `outputs/corpus/` — основной текстовый корпус с метаданными и каталогом. Создается через `mytho corpus`.
 - `outputs/corpus_chunked/` — корпус после разбиения на чанки. Создается через `mytho embeddings generate`.
-- `outputs/chroma_db/` — локальная Chroma DB с векторными коллекциями. Создается через `mytho embeddings generate`.
+- `outputs/chroma/` — локальная Chroma DB с векторными коллекциями. Создается через `mytho embeddings generate`.
 - `outputs/analysis/` — результаты анализа: `models.json`, HTML-графики, кластеризация. Создается через `mytho projection` и `mytho cluster`.
 - `outputs/graphs/` — готовые HTML-графы персонажей и связей. Создается через `mytho graphs`.
 - `outputs/cache/` — кеш эмбеддингов в `.npy` и `.json`. Создается через `mytho embeddings generate`.
