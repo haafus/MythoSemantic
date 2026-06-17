@@ -13,7 +13,7 @@ from .chroma_manager import (
 )
 from .chroma_writer import ChromaWriter
 from .chunking import create_chunking_strategies
-from .corpus_iterator import iter_corpus_files
+from corpus.corpus_iterator import iter_corpus_files
 from .model_manager import ModelManager
 
 logger = logging.getLogger(__name__)

@@ -9,7 +9,7 @@ from settings import settings
 from .builder import EmbeddingBuilder
 from .chroma_manager import collection_name_for_model, delete_collection
 from .chunking import create_chunking_strategies
-from .corpus_iterator import iter_corpus_files
+from corpus.corpus_iterator import iter_corpus_files
 
 logger = logging.getLogger(__name__)
 

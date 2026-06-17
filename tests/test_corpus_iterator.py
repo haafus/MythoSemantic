@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from embedding.corpus_iterator import _normalize_catalog_id, iter_corpus_files
+from corpus.corpus_iterator import _normalize_catalog_id, iter_corpus_files
 
 
 class TestNormalizeCatalogId:
