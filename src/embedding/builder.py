@@ -117,6 +117,8 @@ class EmbeddingBuilder:
         added_total = 0
         skipped_total = 0
         batch_size = self.batch_size
+        encode_seconds = 0.0
+        encode_tokens = 0
 
         with tqdm(total=total_chunks, desc="Embedding", unit="chunk") as pbar:
             for file_info, chunks in file_chunks:
@@ -150,12 +152,17 @@ class EmbeddingBuilder:
                         b_end = min(b_start + batch_size, len(missing_chunks))
                         b_chunks = missing_chunks[b_start:b_end]
 
+                        tokenized = self._models.model.tokenizer(b_chunks, padding=False, truncation=True)
+                        encode_tokens += sum(len(ids) for ids in tokenized["input_ids"])
+
+                        t_enc = time.monotonic()
                         b_embs = self._models.model.encode(
                             b_chunks,
                             batch_size=batch_size,
                             show_progress_bar=False,
                             normalize_embeddings=True,
                         )
+                        encode_seconds += time.monotonic() - t_enc
                         b_embs = np.asarray(b_embs, dtype=np.float32)
 
                         b_ids = missing_ids[b_start:b_end]
@@ -188,6 +195,9 @@ class EmbeddingBuilder:
 
         elapsed = time.monotonic() - t0
         logger.info(f"Total added: {added_total}, skipped: {skipped_total} chunks in collection '{collection_name}' ({elapsed:.1f}s)")
+        if encode_seconds > 0 and encode_tokens > 0:
+            speed = encode_tokens / encode_seconds
+            logger.info(f"Embedding speed: {speed:,.0f} tokens/sec (batch_size={batch_size}, {encode_tokens:,} tokens in {encode_seconds:.1f}s)")
 
     def query_chroma(self, query: str, top_k: int = 5) -> list[dict[str, Any]]:
         collection_name = collection_name_for_model(self._models.model_name)
