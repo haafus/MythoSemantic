@@ -2,24 +2,24 @@ import json
 
 import pytest
 
-from corpus.corpus_iterator import CorpusFileInfo, _normalize_catalog_id, iter_corpus_files
+from corpus.corpus_iterator import CorpusFileInfo, normalize_catalog_id, iter_corpus_files
 
 
 class TestNormalizeCatalogId:
     def test_strips_whitespace(self):
-        assert _normalize_catalog_id("  hello  ") == "hello"
+        assert normalize_catalog_id("  hello  ") == "hello"
 
     def test_replaces_spaces_with_underscore(self):
-        assert _normalize_catalog_id("hello world") == "hello_world"
+        assert normalize_catalog_id("hello world") == "hello_world"
 
     def test_collapses_multiple_spaces(self):
-        assert _normalize_catalog_id("a  b   c") == "a_b_c"
+        assert normalize_catalog_id("a  b   c") == "a_b_c"
 
     def test_none_becomes_empty(self):
-        assert _normalize_catalog_id(None) == ""
+        assert normalize_catalog_id(None) == ""
 
     def test_integer_input(self):
-        assert _normalize_catalog_id(42) == "42"
+        assert normalize_catalog_id(42) == "42"
 
 
 class TestIterCorpusFiles:

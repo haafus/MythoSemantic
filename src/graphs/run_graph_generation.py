@@ -4,6 +4,7 @@ import logging
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
+from corpus.corpus_iterator import normalize_catalog_id
 from json_utils import load_json, save_json
 from llm_processing import LLMProcessor
 from settings import settings
@@ -191,9 +192,10 @@ def run_generate_graphs(llm_model: str | None = None, force: bool = False) -> No
 
     for book in corpus:
         book_id = book.get("id", "unknown_book")
+        text_id = normalize_catalog_id(book_id)
         txt_path = Path(book.get("path", ""))
 
-        book_out_dir = settings.graphs_dir / book_id
+        book_out_dir = settings.graphs_dir / text_id
         book_out_dir.mkdir(parents=True, exist_ok=True)
 
         expected_html_path = book_out_dir / "characters.html"

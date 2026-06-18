@@ -128,11 +128,7 @@ def chroma_orphan_collections(settings) -> list[dict[str, Any]]:
         return []
 
     aliases = list_embedding_aliases()
-    known_names = set()
-    for full_name in aliases.values():
-        known_names.add(collection_name_for_model(full_name))
-    for full_name in aliases.values():
-        known_names.add(collection_name_for_model(full_name))
+    known_names = {collection_name_for_model(full_name) for full_name in aliases.values()}
 
     return [c for c in info["collections"] if c["name"] not in known_names]
 
@@ -226,9 +222,9 @@ def analysis_orphans(settings) -> list[dict[str, Any]]:
         return []
 
     chroma_info = chroma_status(settings)
-    known_collections = {c["name"] for c in chroma_info["collections"]}
+    known_dirs = {settings.safe_model_name(c["model"]) for c in chroma_info["collections"]}
 
-    return [m for m in info["models"] if m["name"] not in known_collections]
+    return [m for m in info["models"] if m["name"] not in known_dirs]
 
 
 # ---------------------------------------------------------------------------
@@ -252,12 +248,13 @@ def graphs_status(settings) -> dict[str, Any]:
 
 
 def graphs_orphans(settings) -> list[tuple[Path, int]]:
-    """Find orphan graph directories (new format: graphs_dir/<book_id>/).
+    """Find orphan graph items in graphs_dir.
 
-    Only checks subdirectories whose name matches a corpus id.
-    Legacy flat HTML files (web_*-characters.html) are skipped —
-    no reliable way to map slug back to corpus id.
+    New format: <text_id>/characters.html (dirs matched by text_id).
+    Legacy format: web_*-characters.html (flat files, no corpus match possible).
     """
+    from corpus.corpus_iterator import normalize_catalog_id
+
     graphs_dir = Path(settings.graphs_dir)
     if not graphs_dir.exists():
         return []
@@ -272,13 +269,12 @@ def graphs_orphans(settings) -> list[tuple[Path, int]]:
     except Exception:
         return []
 
-    known_ids = {entry.get("id") for entry in meta_entries if entry.get("id")}
+    known_text_ids = {normalize_catalog_id(e["id"]) for e in meta_entries if e.get("id")}
 
     orphans = []
     for item in graphs_dir.iterdir():
-        if not item.is_dir():
-            continue
-        if item.name not in known_ids:
-            orphans.append((item, dir_size(item)))
+        if item.is_dir():
+            if item.name not in known_text_ids:
+                orphans.append((item, dir_size(item)))
 
     return orphans

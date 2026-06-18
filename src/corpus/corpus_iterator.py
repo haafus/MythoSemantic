@@ -8,7 +8,7 @@ from typing import Any, Generator
 logger = logging.getLogger(__name__)
 
 
-def _normalize_catalog_id(value: Any) -> str:
+def normalize_catalog_id(value: Any) -> str:
     return re.sub(r"\s+", "_", str(value or "").strip())
 
 
@@ -55,7 +55,7 @@ def iter_corpus_files(corpus_dir: Path) -> Generator[CorpusFileInfo, None, None]
         yield CorpusFileInfo(
             filename=txt_file.name,
             path=str(txt_file),
-            text_id=_normalize_catalog_id(tid),
+            text_id=normalize_catalog_id(tid),
             catalog_id=tid,
             major_tradition=item.get("major_tradition", "unknown"),
             tradition=item.get("tradition", "unknown"),
