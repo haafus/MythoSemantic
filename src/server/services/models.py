@@ -1,6 +1,6 @@
 import logging
 
-from model_registry import key_to_model, model_to_key
+from model_registry import model_to_key
 
 logger = logging.getLogger(__name__)
 
@@ -26,5 +26,4 @@ def list_model_summaries() -> list[dict[str, str]]:
 def get_model_output_dir(model_key: str):
     from settings import settings
 
-    model_name = key_to_model(model_key)
-    return settings.projections_dir / model_to_key(model_name)
+    return settings.projections_dir / model_key
