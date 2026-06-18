@@ -59,7 +59,7 @@ class EmbeddingDataLoader:
 
                 batch_data.append(
                     {
-                        "id": meta["text_id"],
+                        "text_id": meta["text_id"],
                         "tradition": meta["tradition"],
                         "major_tradition": meta["major_tradition"],
                         "chunk_index": meta["chunk_index"],

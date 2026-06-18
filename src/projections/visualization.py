@@ -169,7 +169,7 @@ def _plot_umap_scatter(
             if len(item.get("text", "")) > MAX_TEXT_PREVIEW_LEN:
                 text_preview += "..."
             text_preview = "<br>".join(textwrap.wrap(text_preview, width=60))
-            customdata.append([item.get("id", "unknown"), tradition, item.get("chunk_index", 0), text_preview])
+            customdata.append([item["text_id"], tradition, item["chunk_index"], text_preview])
 
         fig.add_trace(
             go.Scatter(
@@ -363,7 +363,7 @@ def plot_tradition_distribution(
     for item in data:
         trad = item.get("tradition", "unknown")
         tradition_counts[trad] = tradition_counts.get(trad, 0) + 1
-        tradition_docs.setdefault(trad, set()).add(item.get("id", "unknown"))
+        tradition_docs.setdefault(trad, set()).add(item["text_id"])
 
     sorted_traditions = sorted(tradition_counts.items(), key=lambda x: -x[1])
     traditions = [t[0] for t in sorted_traditions]

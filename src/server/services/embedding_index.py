@@ -57,16 +57,16 @@ class EmbeddingIndexService:
         item = index.items[item_index]
 
         return {
-            "id": str(item.get("id")),
-            "text": item.get("text", ""),
-            "tradition": item.get("tradition", "Unknown"),
-            "chunk_index": item.get("chunk_index", 0),
-            "book_title": item.get("text_id", "") or item.get("id", ""),
-            "model": item.get("model", index.model_name),
+            "id": item["text_id"],
+            "text": item["text"],
+            "tradition": item["tradition"],
+            "chunk_index": item["chunk_index"],
+            "book_title": item["text_id"],
+            "model": index.model_name,
             "metadata": {
-                "filename": item.get("filename", ""),
-                "major_tradition": item.get("major_tradition", ""),
-                "url": item.get("url", ""),
+                "filename": item["filename"],
+                "major_tradition": item["major_tradition"],
+                "url": item["url"],
             },
         }
 
@@ -101,9 +101,9 @@ class EmbeddingIndexService:
         normalized_matrix = self._normalize_matrix(matrix)
         id_to_index: dict[str, int] = {}
         for idx, item in enumerate(items):
-            point_id = str(item.get("id"))
+            point_id = item["text_id"]
             id_to_index.setdefault(point_id, idx)
-            id_to_index[self._point_key(point_id, item.get("chunk_index"))] = idx
+            id_to_index[self._point_key(point_id, item["chunk_index"])] = idx
 
         return ModelIndex(
             model_name=model_name,
@@ -174,16 +174,16 @@ class EmbeddingIndexService:
 
             results.append(
                 {
-                    "id": str(item.get("id")),
-                    "tradition": item.get("tradition", "Unknown"),
-                    "major_tradition": item.get("major_tradition", ""),
-                    "chunk_index": item.get("chunk_index", 0),
+                    "id": item["text_id"],
+                    "tradition": item["tradition"],
+                    "major_tradition": item["major_tradition"],
+                    "chunk_index": item["chunk_index"],
                     "similarity_score": similarity,
                     "distance": 1 - similarity,
                     "text": text,
                     "text_preview": preview,
-                    "filename": item.get("filename", ""),
-                    "book_title": item.get("text_id", "") or item.get("id", ""),
+                    "filename": item["filename"],
+                    "book_title": item["text_id"],
                 }
             )
 
