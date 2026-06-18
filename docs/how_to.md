@@ -46,6 +46,7 @@ mytho graphs --help
 mytho server --help
 mytho build --help
 mytho status
+mytho clean
 ```
 
 ## corpus
@@ -122,7 +123,6 @@ mytho embeddings --model bge-m3 --force
 - `src/projection/loader.py` читает данные из Chroma.
 - `src/projection/analyzer.py` собирает статистику.
 - `src/projection/visualization.py` строит UMAP-проекцию, heatmap и distribution chart.
-- `config/projection.yaml` задает пути и параметры визуализации.
 
 Возможности:
 - Получить статистику по модели.
@@ -152,16 +152,15 @@ mytho projection --model "BAAI/bge-m3" --no-plots
 Модуль извлечения персонажей, отношений, мест и времени через LLM и генерации графов.
 
 Основные файлы:
-- `config/graphs.yaml` задает LLM, пути и параметры чанков.
-- `config/graphs_prompts.json` содержит промпты.
-- `src/graphs/llm_processing.py` вызывает OpenAI-compatible API.
-- `src/graphs/run_graph_generation.py` режет тексты и агрегирует сущности.
+- `config/graphs_prompts.json` содержит промпты для извлечения сущностей.
+- `src/graphs/run_graph_generation.py` режет тексты на чанки и агрегирует сущности.
 - `src/graphs/graph_generator.py` строит HTML-граф через NetworkX и Cytoscape.
+- `src/llm_processing.py` вызывает OpenAI-compatible API.
 
 Возможности:
 - Пройти по книгам из `outputs/corpus/corpus_metadata.json`.
 - Извлечь сущности и связи через локальный или внешний LLM.
-- Сохранить графы в `outputs/graphs/<book_id>/characters.html`.
+- Сохранить графы в `outputs/graphs/<text_id>/characters.html`.
 
 Запуск по конфигу:
 
@@ -175,7 +174,33 @@ mytho graphs
 mytho graphs --force
 ```
 
-Перед запуском проверьте `config/graphs.yaml`: по умолчанию выбран локальный OpenAI-compatible сервер `http://127.0.0.1:1234/v1/`.
+LLM-модель задаётся через `config/models.json` и выбирается флагом `--model`. По умолчанию используется модель из `src/settings.py` (`llm.model`).
+
+## status
+
+Показывает текущее состояние пайплайна: что построено, чего не хватает, размеры на диске.
+
+```bash
+mytho status
+```
+
+Вывод содержит секции Corpus, Embeddings, Projections, Graphs с итоговым размером.
+
+## clean
+
+Поиск и удаление осиротевших файлов: corpus-тексты без записи в каталоге, embedding-коллекции без модели в реестре, чанки без текста в корпусе, projection-директории без коллекции, graph-директории без текста в корпусе.
+
+По умолчанию — dry run (только показывает что будет удалено):
+
+```bash
+mytho clean
+```
+
+Удалить:
+
+```bash
+mytho clean --apply
+```
 
 ## server
 
@@ -254,16 +279,16 @@ mytho build --model bge-m3
 
 ```bash
 # 1. Собрать корпус (Gutenberg-тексты очищаются автоматически)
-mytho corpus --type all
+mytho corpus
 
-# 2. Построить эмбеддинги и Chroma DB
+# 2. Построить эмбеддинги
 mytho embeddings
 
 # 3. Построить визуальный анализ эмбеддингов
 mytho projection
 
-# 4. Построить кластеризацию
-mytho cluster
+# 4. Извлечь графы персонажей через LLM
+mytho graphs
 
 # 5. Запустить веб-интерфейс
 mytho server
@@ -272,5 +297,12 @@ mytho server
 Можно пропускать отдельные шаги:
 
 ```bash
-mytho pipeline --skip-corpus --skip-graphs
+mytho build --skip-corpus --skip-graphs
+```
+
+Проверить состояние и найти мусор:
+
+```bash
+mytho status
+mytho clean
 ```
