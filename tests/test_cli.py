@@ -29,7 +29,7 @@ class TestProjectionCommand:
         result = runner.invoke(mytho, ["projections", "--help"])
         assert result.exit_code == 0
         assert "--model" in result.output
-        assert "--motif-analysis" in result.output
+        assert "--motifs" in result.output
 
 
 class TestGraphsCommand:

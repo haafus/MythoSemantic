@@ -56,13 +56,13 @@ def embeddings(model: str | None, force: bool):
 
 @mytho.command()
 @click.option("--model", "-m", default=None, help="Embedding model name (all models if omitted).")
-@click.option("--motif-analysis", is_flag=True, help="Generate motif UMAP from LLM plot summaries.")
+@click.option("--motifs", is_flag=True, help="Generate motif UMAP from LLM plot summaries.")
 @click.option("--force", "-f", is_flag=True, help="Regenerate all plots even if they already exist.")
-def projections(model: str | None, motif_analysis: bool, force: bool):
+def projections(model: str | None, motifs: bool, force: bool):
     """Generate UMAP projections and embedding visualizations."""
     from projections.run_analysis import analyze_embeddings
 
-    analyze_embeddings(model_name=model, motif_analysis=motif_analysis, force=force)
+    analyze_embeddings(model_name=model, motif_analysis=motifs, force=force)
 
 
 @mytho.command()
@@ -96,7 +96,7 @@ def server(host: str | None, port: int | None):
 @click.option("--model", "-m", default=None, help="Embedding model (default from config).")
 @click.option("--llm", default=None, help="LLM model for graphs (from config/models.json).")
 @click.option("--force", "-f", is_flag=True, help="Force regeneration of all steps.")
-@click.option("--sample", is_flag=True, help="Quick run: first embedding model, limited texts.")
+@click.option("--sample", "-s", is_flag=True, help="Quick run: first embedding model, limited texts.")
 def build(model, llm, force, sample):
     """Run the full analysis pipeline end-to-end."""
     if sample:
