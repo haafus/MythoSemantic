@@ -1,5 +1,4 @@
 import logging
-from pathlib import Path
 
 from model_registry import active_embedding_models, default_embedding_model
 from settings import settings
@@ -12,7 +11,7 @@ from corpus.corpus_iterator import iter_corpus_files, read_corpus_file
 logger = logging.getLogger(__name__)
 
 
-def _count_corpus_chunks(corpus_dir: Path, chunking: str) -> int:
+def _count_corpus_chunks(corpus_dir, chunking: str) -> int:
     strategies = create_chunking_strategies()
     chunk_fn = strategies[chunking]
     total = 0
