@@ -81,14 +81,13 @@ def embeddings(model: str | None, force: bool):
 # ---------------------------------------------------------------------------
 @mytho.command()
 @click.option("--model", "-m", default=None, help="Embedding model name (all models if omitted).")
-@click.option("--no-plots", is_flag=True, help="Skip plot generation, only compute stats.")
 @click.option("--motif-analysis", is_flag=True, help="Generate motif UMAP from LLM plot summaries.")
 @click.option("--force", is_flag=True, help="Regenerate all plots even if they already exist.")
-def projections(model: str | None, no_plots: bool, motif_analysis: bool, force: bool):
+def projections(model: str | None, motif_analysis: bool, force: bool):
     """Generate UMAP projections and embedding visualizations."""
     from projections.run_analysis import analyze_embeddings
 
-    analyzer = analyze_embeddings(model_name=model, generate_all_plots=not no_plots, motif_analysis=motif_analysis, force=force)
+    analyzer = analyze_embeddings(model_name=model, motif_analysis=motif_analysis, force=force)
     if analyzer is None:
         click.echo(click.style("No data found — check that embeddings exist.", fg="red"), err=True)
         sys.exit(1)
@@ -103,9 +102,9 @@ def projections(model: str | None, no_plots: bool, motif_analysis: bool, force: 
 @click.option("--force", is_flag=True, help="Overwrite existing graph outputs.")
 def graphs(model: str | None, force: bool):
     """Extract knowledge graphs from corpus texts using an LLM."""
-    from graphs.run_graph_generation import run_generate_graphs
+    from graphs.run_graph_generation import generate_graphs
 
-    run_generate_graphs(llm=model, force=force)
+    generate_graphs(llm=model, force=force)
     click.echo(click.style("Graph generation completed.", fg="green"))
 
 
@@ -188,9 +187,9 @@ def _build_projections(model: str | None, force: bool = False):
 
 
 def _build_graphs(llm: str | None = None, force: bool = False, max_texts: int | None = None):
-    from graphs.run_graph_generation import run_generate_graphs
+    from graphs.run_graph_generation import generate_graphs
 
-    run_generate_graphs(llm=llm, force=force, max_texts=max_texts)
+    generate_graphs(llm=llm, force=force, max_texts=max_texts)
 
 
 # ---------------------------------------------------------------------------
