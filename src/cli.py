@@ -156,129 +156,179 @@ def _build_graphs(llm_model: str | None = None, force: bool = False):
 # ---------------------------------------------------------------------------
 # status
 # ---------------------------------------------------------------------------
-PROJECTION_PLOTS = [
-    "umap_2d_traditions.html",
-    "residual_umap_2d.html",
-    "residual_normalized_umap_2d.html",
-    "rlace_umap_2d.html",
-    "distance_heatmap.html",
-    "tradition_distribution.html",
-]
-
-
 @mytho.command()
 def status():
     """Show the current state of the data pipeline."""
-    import json
-    from pathlib import Path
-
+    from pipeline_inspect import (
+        analysis_status,
+        chroma_status,
+        corpus_status,
+        format_size,
+        graphs_status,
+    )
     from settings import settings
 
-    _status_corpus(settings)
-    _status_embeddings(settings)
-    _status_projections(settings)
-    _status_graphs(settings)
+    total = 0
 
-
-def _status_corpus(settings):
-    import json
-
-    click.echo(click.style("Corpus:", bold=True))
-
-    config_path = settings.corpus_config_file
-    config_count = 0
-    if config_path.exists():
-        try:
-            with open(config_path, encoding="utf-8") as f:
-                config_count = len(json.load(f))
-        except Exception:
-            pass
-
-    meta_path = settings.corpus_metadata_path
-    meta_count = 0
-    if meta_path.exists():
-        try:
-            with open(meta_path, encoding="utf-8") as f:
-                meta_count = len(json.load(f))
-        except Exception:
-            pass
-
-    click.echo(f"  {meta_count} texts built (from {config_count} in config)")
-    if config_count > meta_count:
-        click.echo(click.style(f"  {config_count - meta_count} missing", fg="yellow"))
+    # Corpus
+    info = corpus_status(settings)
+    total += info["total_size"]
+    _header("Corpus", info["total_size"])
+    built, cfg, missing = info["built_count"], info["config_count"], info["missing_count"]
+    click.echo(f"  {built} texts built (from {cfg} in config)")
+    if missing:
+        click.echo(click.style(f"  {missing} missing", fg="yellow"))
     click.echo()
 
-
-def _status_embeddings(settings):
-    click.echo(click.style("Embeddings:", bold=True))
-
-    chroma_path = settings.chroma_dir
-    if not chroma_path.exists():
+    # Chroma
+    info = chroma_status(settings)
+    total += info["total_size"]
+    _header("Chroma", info["total_size"])
+    if not info["exists"]:
         click.echo("  No ChromaDB found")
-        click.echo()
-        return
-
-    try:
-        import chromadb
-
-        from embedding.chroma_manager import is_model_collection_name
-
-        client = chromadb.PersistentClient(path=str(chroma_path))
-        collections = client.list_collections()
-        model_collections = []
-        for col in collections:
-            if is_model_collection_name(col.name):
-                model_name = (col.metadata or {}).get("model", col.name)
-                model_collections.append((model_name, col.count()))
-
-        if not model_collections:
-            click.echo("  No embedding collections")
-        else:
-            click.echo(f"  {len(model_collections)} models:")
-            for model_name, count in sorted(model_collections):
-                click.echo(f"    {model_name:<40} {count:>6} chunks")
-    except Exception as e:
-        click.echo(click.style(f"  Error reading ChromaDB: {e}", fg="red"))
-
+    elif "error" in info:
+        click.echo(click.style(f"  Error: {info['error']}", fg="red"))
+    elif not info["collections"]:
+        click.echo("  No embedding collections")
+    else:
+        for col in sorted(info["collections"], key=lambda c: c["model"]):
+            click.echo(f"  {col['model']:<40} {col['count']:>6} chunks")
     click.echo()
 
-
-def _status_projections(settings):
-    click.echo(click.style("Projections:", bold=True))
-
-    analysis_dir = settings.analysis_dir
-    if not analysis_dir.exists():
+    # Analysis
+    info = analysis_status(settings)
+    total += info["total_size"]
+    _header("Analysis", info["total_size"])
+    if not info["exists"]:
         click.echo("  No analysis directory")
-        click.echo()
-        return
-
-    model_dirs = sorted(d for d in analysis_dir.iterdir() if d.is_dir())
-    if not model_dirs:
+    elif not info["models"]:
         click.echo("  No model results")
     else:
-        for model_dir in model_dirs:
-            existing = [p for p in PROJECTION_PLOTS if (model_dir / p).exists()]
-            total = len(PROJECTION_PLOTS)
-            count = len(existing)
-            color = "green" if count == total else "yellow" if count > 0 else "red"
-            mark = "ok" if count == total else f"{count}/{total}"
-            click.echo(click.style(f"  {model_dir.name:<40} {mark}", fg=color))
-
+        for m in info["models"]:
+            done, tot = m["plots_done"], m["plots_total"]
+            color = "green" if done == tot else "yellow" if done > 0 else "red"
+            mark = "ok" if done == tot else f"{done}/{tot}"
+            click.echo(click.style(f"  {m['name']:<40} {mark:>5}  {format_size(m['size']):>8}", fg=color))
     click.echo()
 
-
-def _status_graphs(settings):
-    click.echo(click.style("Graphs:", bold=True))
-
-    graphs_dir = settings.graphs_dir
-    if not graphs_dir.exists():
+    # Graphs
+    info = graphs_status(settings)
+    total += info["total_size"]
+    _header("Graphs", info["total_size"])
+    if not info["exists"]:
         click.echo("  No graphs directory")
+    else:
+        click.echo(f"  {info['count']} graph files")
+    click.echo()
+
+    click.echo(click.style(f"Total: {format_size(total)}", bold=True))
+
+
+def _header(name: str, size: int):
+    from pipeline_inspect import format_size
+    click.echo(click.style(f"{name}:", bold=True) + f"  {format_size(size)}")
+
+
+# ---------------------------------------------------------------------------
+# clean
+# ---------------------------------------------------------------------------
+@mytho.command()
+@click.option("--apply", is_flag=True, help="Actually delete orphan files (default is dry run).")
+def clean(apply: bool):
+    """Find and remove orphan files not used by the pipeline."""
+    import shutil
+
+    from pipeline_inspect import (
+        analysis_orphans,
+        chroma_orphan_chunks,
+        chroma_orphan_collections,
+        corpus_orphans,
+        format_size,
+        graphs_orphans,
+    )
+    from settings import settings
+
+    total_bytes = 0
+    total_items = 0
+    action = "Removing" if apply else "Would remove"
+
+    # Corpus
+    orphans = corpus_orphans(settings)
+    if orphans:
+        _header("Corpus", sum(s for _, s in orphans))
+        for path, size in orphans:
+            total_bytes += size
+            total_items += 1
+            click.echo(f"  {path.relative_to(settings.corpus_dir):<50} {format_size(size):>8}")
+            if apply:
+                path.unlink(missing_ok=True)
         click.echo()
+
+    # Chroma orphan collections
+    orphan_cols = chroma_orphan_collections(settings)
+    orphan_chunks = chroma_orphan_chunks(settings)
+    if orphan_cols or orphan_chunks:
+        click.echo(click.style("Chroma:", bold=True))
+        for col in orphan_cols:
+            total_items += 1
+            click.echo(f"  orphan collection: {col['model']:<30} {col['count']:>6} chunks")
+            if apply:
+                import chromadb
+                from embedding.chroma_manager import delete_collection
+                client = chromadb.PersistentClient(path=str(settings.chroma_dir))
+                delete_collection(client, col["name"])
+        for info in orphan_chunks:
+            n = len(info["orphan_ids"])
+            total_items += n
+            click.echo(f"  orphan chunks in {info['model']:<30} {n:>6} / {info['total_count']}")
+            if apply:
+                import chromadb
+                client = chromadb.PersistentClient(path=str(settings.chroma_dir))
+                collection = client.get_collection(name=info["collection"])
+                collection.delete(ids=info["orphan_ids"])
+        click.echo()
+
+    # Analysis
+    orphans = analysis_orphans(settings)
+    if orphans:
+        _header("Analysis", sum(m["size"] for m in orphans))
+        for m in orphans:
+            total_bytes += m["size"]
+            total_items += 1
+            click.echo(f"  {m['name']:<50} {format_size(m['size']):>8}")
+            if apply:
+                shutil.rmtree(m["path"])
+        click.echo()
+
+    # Graphs
+    orphans = graphs_orphans(settings)
+    if orphans:
+        _header("Graphs", sum(s for _, s in orphans))
+        for path, size in orphans:
+            total_bytes += size
+            total_items += 1
+            name = path.name
+            click.echo(f"  {name:<50} {format_size(size):>8}")
+            if apply:
+                if path.is_dir():
+                    shutil.rmtree(path)
+                else:
+                    path.unlink(missing_ok=True)
+        click.echo()
+
+    if total_items == 0:
+        click.echo(click.style("No orphans found.", fg="green"))
         return
 
-    html_files = list(graphs_dir.glob("*.html"))
-    click.echo(f"  {len(html_files)} graph files")
-    click.echo()
+    summary = f"{total_items} orphan items"
+    if total_bytes:
+        summary += f", {format_size(total_bytes)} on disk"
+
+    if apply:
+        click.echo(click.style(f"Removed: {summary}", fg="green"))
+    else:
+        click.echo(f"{summary}")
+        click.echo(click.style("Dry run. Use --apply to delete.", fg="yellow"))
 
 
 if __name__ == "__main__":
