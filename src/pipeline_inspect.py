@@ -223,13 +223,10 @@ def analysis_status(settings) -> dict[str, Any]:
 
 def analysis_orphans(settings) -> list[dict[str, Any]]:
     info = analysis_status(settings)
-    if not info["exists"]:
+    if not info["exists"] or not info["models"]:
         return []
 
     chroma_info = chroma_status(settings)
-    if not chroma_info["exists"] or not chroma_info["collections"]:
-        return []
-
     known_dirs = {settings.safe_model_name(c["model"]) for c in chroma_info["collections"]}
 
     return [m for m in info["models"] if m["name"] not in known_dirs]
