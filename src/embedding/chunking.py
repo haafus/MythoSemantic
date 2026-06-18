@@ -206,7 +206,7 @@ class ChunkingStrategy:
         self.chunking_func = chunking_func or character_based_chunking
 
     def __call__(self, text: str) -> list[str]:
-        if not text or not text.strip():
+        if not text:
             return []
         return self.chunking_func(text, self.chunk_size, self.chunk_overlap)
 

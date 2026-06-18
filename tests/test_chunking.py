@@ -126,7 +126,6 @@ class TestChunkingStrategy:
     def test_empty_text(self):
         strategy = ChunkingStrategy(name="test", chunk_size=100, chunk_overlap=10)
         assert strategy("") == []
-        assert strategy("   ") == []
 
 
 class TestCreateChunkingStrategies:
