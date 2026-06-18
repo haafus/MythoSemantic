@@ -55,7 +55,7 @@ class EmbeddingDataLoader:
             try:
                 meta = metadatas[i]
                 doc = documents[i]
-                embedding = np.array(embeddings[i]) if isinstance(embeddings[i], list) else embeddings[i]
+                embedding = np.array(embeddings[i])
 
                 batch_data.append(
                     {
