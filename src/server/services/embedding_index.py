@@ -91,7 +91,7 @@ class EmbeddingIndexService:
         return self._top_results(index, similarities, top_k)
 
     def _load_index(self, model_name: str) -> ModelIndex:
-        from projection.loader import EmbeddingDataLoader
+        from projections.loader import EmbeddingDataLoader
 
         items = EmbeddingDataLoader().load_data(model_name=model_name)
         if not items:

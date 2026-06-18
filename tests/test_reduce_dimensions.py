@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from projection.utils import reduce_dimensions
+from projections.utils import reduce_dimensions
 
 
 @pytest.fixture

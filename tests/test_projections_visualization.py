@@ -24,8 +24,8 @@ _subplots.make_subplots = lambda *a, **kw: None
 _pd = types.ModuleType("pandas")
 _pd.DataFrame = type("DataFrame", (), {})  # type: ignore[attr-defined]
 
-_proj_pkg = types.ModuleType("projection")
-_proj_pkg.__path__ = [os.path.join(_src, "projection")]  # type: ignore[attr-defined]
+_proj_pkg = types.ModuleType("projections")
+_proj_pkg.__path__ = [os.path.join(_src, "projections")]  # type: ignore[attr-defined]
 
 _added_stubs: list[str] = []
 for _name, _module in [
@@ -34,7 +34,7 @@ for _name, _module in [
     ("plotly.graph_objects", _go),
     ("plotly.subplots", _subplots),
     ("pandas", _pd),
-    ("projection", _proj_pkg),
+    ("projections", _proj_pkg),
 ]:
     if _name not in sys.modules:
         sys.modules[_name] = _module
@@ -42,8 +42,8 @@ for _name, _module in [
 
 try:
     _spec = importlib.util.spec_from_file_location(
-        "projection.visualization",
-        os.path.join(_src, "projection", "visualization.py"),
+        "projections.visualization",
+        os.path.join(_src, "projections", "visualization.py"),
     )
     assert _spec is not None and _spec.loader is not None
     _mod = importlib.util.module_from_spec(_spec)

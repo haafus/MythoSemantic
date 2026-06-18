@@ -83,7 +83,7 @@ def embeddings(model: str | None, force: bool):
 @click.option("--force", is_flag=True, help="Regenerate all plots even if they already exist.")
 def projections(model: str | None, no_plots: bool, motif_analysis: bool, force: bool):
     """Generate UMAP projections and embedding visualizations."""
-    from projection.run_analysis import analyze_embeddings
+    from projections.run_analysis import analyze_embeddings
 
     analyzer = analyze_embeddings(model_name=model, generate_all_plots=not no_plots, motif_analysis=motif_analysis, force=force)
     if analyzer is None:
@@ -174,7 +174,7 @@ def _build_embeddings(model: str | None, force: bool = False):
 
 
 def _build_projections(model: str | None, force: bool = False):
-    from projection.run_analysis import analyze_embeddings
+    from projections.run_analysis import analyze_embeddings
 
     analyze_embeddings(model_name=model, force=force)
 

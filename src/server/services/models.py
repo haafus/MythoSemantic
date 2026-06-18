@@ -31,7 +31,7 @@ def key_to_model(model_key: str, models: list[str] | None = None) -> str:
 
 
 def list_models_raw() -> list[str]:
-    from projection.loader import EmbeddingDataLoader
+    from projections.loader import EmbeddingDataLoader
 
     try:
         return EmbeddingDataLoader().get_available_models()
