@@ -87,10 +87,7 @@ def projections(model: str | None, motif_analysis: bool, force: bool):
     """Generate UMAP projections and embedding visualizations."""
     from projections.run_analysis import analyze_embeddings
 
-    analyzer = analyze_embeddings(model_name=model, motif_analysis=motif_analysis, force=force)
-    if analyzer is None:
-        click.echo(click.style("No data found — check that embeddings exist.", fg="red"), err=True)
-        sys.exit(1)
+    analyze_embeddings(model_name=model, motif_analysis=motif_analysis, force=force)
     click.echo(click.style("Projection analysis completed.", fg="green"))
 
 
