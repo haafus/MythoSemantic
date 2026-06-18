@@ -151,6 +151,13 @@ def build(model, llm, force, sample):
     ]
 
     import time
+    from datetime import timedelta
+
+    def _fmt_elapsed(seconds: float) -> str:
+        td = timedelta(seconds=round(seconds))
+        if seconds < 60:
+            return f"{seconds:.1f}s"
+        return str(td)
 
     start_all = time.monotonic()
     for name, fn, kwargs in steps:
@@ -159,13 +166,13 @@ def build(model, llm, force, sample):
         try:
             fn(**kwargs)
             elapsed = time.monotonic() - start
-            click.echo(click.style(f"[done]  {name}", fg="green") + f" ({elapsed:.1f}s)")
+            click.echo(click.style(f"[done]  {name}", fg="green") + f" ({_fmt_elapsed(elapsed)})")
         except Exception as e:
             click.echo(click.style(f"[fail]  {name}: {e}", fg="red"), err=True)
             sys.exit(1)
 
     total = time.monotonic() - start_all
-    click.echo(click.style(f"\nBuild finished.", fg="green", bold=True) + f" ({total:.1f}s)")
+    click.echo(click.style(f"\nBuild finished.", fg="green", bold=True) + f" ({_fmt_elapsed(total)})")
 
 
 def _build_corpus(force: bool = False, max_texts: int | None = None):
