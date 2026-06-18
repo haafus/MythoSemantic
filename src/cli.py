@@ -39,7 +39,7 @@ def mytho():
 # corpus
 # ---------------------------------------------------------------------------
 @mytho.command()
-@click.option("--force", is_flag=True, help="Overwrite existing files.")
+@click.option("--force", "-f", is_flag=True, help="Overwrite existing files.")
 def corpus(force: bool):
     """Download and build the text corpus."""
     from corpus.builder import build_corpus
@@ -52,7 +52,7 @@ def corpus(force: bool):
 # ---------------------------------------------------------------------------
 @mytho.command()
 @click.option("--model", "-m", default=None, help="Embedding model to use.")
-@click.option("--force", is_flag=True, help="Regenerate even if collection exists.")
+@click.option("--force", "-f", is_flag=True, help="Regenerate even if collection exists.")
 def embeddings(model: str | None, force: bool):
     """Generate embeddings for the corpus."""
     from embeddings.build_embeddings import build_embeddings
@@ -66,7 +66,7 @@ def embeddings(model: str | None, force: bool):
 @mytho.command()
 @click.option("--model", "-m", default=None, help="Embedding model name (all models if omitted).")
 @click.option("--motif-analysis", is_flag=True, help="Generate motif UMAP from LLM plot summaries.")
-@click.option("--force", is_flag=True, help="Regenerate all plots even if they already exist.")
+@click.option("--force", "-f", is_flag=True, help="Regenerate all plots even if they already exist.")
 def projections(model: str | None, motif_analysis: bool, force: bool):
     """Generate UMAP projections and embedding visualizations."""
     from projections.run_analysis import analyze_embeddings
@@ -79,7 +79,7 @@ def projections(model: str | None, motif_analysis: bool, force: bool):
 # ---------------------------------------------------------------------------
 @mytho.command()
 @click.option("--model", "-m", default=None, help="LLM model name from config/models.json registry.")
-@click.option("--force", is_flag=True, help="Overwrite existing graph outputs.")
+@click.option("--force", "-f", is_flag=True, help="Overwrite existing graph outputs.")
 def graphs(model: str | None, force: bool):
     """Extract knowledge graphs from corpus texts using an LLM."""
     from graphs.run_graph_generation import generate_graphs
@@ -116,7 +116,7 @@ SAMPLE_MAX_TEXTS = 3
 @mytho.command()
 @click.option("--model", "-m", default=None, help="Embedding model (default from config).")
 @click.option("--llm", default=None, help="LLM model for graphs (from config/models.json).")
-@click.option("--force", is_flag=True, help="Force regeneration of all steps.")
+@click.option("--force", "-f", is_flag=True, help="Force regeneration of all steps.")
 @click.option("--sample", is_flag=True, help="Quick run: first embedding model, limited texts.")
 def build(model, llm, force, sample):
     """Run the full analysis pipeline end-to-end."""
