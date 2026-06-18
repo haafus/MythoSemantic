@@ -162,7 +162,7 @@ def deduplicate_relations(relations: list[dict]) -> list[dict]:
     return deduplicated
 
 
-def run_generate_graphs(llm_model: str | None = None, force: bool = False) -> None:
+def run_generate_graphs(llm: str | None = None, force: bool = False) -> None:
     prompts_path = settings.project_root / "config" / "graphs_prompts.json"
     try:
         prompts = json.loads(prompts_path.read_text(encoding="utf-8"))
@@ -184,7 +184,7 @@ def run_generate_graphs(llm_model: str | None = None, force: bool = False) -> No
 
     graphs_cfg = settings.graphs
     llm = LLMProcessor(
-        model_alias=llm_model,
+        model_alias=llm,
         use_json_mode=graphs_cfg.use_json_mode,
     )
 

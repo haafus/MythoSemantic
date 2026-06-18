@@ -102,7 +102,7 @@ def graphs(model: str | None, force: bool):
     """Extract knowledge graphs from corpus texts using an LLM."""
     from graphs.run_graph_generation import run_generate_graphs
 
-    run_generate_graphs(llm_model=model, force=force)
+    run_generate_graphs(llm=model, force=force)
     click.echo(click.style("Graph generation completed.", fg="green"))
 
 
@@ -139,7 +139,7 @@ def build(model, llm, force):
         ("Corpus", _build_corpus, {"force": force}),
         ("Embeddings", _build_embeddings, {"model": model, "force": force}),
         ("Projections", _build_projections, {"model": model, "force": force}),
-        ("Graphs", _build_graphs, {"llm_model": llm, "force": force}),
+        ("Graphs", _build_graphs, {"llm": llm, "force": force}),
     ]
 
     for name, fn, kwargs in steps:
@@ -172,10 +172,10 @@ def _build_projections(model: str | None, force: bool = False):
     analyze_embeddings(model_name=model, force=force)
 
 
-def _build_graphs(llm_model: str | None = None, force: bool = False):
+def _build_graphs(llm: str | None = None, force: bool = False):
     from graphs.run_graph_generation import run_generate_graphs
 
-    run_generate_graphs(llm_model=llm_model, force=force)
+    run_generate_graphs(llm=llm, force=force)
 
 
 # ---------------------------------------------------------------------------
