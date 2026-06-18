@@ -59,14 +59,14 @@ class EmbeddingDataLoader:
 
                 batch_data.append(
                     {
-                        "id": meta.get("text_id", doc_id),
-                        "tradition": meta.get("tradition", "unknown"),
-                        "major_tradition": meta.get("major_tradition", "unknown"),
-                        "chunk_index": meta.get("chunk_index", 0),
+                        "id": meta["text_id"],
+                        "tradition": meta["tradition"],
+                        "major_tradition": meta["major_tradition"],
+                        "chunk_index": meta["chunk_index"],
                         "embedding": embedding,
                         "text": doc,
-                        "filename": meta.get("filename", "unknown"),
-                        "url": meta.get("url", ""),
+                        "filename": meta["filename"],
+                        "url": meta["url"],
                     }
                 )
             except Exception as e:
