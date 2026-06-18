@@ -39,9 +39,7 @@ def mytho():
 @click.option("--force", "-f", is_flag=True, help="Overwrite existing files.")
 def corpus(force: bool):
     """Download and build the text corpus."""
-    from corpus.builder import build_corpus
-
-    build_corpus(force=force)
+    _build_corpus(force=force)
 
 
 @mytho.command()
@@ -49,9 +47,7 @@ def corpus(force: bool):
 @click.option("--force", "-f", is_flag=True, help="Regenerate even if collection exists.")
 def embeddings(model: str | None, force: bool):
     """Generate embeddings for the corpus."""
-    from embeddings.build_embeddings import build_embeddings
-
-    build_embeddings(model_name=model, force=force)
+    _build_embeddings(model=model, force=force)
 
 
 @mytho.command()
@@ -60,9 +56,7 @@ def embeddings(model: str | None, force: bool):
 @click.option("--force", "-f", is_flag=True, help="Regenerate all plots even if they already exist.")
 def projections(model: str | None, motifs: bool, force: bool):
     """Generate UMAP projections and embedding visualizations."""
-    from projections.run_analysis import analyze_embeddings
-
-    analyze_embeddings(model_name=model, motif_analysis=motifs, force=force)
+    _build_projections(model=model, motif_analysis=motifs, force=force)
 
 
 @mytho.command()
@@ -70,9 +64,7 @@ def projections(model: str | None, motifs: bool, force: bool):
 @click.option("--force", "-f", is_flag=True, help="Overwrite existing graph outputs.")
 def graphs(model: str | None, force: bool):
     """Extract knowledge graphs from corpus texts using an LLM."""
-    from graphs.run_graph_generation import generate_graphs
-
-    generate_graphs(llm=model, force=force)
+    _build_graphs(llm=model, force=force)
 
 
 @mytho.command()
@@ -151,10 +143,10 @@ def _build_embeddings(model: str | None, force: bool = False):
     build_embeddings(model_name=model, force=force)
 
 
-def _build_projections(model: str | None, force: bool = False):
+def _build_projections(model: str | None, force: bool = False, motif_analysis: bool = False):
     from projections.run_analysis import analyze_embeddings
 
-    analyze_embeddings(model_name=model, force=force)
+    analyze_embeddings(model_name=model, motif_analysis=motif_analysis, force=force)
 
 
 def _build_graphs(llm: str | None = None, force: bool = False, max_texts: int | None = None):
