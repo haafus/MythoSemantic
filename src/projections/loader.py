@@ -1,4 +1,3 @@
-import logging
 from typing import Any
 
 import chromadb
@@ -6,8 +5,6 @@ import numpy as np
 
 from embeddings.chroma_manager import collection_name_for_model
 from settings import settings
-
-logger = logging.getLogger(__name__)
 
 
 class EmbeddingDataLoader:
