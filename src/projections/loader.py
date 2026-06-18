@@ -21,13 +21,8 @@ class EmbeddingDataLoader:
             logger.warning(f"Failed to list Chroma collections: {e}")
             return []
 
-    def _resolve_collection_names(self, model_name: str | None = None) -> list[str]:
-        if model_name:
-            return [collection_name_for_model(model_name)]
-        return self._list_collection_names()
-
     def _iter_collections(self, model_name: str | None = None):
-        names = self._resolve_collection_names(model_name=model_name)
+        names = [collection_name_for_model(model_name)] if model_name else self._list_collection_names()
         if not names:
             raise RuntimeError("Model-based Chroma collections not found")
 
@@ -112,7 +107,7 @@ class EmbeddingDataLoader:
         models: set[str] = set()
 
         try:
-            if not self._resolve_collection_names():
+            if not self._list_collection_names():
                 return []
 
             for collection in self._iter_collections():
