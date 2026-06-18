@@ -5,7 +5,7 @@ from typing import Any
 import chromadb
 import numpy as np
 
-from embedding.chroma_manager import collection_name_for_model, is_model_collection_name
+from embeddings.chroma_manager import collection_name_for_model, is_model_collection_name
 from settings import settings
 
 logger = logging.getLogger(__name__)

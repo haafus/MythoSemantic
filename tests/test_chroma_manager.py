@@ -10,7 +10,7 @@ sys.modules["chromadb"] = chromadb_stub
 
 _spec = importlib.util.spec_from_file_location(
     "chroma_manager",
-    os.path.join(os.path.dirname(__file__), "..", "src", "embedding", "chroma_manager.py"),
+    os.path.join(os.path.dirname(__file__), "..", "src", "embeddings", "chroma_manager.py"),
 )
 assert _spec is not None and _spec.loader is not None
 _mod = importlib.util.module_from_spec(_spec)

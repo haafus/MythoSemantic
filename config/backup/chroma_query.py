@@ -1,7 +1,7 @@
 """Chroma query and collection removal, removed from CLI.
 
 Usage example (query):
-    from embedding.builder import EmbeddingBuilder
+    from embeddings.builder import EmbeddingBuilder
     builder = EmbeddingBuilder(embedding_model="BAAI/bge-m3")
     results = builder.query_chroma("creation of the world", top_k=5)
     for r in results:
@@ -15,7 +15,7 @@ from typing import Any
 
 def query_chroma(builder, query: str, top_k: int = 5) -> list[dict[str, Any]]:
     """Was EmbeddingBuilder.query_chroma()."""
-    from embedding.chroma_manager import collection_name_for_model
+    from embeddings.chroma_manager import collection_name_for_model
 
     collection_name = collection_name_for_model(builder._models.model_name)
     try:
@@ -55,7 +55,7 @@ def query_chroma_collection(
 
 def delete_chroma_collection(model: str) -> None:
     """Was CLI command `mytho embeddings remove --model <model>`."""
-    from embedding.chroma_manager import collection_name_for_model, delete_collection
+    from embeddings.chroma_manager import collection_name_for_model, delete_collection
     from model_registry import resolve_embedding_model
     from settings import settings
 

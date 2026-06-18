@@ -105,7 +105,7 @@ def embeddings_status(settings) -> dict[str, Any]:
 
     try:
         import chromadb
-        from embedding.chroma_manager import is_model_collection_name
+        from embeddings.chroma_manager import is_model_collection_name
 
         client = chromadb.PersistentClient(path=str(chroma_path))
         for col in client.list_collections():
@@ -123,7 +123,7 @@ def embeddings_status(settings) -> dict[str, Any]:
 
 
 def embeddings_orphan_collections(settings) -> list[dict[str, Any]]:
-    from embedding.chroma_manager import collection_name_for_model
+    from embeddings.chroma_manager import collection_name_for_model
     from model_registry import list_embedding_aliases
 
     info = embeddings_status(settings)
@@ -160,7 +160,7 @@ def embeddings_orphan_chunks(settings, *, skip_collections: set[str] | None = No
     results = []
     try:
         import chromadb
-        from embedding.chroma_manager import is_model_collection_name
+        from embeddings.chroma_manager import is_model_collection_name
 
         client = chromadb.PersistentClient(path=str(chroma_path))
         for col in client.list_collections():

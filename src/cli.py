@@ -55,7 +55,7 @@ def corpus(force: bool):
 @click.option("--force", is_flag=True, help="Regenerate even if collection exists.")
 def embeddings(model: str | None, force: bool):
     """Generate embeddings for the corpus."""
-    from embedding.build_embeddings import build_embeddings
+    from embeddings.build_embeddings import build_embeddings
 
     build_embeddings(model_name=model, force=force)
 
@@ -167,7 +167,7 @@ def _build_corpus(force: bool = False, max_texts: int | None = None):
 
 
 def _build_embeddings(model: str | None, force: bool = False):
-    from embedding.build_embeddings import build_embeddings
+    from embeddings.build_embeddings import build_embeddings
 
     build_embeddings(model_name=model, force=force)
 
@@ -309,7 +309,7 @@ def clean(apply: bool):
             click.echo(f"  orphan chunks in {info['model']:<30} {n:>6} / {info['total_count']}")
         if apply:
             import chromadb
-            from embedding.chroma_manager import delete_collection
+            from embeddings.chroma_manager import delete_collection
             client = chromadb.PersistentClient(path=str(settings.embeddings_dir))
             for col in orphan_cols:
                 delete_collection(client, col["name"])

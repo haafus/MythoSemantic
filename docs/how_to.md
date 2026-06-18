@@ -88,9 +88,9 @@ mytho corpus --type all --force
 Модуль генерации эмбеддингов и записи в Chroma DB.
 
 Основные файлы:
-- `src/embedding/builder.py` читает корпус, режет тексты на чанки, считает эмбеддинги и пишет в Chroma.
-- `src/embedding/build_embeddings.py` оркестрирует генерацию для нескольких моделей.
-- `src/embedding/chunking.py` содержит стратегии chunking.
+- `src/embeddings/builder.py` читает корпус, режет тексты на чанки, считает эмбеддинги и пишет в Chroma.
+- `src/embeddings/build_embeddings.py` оркестрирует генерацию для нескольких моделей.
+- `src/embeddings/chunking.py` содержит стратегии chunking.
 - `config/models.json` задает модели и алиасы.
 
 Возможности:

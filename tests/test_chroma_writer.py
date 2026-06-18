@@ -3,7 +3,7 @@ import pytest
 pytest.importorskip("chromadb")
 
 from corpus.corpus_iterator import CorpusFileInfo
-from embedding.chroma_writer import ChromaWriter, _safe_id_part
+from embeddings.chroma_writer import ChromaWriter, _safe_id_part
 
 
 def _info(**overrides) -> CorpusFileInfo:
