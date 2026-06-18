@@ -26,7 +26,7 @@ class EmbeddingBuilder:
 
         self._models = ModelManager()
 
-        chroma_dir = Path(settings.chroma_dir)
+        chroma_dir = Path(settings.embeddings_dir)
         chroma_dir.mkdir(parents=True, exist_ok=True)
         self.chroma_client = chromadb.PersistentClient(path=str(chroma_dir))
         self._chroma = ChromaWriter(emb.chroma_batch_size, emb.queue_maxsize)

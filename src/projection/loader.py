@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 class EmbeddingDataLoader:
     def __init__(self, auto_migrate: bool = True):
-        self.client = chromadb.PersistentClient(path=str(settings.chroma_dir))
+        self.client = chromadb.PersistentClient(path=str(settings.embeddings_dir))
         self._metadata_map: dict[str, str] | None = None
         self._collection_names_cache: dict[str, list[str]] = {}
 

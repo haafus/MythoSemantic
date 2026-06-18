@@ -160,11 +160,11 @@ def _build_graphs(llm_model: str | None = None, force: bool = False):
 def status():
     """Show the current state of the data pipeline."""
     from pipeline_inspect import (
-        analysis_status,
-        chroma_status,
         corpus_status,
+        embeddings_status,
         format_size,
         graphs_status,
+        projections_status,
     )
     from settings import settings
 
@@ -180,12 +180,12 @@ def status():
         click.echo(click.style(f"  {missing} missing", fg="yellow"))
     click.echo()
 
-    # Chroma
-    info = chroma_status(settings)
+    # Embeddings
+    info = embeddings_status(settings)
     total += info["total_size"]
-    _header("Chroma", info["total_size"])
+    _header("Embeddings", info["total_size"])
     if not info["exists"]:
-        click.echo("  No ChromaDB found")
+        click.echo("  No embeddings found")
     elif "error" in info:
         click.echo(click.style(f"  Error: {info['error']}", fg="red"))
     elif not info["collections"]:
@@ -195,12 +195,12 @@ def status():
             click.echo(f"  {col['model']:<40} {col['count']:>6} chunks")
     click.echo()
 
-    # Analysis
-    info = analysis_status(settings)
+    # Projections
+    info = projections_status(settings)
     total += info["total_size"]
-    _header("Analysis", info["total_size"])
+    _header("Projections", info["total_size"])
     if not info["exists"]:
-        click.echo("  No analysis directory")
+        click.echo("  No projections found")
     elif not info["models"]:
         click.echo("  No model results")
     else:
@@ -239,12 +239,12 @@ def clean(apply: bool):
     import shutil
 
     from pipeline_inspect import (
-        analysis_orphans,
-        chroma_orphan_chunks,
-        chroma_orphan_collections,
         corpus_orphans,
+        embeddings_orphan_chunks,
+        embeddings_orphan_collections,
         format_size,
         graphs_orphans,
+        projections_orphans,
     )
     from settings import settings
 
@@ -263,12 +263,12 @@ def clean(apply: bool):
                 path.unlink(missing_ok=True)
         click.echo()
 
-    # Chroma orphan collections + chunks
-    orphan_cols = chroma_orphan_collections(settings)
+    # Embeddings orphan collections + chunks
+    orphan_cols = embeddings_orphan_collections(settings)
     skip_col_names = {c["name"] for c in orphan_cols}
-    orphan_chunks = chroma_orphan_chunks(settings, skip_collections=skip_col_names)
+    orphan_chunks = embeddings_orphan_chunks(settings, skip_collections=skip_col_names)
     if orphan_cols or orphan_chunks:
-        click.echo(click.style("Chroma:", bold=True))
+        click.echo(click.style("Embeddings:", bold=True))
         for col in orphan_cols:
             total_items += 1
             click.echo(f"  orphan collection: {col['model']:<30} {col['count']:>6} chunks")
@@ -279,7 +279,7 @@ def clean(apply: bool):
         if apply:
             import chromadb
             from embedding.chroma_manager import delete_collection
-            client = chromadb.PersistentClient(path=str(settings.chroma_dir))
+            client = chromadb.PersistentClient(path=str(settings.embeddings_dir))
             for col in orphan_cols:
                 delete_collection(client, col["name"])
             for info in orphan_chunks:
@@ -287,10 +287,10 @@ def clean(apply: bool):
                 collection.delete(ids=info["orphan_ids"])
         click.echo()
 
-    # Analysis
-    orphans = analysis_orphans(settings)
+    # Projections
+    orphans = projections_orphans(settings)
     if orphans:
-        _header("Analysis", sum(m["size"] for m in orphans))
+        _header("Projections", sum(m["size"] for m in orphans))
         for m in orphans:
             total_bytes += m["size"]
             total_items += 1

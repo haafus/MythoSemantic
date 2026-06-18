@@ -64,8 +64,8 @@ class Settings(BaseSettings):
     project_root: Path = Field(default_factory=lambda: Path(__file__).resolve().parent.parent)
 
     corpus_dir: Path = Path("outputs/corpus")
-    chroma_dir: Path = Path("outputs/chroma")
-    analysis_dir: Path = Path("outputs/analysis")
+    embeddings_dir: Path = Path("outputs/embeddings")
+    projections_dir: Path = Path("outputs/projections")
     logs_dir: Path = Path("outputs/logs")
     graphs_dir: Path = Path("outputs/graphs")
     corpus_config_file: Path = Path("config/corpus.json")
@@ -109,6 +109,6 @@ class Settings(BaseSettings):
         return model_name.replace("/", "_").replace("\\", "_")
 
     def model_output_dir(self, model_name: str) -> Path:
-        return self.analysis_dir / self.safe_model_name(model_name)
+        return self.projections_dir / self.safe_model_name(model_name)
 
 settings = Settings()

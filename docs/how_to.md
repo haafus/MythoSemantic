@@ -6,7 +6,7 @@
 
 ```
 config/          — статические конфиги, шаблоны, download_list.json
-outputs/         — всё, что генерируется при запуске (corpus, analysis, logs, …)
+outputs/         — всё, что генерируется при запуске (corpus, embeddings, projections, …)
 src/             — исходный код (все Python-пакеты, settings.py, main.py, cli.py)
 docs/            — документация
 tests/           — тесты
@@ -23,11 +23,11 @@ pip install --upgrade pip
 pip install -e ".[all,dev]"
 ```
 
-Часть команд скачивает модели, обращается к внешним сайтам или пишет большие артефакты в `outputs/cache/`, `outputs/chroma/`, `outputs/analysis/`, `outputs/corpus_chunked/`, `outputs/graphs/` и `outputs/logs/`.
+Часть команд скачивает модели, обращается к внешним сайтам или пишет большие артефакты в `outputs/embeddings/`, `outputs/projections/`, `outputs/corpus/`, `outputs/graphs/` и `outputs/logs/`.
 
 ## Конфигурация
 
-- **`src/settings.py`** — единый источник путей и параметров. Все директории (`outputs/corpus`, `outputs/chroma`, …), параметры chunking, LLM, сервера и т.д. Переопределяется через переменные окружения с префиксом `MYTHO_` или файл `.env` / `config/.env` (например, `MYTHO_CORPUS_DIR=/data/corpus`). Вложенные параметры через `__`: `MYTHO_LLM__MODEL=gpt4o-mini`. Полный список переменных — в `.env.example`.
+- **`src/settings.py`** — единый источник путей и параметров. Все директории (`outputs/corpus`, `outputs/embeddings`, …), параметры chunking, LLM, сервера и т.д. Переопределяется через переменные окружения с префиксом `MYTHO_` или файл `.env` / `config/.env` (например, `MYTHO_CORPUS_DIR=/data/corpus`). Вложенные параметры через `__`: `MYTHO_LLM__MODEL=gpt4o-mini`. Полный список переменных — в `.env.example`.
 - **`config/models.json`** — реестр LLM-провайдеров (base_url, model, env_key) и алиасов embedding-моделей. Алиасы позволяют писать `bge-m3` вместо `BAAI/bge-m3` в CLI и конфигах.
 - **`config/corpus.json`** — каталог текстов корпуса (источники, традиции, URL).
 - **`config/traditions.json`** — описания традиций и их группировка.
@@ -94,7 +94,7 @@ mytho corpus --type all --force
 
 Возможности:
 - Построить эмбеддинги для нескольких моделей.
-- Сохранить индекс в `outputs/chroma/`.
+- Сохранить индекс в `outputs/embeddings/`.
 
 Сгенерировать эмбеддинги для всех активных моделей:
 
@@ -116,7 +116,7 @@ mytho embeddings --model bge-m3 --force
 
 ## projection
 
-Модуль анализа эмбеддингов из Chroma DB и генерации HTML/CSV/JSON-артефактов в `outputs/analysis/`.
+Модуль анализа эмбеддингов из Chroma DB и генерации HTML/CSV/JSON-артефактов в `outputs/projections/`.
 
 Основные файлы:
 - `src/projection/loader.py` читает данные из Chroma.
@@ -184,7 +184,7 @@ mytho graphs --force
 Возможности:
 - API для списка моделей, корпуса, географии, похожих фрагментов и кластеризации.
 - Раздача веб-интерфейса из `src/server/web`.
-- Раздача готовых HTML-артефактов из `outputs/analysis/`, `config/template/`, `outputs/corpus/`, `outputs/corpus_chunked/`.
+- Раздача готовых HTML-артефактов из `outputs/projections/`, `config/template/`, `outputs/corpus/`.
 
 Запуск:
 
@@ -237,8 +237,8 @@ mytho server
 Все генерируемые данные хранятся в `outputs/`:
 
 - `outputs/corpus/` — основной текстовый корпус с метаданными и каталогом. Создается через `mytho corpus`.
-- `outputs/chroma/` — локальная Chroma DB с векторными коллекциями. Создается через `mytho embeddings`.
-- `outputs/analysis/` — результаты анализа: `models.json`, HTML-графики, кластеризация. Создается через `mytho projection` и `mytho cluster`.
+- `outputs/embeddings/` — локальная Chroma DB с векторными коллекциями. Создается через `mytho embeddings`.
+- `outputs/projections/` — результаты анализа: `models.json`, HTML-графики. Создается через `mytho projection`.
 - `outputs/graphs/` — готовые HTML-графы персонажей и связей. Создается через `mytho graphs`.
 - `outputs/logs/` — логи всех пайплайнов.
 

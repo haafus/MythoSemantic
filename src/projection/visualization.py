@@ -148,7 +148,7 @@ def _plot_umap_scatter(
     model_name: str | None = None,
 ) -> go.Figure | None:
     if output_dir is None:
-        output_dir = settings.analysis_dir
+        output_dir = settings.projections_dir
 
     embedding_2d = _reduce_dimensions_safe(embeddings, n_components=2)
     if embedding_2d is None:
@@ -296,7 +296,7 @@ def plot_distance_heatmap(
     data: list[dict], output_dir: Path | None = None, model_name: str | None = None, save_html: bool = True
 ) -> go.Figure | None:
     if output_dir is None:
-        output_dir = settings.analysis_dir
+        output_dir = settings.projections_dir
 
     traditions_data: dict[str, list] = {}
     for item in data:
@@ -356,7 +356,7 @@ def plot_tradition_distribution(
     data: list[dict], output_dir: Path | None = None, model_name: str | None = None, save_html: bool = True
 ) -> go.Figure | None:
     if output_dir is None:
-        output_dir = settings.analysis_dir
+        output_dir = settings.projections_dir
 
     tradition_counts: dict[str, int] = {}
     tradition_docs: dict[str, set] = {}

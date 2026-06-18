@@ -35,7 +35,7 @@ def build_embeddings(
 
     logger.info("Starting embedding generation...")
     logger.info(f"   Source: {settings.corpus_dir}")
-    logger.info(f"   Chroma DB: {settings.chroma_dir}")
+    logger.info(f"   Embeddings: {settings.embeddings_dir}")
 
     expected_chunks: int | None = None
 

@@ -6,8 +6,8 @@ def test_default_paths():
 
     s = Settings()
     assert s.corpus_dir == Path("outputs/corpus")
-    assert s.chroma_dir == Path("outputs/chroma")
-    assert s.analysis_dir == Path("outputs/analysis")
+    assert s.embeddings_dir == Path("outputs/embeddings")
+    assert s.projections_dir == Path("outputs/projections")
     assert s.logs_dir == Path("outputs/logs")
 
 
@@ -22,8 +22,8 @@ def test_model_output_dir():
     from settings import Settings
 
     s = Settings()
-    assert s.model_output_dir("BAAI/bge-m3") == Path("outputs/analysis/BAAI_bge-m3")
-    assert s.model_output_dir("sentence-transformers/LaBSE") == Path("outputs/analysis/sentence-transformers_LaBSE")
+    assert s.model_output_dir("BAAI/bge-m3") == Path("outputs/projections/BAAI_bge-m3")
+    assert s.model_output_dir("sentence-transformers/LaBSE") == Path("outputs/projections/sentence-transformers_LaBSE")
 
 
 def test_env_override(monkeypatch):
@@ -38,13 +38,13 @@ def test_env_override(monkeypatch):
     assert s.corpus_metadata_path == Path("/tmp/my_corpus/corpus.json")
 
 
-def test_env_override_chroma(monkeypatch):
-    monkeypatch.setenv("MYTHO_CHROMA_DIR", "/data/chroma")
+def test_env_override_embeddings_dir(monkeypatch):
+    monkeypatch.setenv("MYTHO_EMBEDDINGS_DIR", "/data/embeddings")
 
     from settings import Settings
 
     s = Settings()
-    assert s.chroma_dir == Path("/data/chroma")
+    assert s.embeddings_dir == Path("/data/embeddings")
 
 
 def test_default_embedding_settings():

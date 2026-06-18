@@ -69,6 +69,6 @@ class TestListModelSummaries:
 
 class TestGetModelOutputDir:
     def test_returns_path(self, tmp_path, monkeypatch):
-        monkeypatch.setattr(settings, "analysis_dir", tmp_path)
+        monkeypatch.setattr(settings, "projections_dir", tmp_path)
         result = get_model_output_dir("BAAI_bge-m3")
         assert result.parent == tmp_path

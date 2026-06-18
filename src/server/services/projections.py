@@ -77,7 +77,7 @@ def get_saved_html_plot(model_key: str, method: str, output_dir: Path | None = N
 
     return {
         "exists": True,
-        "url": f"/analysis/{safe_dir}/{filename}",
+        "url": f"/projections/{safe_dir}/{filename}",
         "path": str(html_path),
     }
 

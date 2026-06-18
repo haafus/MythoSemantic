@@ -61,6 +61,6 @@ def delete_chroma_collection(model: str) -> None:
 
     model_name = resolve_embedding_model(model)
     collection = collection_name_for_model(model_name)
-    client = chromadb.PersistentClient(path=str(settings.chroma_dir))
+    client = chromadb.PersistentClient(path=str(settings.embeddings_dir))
     deleted = delete_collection(client, collection)
     print(f"Collection '{collection}' {'deleted' if deleted else 'does not exist'}")

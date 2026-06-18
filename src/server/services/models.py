@@ -52,4 +52,4 @@ def get_model_output_dir(model_key: str):
     from settings import settings
 
     model_name = key_to_model(model_key)
-    return settings.analysis_dir / model_to_key(model_name)
+    return settings.projections_dir / model_to_key(model_name)

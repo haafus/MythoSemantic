@@ -13,7 +13,7 @@ class EmbeddingAnalyzer:
     def __init__(self, model_name: str | None = None):
         self.model_name: str | None = None
         self.data: list[dict[str, Any]] = []
-        self.output_dir: Path = settings.analysis_dir
+        self.output_dir: Path = settings.projections_dir
 
         if model_name:
             self.set_model(model_name)

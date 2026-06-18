@@ -90,11 +90,11 @@ def corpus_orphans(settings) -> list[tuple[Path, int]]:
 
 
 # ---------------------------------------------------------------------------
-# Chroma inspection
+# Embeddings inspection
 # ---------------------------------------------------------------------------
 
-def chroma_status(settings) -> dict[str, Any]:
-    chroma_path = Path(settings.chroma_dir)
+def embeddings_status(settings) -> dict[str, Any]:
+    chroma_path = Path(settings.embeddings_dir)
     result: dict[str, Any] = {
         "exists": chroma_path.exists(),
         "total_size": dir_size(chroma_path),
@@ -122,11 +122,11 @@ def chroma_status(settings) -> dict[str, Any]:
     return result
 
 
-def chroma_orphan_collections(settings) -> list[dict[str, Any]]:
+def embeddings_orphan_collections(settings) -> list[dict[str, Any]]:
     from embedding.chroma_manager import collection_name_for_model
     from model_registry import list_embedding_aliases
 
-    info = chroma_status(settings)
+    info = embeddings_status(settings)
     if not info["exists"]:
         return []
 
@@ -136,10 +136,10 @@ def chroma_orphan_collections(settings) -> list[dict[str, Any]]:
     return [c for c in info["collections"] if c["name"] not in known_names]
 
 
-def chroma_orphan_chunks(settings, *, skip_collections: set[str] | None = None) -> list[dict[str, Any]]:
+def embeddings_orphan_chunks(settings, *, skip_collections: set[str] | None = None) -> list[dict[str, Any]]:
     from corpus.corpus_iterator import normalize_catalog_id
 
-    chroma_path = Path(settings.chroma_dir)
+    chroma_path = Path(settings.embeddings_dir)
     if not chroma_path.exists():
         return []
 
@@ -188,7 +188,7 @@ def chroma_orphan_chunks(settings, *, skip_collections: set[str] | None = None) 
 
 
 # ---------------------------------------------------------------------------
-# Analysis inspection
+# Projections inspection
 # ---------------------------------------------------------------------------
 
 PROJECTION_PLOTS = [
@@ -201,17 +201,17 @@ PROJECTION_PLOTS = [
 ]
 
 
-def analysis_status(settings) -> dict[str, Any]:
-    analysis_dir = Path(settings.analysis_dir)
+def projections_status(settings) -> dict[str, Any]:
+    proj_dir = Path(settings.projections_dir)
     result: dict[str, Any] = {
-        "exists": analysis_dir.exists(),
-        "total_size": dir_size(analysis_dir),
+        "exists": proj_dir.exists(),
+        "total_size": dir_size(proj_dir),
         "models": [],
     }
-    if not analysis_dir.exists():
+    if not proj_dir.exists():
         return result
 
-    for model_dir in sorted(d for d in analysis_dir.iterdir() if d.is_dir()):
+    for model_dir in sorted(d for d in proj_dir.iterdir() if d.is_dir()):
         existing = [p for p in PROJECTION_PLOTS if (model_dir / p).exists()]
         result["models"].append({
             "name": model_dir.name,
@@ -224,13 +224,13 @@ def analysis_status(settings) -> dict[str, Any]:
     return result
 
 
-def analysis_orphans(settings) -> list[dict[str, Any]]:
-    info = analysis_status(settings)
+def projections_orphans(settings) -> list[dict[str, Any]]:
+    info = projections_status(settings)
     if not info["exists"] or not info["models"]:
         return []
 
-    chroma_info = chroma_status(settings)
-    known_dirs = {settings.safe_model_name(c["model"]) for c in chroma_info["collections"]}
+    emb_info = embeddings_status(settings)
+    known_dirs = {settings.safe_model_name(c["model"]) for c in emb_info["collections"]}
 
     return [m for m in info["models"] if m["name"] not in known_dirs]
 
