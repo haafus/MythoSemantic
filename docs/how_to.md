@@ -38,12 +38,13 @@ pip install -e ".[all,dev]"
 
 ```bash
 mytho --help
+mytho corpus --help
 mytho embeddings --help
 mytho projection --help
-mytho cluster --help
 mytho graphs --help
 mytho server --help
-mytho pipeline --help
+mytho build --help
+mytho status
 ```
 
 ## corpus
@@ -85,59 +86,31 @@ mytho corpus --type all --force
 Модуль генерации эмбеддингов и записи в Chroma DB.
 
 Основные файлы:
-- `config/embedding.yaml` задает пути, модели, chunking и batch size.
-- `src/embedding/cli.py` содержит click-команды (generate, query, test, compare и др.).
 - `src/embedding/builder.py` читает корпус, режет тексты на чанки, считает эмбеддинги и пишет в Chroma.
+- `src/embedding/build_embeddings.py` оркестрирует генерацию для нескольких моделей.
 - `src/embedding/chunking.py` содержит стратегии chunking.
-- `src/embedding/cache_utils.py` и `cache_validator.py` работают с кешем.
+- `config/models.json` задает модели и алиасы.
 
 Возможности:
 - Построить эмбеддинги для нескольких моделей.
-- Сохранить чанки в `outputs/corpus_chunked/`.
 - Сохранить индекс в `outputs/chroma/`.
-- Кешировать эмбеддинги в `outputs/cache/`.
-- Делать запросы к Chroma.
 
-Посмотреть конфиг:
+Сгенерировать эмбеддинги для всех активных моделей:
 
 ```bash
-mytho embeddings show-config
-```
-
-Сгенерировать эмбеддинги по конфигу:
-
-```bash
-mytho embeddings generate
+mytho embeddings
 ```
 
 Сгенерировать для конкретной модели:
 
 ```bash
-mytho embeddings generate --model "BAAI/bge-m3"
+mytho embeddings --model bge-m3
 ```
 
-Выбрать chunking и тип текста:
+Пересоздать с нуля:
 
 ```bash
-mytho embeddings generate --chunking paragraph --text-type all
-```
-
-Поиск по индексу:
-
-```bash
-mytho embeddings query "creation of the world" --model "BAAI/bge-m3" --top-k 5
-```
-
-Проверить кеш:
-
-```bash
-mytho embeddings validate-cache
-```
-
-Удалить коллекцию модели:
-
-```bash
-mytho embeddings clear-cache --model "BAAI/bge-m3"
+mytho embeddings --model bge-m3 --force
 ```
 
 ## projection
@@ -263,11 +236,9 @@ mytho server
 Все генерируемые данные хранятся в `outputs/`:
 
 - `outputs/corpus/` — основной текстовый корпус с метаданными и каталогом. Создается через `mytho corpus`.
-- `outputs/corpus_chunked/` — корпус после разбиения на чанки. Создается через `mytho embeddings generate`.
-- `outputs/chroma/` — локальная Chroma DB с векторными коллекциями. Создается через `mytho embeddings generate`.
+- `outputs/chroma/` — локальная Chroma DB с векторными коллекциями. Создается через `mytho embeddings`.
 - `outputs/analysis/` — результаты анализа: `models.json`, HTML-графики, кластеризация. Создается через `mytho projection` и `mytho cluster`.
 - `outputs/graphs/` — готовые HTML-графы персонажей и связей. Создается через `mytho graphs`.
-- `outputs/cache/` — кеш эмбеддингов в `.npy` и `.json`. Создается через `mytho embeddings generate`.
 - `outputs/logs/` — логи всех пайплайнов.
 
 ## Типовой пайплайн
@@ -275,7 +246,7 @@ mytho server
 Запустить всё одной командой:
 
 ```bash
-mytho pipeline --model "BAAI/bge-m3" --text-type all
+mytho build --model bge-m3
 ```
 
 Или по шагам:
@@ -285,7 +256,7 @@ mytho pipeline --model "BAAI/bge-m3" --text-type all
 mytho corpus --type all
 
 # 2. Построить эмбеддинги и Chroma DB
-mytho embeddings generate
+mytho embeddings
 
 # 3. Построить визуальный анализ эмбеддингов
 mytho projection
