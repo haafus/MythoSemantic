@@ -134,6 +134,8 @@ def chroma_orphan_collections(settings) -> list[dict[str, Any]]:
 
 
 def chroma_orphan_chunks(settings) -> list[dict[str, Any]]:
+    from corpus.corpus_iterator import normalize_catalog_id
+
     chroma_path = Path(settings.chroma_dir)
     if not chroma_path.exists():
         return []
@@ -148,7 +150,8 @@ def chroma_orphan_chunks(settings) -> list[dict[str, Any]]:
     except Exception:
         return []
 
-    known_text_ids = {entry.get("id") for entry in meta_entries if entry.get("id")}
+    known_text_ids = {normalize_catalog_id(e["id"]) for e in meta_entries if e.get("id")}
+    orphan_collection_names = {c["name"] for c in chroma_orphan_collections(settings)}
 
     results = []
     try:
@@ -158,6 +161,8 @@ def chroma_orphan_chunks(settings) -> list[dict[str, Any]]:
         client = chromadb.PersistentClient(path=str(chroma_path))
         for col in client.list_collections():
             if not is_model_collection_name(col.name):
+                continue
+            if col.name in orphan_collection_names:
                 continue
             all_meta = col.get(include=["metadatas"])
             orphan_ids = []
@@ -222,6 +227,9 @@ def analysis_orphans(settings) -> list[dict[str, Any]]:
         return []
 
     chroma_info = chroma_status(settings)
+    if not chroma_info["exists"] or not chroma_info["collections"]:
+        return []
+
     known_dirs = {settings.safe_model_name(c["model"]) for c in chroma_info["collections"]}
 
     return [m for m in info["models"] if m["name"] not in known_dirs]
