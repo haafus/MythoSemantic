@@ -74,6 +74,7 @@ def embeddings(model: str | None, force: bool):
     from embedding.build_embeddings import build_embeddings
 
     build_embeddings(model_name=model, force=force)
+    click.echo(click.style("Embedding generation completed.", fg="green"))
 
 
 # ---------------------------------------------------------------------------
