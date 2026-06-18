@@ -68,6 +68,8 @@ class Settings(BaseSettings):
     graphs_dir: Path = Path("outputs/graphs")
     corpus_config_file: Path = Path("config/corpus.json")
     traditions_config_file: Path = Path("config/traditions.json")
+    corpus_metadata_path: Path = Path("outputs/corpus/corpus.json")
+    web_root: Path = Path("src/server/web")
 
     log_level: str = "INFO"
 
@@ -85,18 +87,6 @@ class Settings(BaseSettings):
         "env_nested_delimiter": "__",
         "extra": "ignore",
     }
-
-    @property
-    def corpus_metadata_path(self) -> Path:
-        return self.corpus_dir / "corpus.json"
-
-    @property
-    def web_root(self) -> Path:
-        return Path("src/server/web")
-
-    @property
-    def assets_dir(self) -> Path:
-        return self.web_root / "assets"
 
 
 settings = Settings()

@@ -35,6 +35,6 @@ class TestServerPaths:
     def test_web_root_points_to_server_web(self):
         assert settings.web_root == Path("src/server/web")
 
-    def test_assets_under_web_root(self):
-        assert settings.assets_dir == settings.web_root / "assets"
+    def test_web_root_is_regular_field(self):
+        assert "web_root" in settings.model_fields
 

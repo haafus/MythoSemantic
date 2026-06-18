@@ -22,8 +22,9 @@ def create_app() -> FastAPI:
     app.include_router(geography.router)
     app.include_router(similarity.router)
 
-    if settings.assets_dir.exists():
-        app.mount("/assets", StaticFiles(directory=str(settings.assets_dir)), name="assets")
+    assets_dir = settings.web_root / "assets"
+    if assets_dir.exists():
+        app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
     if settings.projections_dir.exists():
         app.mount("/projections", StaticFiles(directory=str(settings.projections_dir)), name="projections")
     if settings.corpus_dir.exists():

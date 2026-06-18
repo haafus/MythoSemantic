@@ -20,7 +20,7 @@ class TestSPAFallback:
     def test_missing_index_returns_404(self, tmp_path, monkeypatch):
         from settings import settings
 
-        monkeypatch.setattr(type(settings), "web_root", property(lambda self: tmp_path / "web"))
+        monkeypatch.setattr(settings, "web_root", tmp_path / "web")
         test_client = TestClient(create_app())
         response = test_client.get("/nonexistent/page")
         assert response.status_code == 404

@@ -11,7 +11,7 @@ def test_default_paths():
     assert s.logs_dir == Path("outputs/logs")
 
 
-def test_derived_paths():
+def test_default_metadata_path():
     from settings import Settings
 
     s = Settings()
@@ -28,7 +28,7 @@ def test_env_override(monkeypatch):
     s = Settings()
     assert s.corpus_dir == Path("/tmp/my_corpus")
     assert s.log_level == "DEBUG"
-    assert s.corpus_metadata_path == Path("/tmp/my_corpus/corpus.json")
+    assert s.corpus_metadata_path == Path("outputs/corpus/corpus.json")
 
 
 def test_env_override_embeddings_dir(monkeypatch):
