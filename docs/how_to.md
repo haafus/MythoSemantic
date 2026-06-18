@@ -41,7 +41,7 @@ pip install -e ".[all,dev]"
 mytho --help
 mytho corpus --help
 mytho embeddings --help
-mytho projection --help
+mytho projections --help
 mytho graphs --help
 mytho server --help
 mytho build --help
@@ -115,7 +115,7 @@ mytho embeddings --model bge-m3
 mytho embeddings --model bge-m3 --force
 ```
 
-## projection
+## projections
 
 Модуль анализа эмбеддингов из Chroma DB и генерации HTML/CSV/JSON-артефактов в `outputs/projections/`.
 
@@ -132,19 +132,19 @@ mytho embeddings --model bge-m3 --force
 Запустить анализ всех доступных моделей:
 
 ```bash
-mytho projection
+mytho projections
 ```
 
 Запустить анализ одной модели:
 
 ```bash
-mytho projection --model "BAAI/bge-m3"
+mytho projections --model "BAAI/bge-m3"
 ```
 
 Только статистика, без графиков:
 
 ```bash
-mytho projection --model "BAAI/bge-m3" --no-plots
+mytho projections --model "BAAI/bge-m3" --no-plots
 ```
 
 ## graphs
@@ -263,7 +263,7 @@ mytho server
 
 - `outputs/corpus/` — основной текстовый корпус с метаданными и каталогом. Создается через `mytho corpus`.
 - `outputs/embeddings/` — локальная Chroma DB с векторными коллекциями. Создается через `mytho embeddings`.
-- `outputs/projections/` — результаты анализа: `models.json`, HTML-графики. Создается через `mytho projection`.
+- `outputs/projections/` — результаты анализа: `models.json`, HTML-графики. Создается через `mytho projections`.
 - `outputs/graphs/` — готовые HTML-графы персонажей и связей. Создается через `mytho graphs`.
 - `outputs/logs/` — логи всех пайплайнов.
 
@@ -285,7 +285,7 @@ mytho corpus
 mytho embeddings
 
 # 3. Построить визуальный анализ эмбеддингов
-mytho projection
+mytho projections
 
 # 4. Извлечь графы персонажей через LLM
 mytho graphs

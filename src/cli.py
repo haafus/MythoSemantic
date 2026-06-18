@@ -7,7 +7,7 @@ from log_setup import setup_logging
 
 
 COMMAND_ORDER = [
-    "corpus", "embeddings", "projection", "graphs",
+    "corpus", "embeddings", "projections", "graphs",
     None,
     "build", "status", "clean", "server",
 ]
@@ -74,14 +74,14 @@ def embeddings(model: str | None, force: bool):
 
 
 # ---------------------------------------------------------------------------
-# projection
+# projections
 # ---------------------------------------------------------------------------
 @mytho.command()
 @click.option("--model", "-m", default=None, help="Embedding model name (all models if omitted).")
 @click.option("--no-plots", is_flag=True, help="Skip plot generation, only compute stats.")
 @click.option("--motif-analysis", is_flag=True, help="Generate motif UMAP from LLM plot summaries.")
 @click.option("--force", is_flag=True, help="Regenerate all plots even if they already exist.")
-def projection(model: str | None, no_plots: bool, motif_analysis: bool, force: bool):
+def projections(model: str | None, no_plots: bool, motif_analysis: bool, force: bool):
     """Generate UMAP projections and embedding visualizations."""
     from projection.run_analysis import analyze_embeddings
 
@@ -135,14 +135,14 @@ def server(host: str | None, port: int | None):
 @click.option("--force", is_flag=True, help="Force regeneration of all steps.")
 @click.option("--skip-corpus", is_flag=True, help="Skip corpus download.")
 @click.option("--skip-embeddings", is_flag=True, help="Skip embedding generation.")
-@click.option("--skip-projection", is_flag=True, help="Skip projection generation.")
+@click.option("--skip-projections", is_flag=True, help="Skip projections generation.")
 @click.option("--skip-graphs", is_flag=True, help="Skip graph extraction.")
-def build(model, llm_model, force, skip_corpus, skip_embeddings, skip_projection, skip_graphs):
+def build(model, llm_model, force, skip_corpus, skip_embeddings, skip_projections, skip_graphs):
     """Run the full analysis pipeline end-to-end."""
     steps = [
         ("Corpus", skip_corpus, _build_corpus, {"force": force}),
         ("Embeddings", skip_embeddings, _build_embeddings, {"model": model, "force": force}),
-        ("Projection", skip_projection, _build_projection, {"model": model, "force": force}),
+        ("Projections", skip_projections, _build_projections, {"model": model, "force": force}),
         ("Graphs", skip_graphs, _build_graphs, {"llm_model": llm_model, "force": force}),
     ]
 
@@ -173,7 +173,7 @@ def _build_embeddings(model: str | None, force: bool = False):
     build_embeddings(model_name=model, force=force)
 
 
-def _build_projection(model: str | None, force: bool = False):
+def _build_projections(model: str | None, force: bool = False):
     from projection.run_analysis import analyze_embeddings
 
     analyze_embeddings(model_name=model, force=force)
