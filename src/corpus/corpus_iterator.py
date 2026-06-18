@@ -53,3 +53,7 @@ def iter_corpus_files(corpus_dir: Path) -> Generator[dict[str, Any], None, None]
             "tradition": item.get("tradition", "unknown"),
             "url": item.get("url", ""),
         }
+
+
+def read_corpus_file(file_info: dict[str, Any]) -> str:
+    return Path(file_info["path"]).read_text(encoding="utf-8")
