@@ -1,11 +1,10 @@
 from unittest.mock import patch
 
+from model_registry import key_to_model, model_to_key
 from server.services.models import (
     get_model_output_dir,
-    key_to_model,
     list_model_summaries,
     list_models_raw,
-    model_to_key,
 )
 from settings import settings
 
@@ -13,9 +12,6 @@ from settings import settings
 class TestModelToKey:
     def test_slash_replaced(self):
         assert model_to_key("BAAI/bge-m3") == "BAAI_bge-m3"
-
-    def test_backslash_replaced(self):
-        assert model_to_key("path\\model") == "path_model"
 
     def test_no_special_chars(self):
         assert model_to_key("simple-model") == "simple-model"
@@ -25,23 +21,14 @@ class TestModelToKey:
 
 
 class TestKeyToModel:
-    def test_passthrough_with_slash(self):
-        assert key_to_model("BAAI/bge-m3") == "BAAI/bge-m3"
+    def test_underscore_to_slash(self):
+        assert key_to_model("BAAI_bge-m3") == "BAAI/bge-m3"
+
+    def test_no_underscores(self):
+        assert key_to_model("simple-model") == "simple-model"
 
     def test_empty_string(self):
         assert key_to_model("") == ""
-
-    def test_finds_in_models_list(self):
-        result = key_to_model("BAAI_bge-m3", models=["BAAI/bge-m3", "other/model"])
-        assert result == "BAAI/bge-m3"
-
-    def test_fallback_replaces_underscore(self):
-        result = key_to_model("unknown_xyz_abc", models=[])
-        assert result == "unknown/xyz/abc"
-
-    def test_first_match_wins(self):
-        result = key_to_model("a_b", models=["a/b", "a_b"])
-        assert result == "a/b"
 
 
 class TestListModelsRaw:
