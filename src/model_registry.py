@@ -48,12 +48,6 @@ def active_embedding_models() -> list[str]:
     return list(_load_registry().get("embedding", {}).get("models", {}).values())
 
 
-def default_embedding_model(name: str | None = None) -> str:
-    if name:
-        return resolve_embedding_model(name)
-    return active_embedding_models()[0]
-
-
 def list_embedding_aliases() -> dict[str, str]:
     emb = _load_registry().get("embedding", {})
     return {**emb.get("models", {}), **emb.get("inactive", {})}

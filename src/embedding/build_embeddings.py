@@ -1,6 +1,6 @@
 import logging
 
-from model_registry import active_embedding_models, default_embedding_model
+from model_registry import active_embedding_models, resolve_embedding_model
 from settings import settings
 
 from .builder import EmbeddingBuilder
@@ -26,10 +26,12 @@ def build_embeddings(
     models: list | None = None,
     force: bool = False,
 ) -> None:
-    resolved = default_embedding_model(model_name)
+    if model_name:
+        models_to_run = [resolve_embedding_model(model_name)]
+    else:
+        models_to_run = models or active_embedding_models()
 
-    builder = EmbeddingBuilder(embedding_model=resolved)
-    models_to_run = models or ([resolved] if model_name else active_embedding_models())
+    builder = EmbeddingBuilder(embedding_model=models_to_run[0])
 
     logger.info("Starting embedding generation...")
     logger.info(f"   Source: {settings.corpus_dir}")

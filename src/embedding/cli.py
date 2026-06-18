@@ -2,7 +2,7 @@ import time
 
 import click
 
-from model_registry import default_embedding_model
+from model_registry import resolve_embedding_model
 from settings import settings
 
 from .build_embeddings import build_embeddings
@@ -27,12 +27,12 @@ def generate(ctx, model: str | None, force: bool):
 @click.command()
 @click.argument("query")
 @click.option("--top-k", "-k", default=5, type=int, help="Number of results to return")
-@click.option("--model", "-m", default=None, help="Model to use for query encoding")
+@click.option("--model", "-m", required=True, help="Model to use for query encoding")
 @click.pass_context
-def query(ctx, query: str, top_k: int, model: str | None):
+def query(ctx, query: str, top_k: int, model: str):
     from .builder import EmbeddingBuilder
 
-    builder = EmbeddingBuilder(embedding_model=default_embedding_model(model))
+    builder = EmbeddingBuilder(embedding_model=resolve_embedding_model(model))
 
     try:
         results = builder.query_chroma(query, top_k=top_k)
@@ -51,11 +51,11 @@ def query(ctx, query: str, top_k: int, model: str | None):
 
 
 @click.command("remove")
-@click.option("--model", "-m", default=None, help="Model whose collection should be deleted")
+@click.option("--model", "-m", required=True, help="Model whose collection should be deleted")
 @click.option("--yes", is_flag=True, help="Skip confirmation")
 @click.pass_context
-def delete_chroma_collection(ctx, model: str | None, yes: bool):
-    model_name = default_embedding_model(model)
+def delete_chroma_collection(ctx, model: str, yes: bool):
+    model_name = resolve_embedding_model(model)
     collection = collection_name_for_model(model_name)
 
     if not yes:
