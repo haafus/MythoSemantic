@@ -20,7 +20,7 @@ class EmbeddingDataLoader:
         return list(self.client.list_collections())
 
     def load_data(
-        self, model_name: str | None = None, batch_size: int = 5000
+        self, model_name: str, batch_size: int = 5000
     ) -> list[dict[str, Any]]:
         all_data: list[dict[str, Any]] = []
 
