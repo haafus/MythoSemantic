@@ -14,21 +14,21 @@ class EmbeddingDataLoader:
     def __init__(self):
         self.client = chromadb.PersistentClient(path=str(settings.embeddings_dir))
 
-    def _iter_collections(self, model_name: str | None = None):
+    def _get_collections(self, model_name: str | None = None) -> list:
         try:
             if model_name:
-                yield self.client.get_collection(name=collection_name_for_model(model_name))
-            else:
-                yield from self.client.list_collections()
+                return [self.client.get_collection(name=collection_name_for_model(model_name))]
+            return list(self.client.list_collections())
         except Exception as e:
             logger.warning(f"Failed to get Chroma collections: {e}")
+            return []
 
     def load_data(
         self, model_name: str | None = None, batch_size: int = 5000, max_records: int | None = None
     ) -> list[dict[str, Any]]:
         all_data: list[dict[str, Any]] = []
 
-        for collection in self._iter_collections(model_name=model_name):
+        for collection in self._get_collections(model_name=model_name):
             offset = 0
 
             while True:
@@ -96,7 +96,7 @@ class EmbeddingDataLoader:
 
     def get_available_models(self) -> list[str]:
         models: set[str] = set()
-        for collection in self._iter_collections():
+        for collection in self._get_collections():
             models.add(collection.metadata["model"])
         return sorted(models)
 
