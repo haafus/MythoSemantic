@@ -61,7 +61,7 @@ class EmbeddingIndexService:
             "text": item.get("text", ""),
             "tradition": item.get("tradition", "Unknown"),
             "chunk_index": item.get("chunk_index", 0),
-            "book_title": item.get("filename", "") or item.get("id", ""),
+            "book_title": item.get("text_id", "") or item.get("id", ""),
             "model": item.get("model", index.model_name),
             "metadata": {
                 "filename": item.get("filename", ""),
@@ -183,7 +183,7 @@ class EmbeddingIndexService:
                     "text": text,
                     "text_preview": preview,
                     "filename": item.get("filename", ""),
-                    "book_title": item.get("filename", "") or item.get("id", ""),
+                    "book_title": item.get("text_id", "") or item.get("id", ""),
                 }
             )
 

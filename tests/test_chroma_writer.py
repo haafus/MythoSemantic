@@ -82,26 +82,19 @@ class TestBuildEntries:
 
         assert len(metadatas) == 1
         m = metadatas[0]
-        assert m["filename"] == "file"
+        assert m["filename"] == "file.txt"
         assert m["tradition"] == "Buddhism"
         assert m["major_tradition"] == "Eastern"
         assert m["model"] == "model-x"
         assert m["chunking"] == "sentence"
         assert m["chunk_index"] == 0
 
-    def test_txt_extension_stripped_from_filename(self, writer):
+    def test_filename_preserved_as_is(self, writer):
         chunks = ["text"]
         info = _info(filename="document.txt")
 
         _, metadatas = writer.build_entries(chunks, info, "m", "c")
-        assert metadatas[0]["filename"] == "document"
-
-    def test_non_txt_extension_kept(self, writer):
-        chunks = ["text"]
-        info = _info(filename="document.pdf")
-
-        _, metadatas = writer.build_entries(chunks, info, "m", "c")
-        assert metadatas[0]["filename"] == "document.pdf"
+        assert metadatas[0]["filename"] == "document.txt"
 
     def test_default_info_uses_defaults(self, writer):
         chunks = ["text"]

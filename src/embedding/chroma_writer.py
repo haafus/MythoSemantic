@@ -32,13 +32,9 @@ class ChromaWriter:
 
         ids = [f"{text_id_safe}_{model_id}_{i}" for i in range(len(chunks))]
 
-        filename = info.filename
-        if filename.endswith(".txt"):
-            filename = filename[:-4]
-
         metadatas = [
             {
-                "filename": filename or "unknown",
+                "filename": info.filename,
                 "tradition": info.tradition,
                 "major_tradition": info.major_tradition,
                 "chunk_index": i,

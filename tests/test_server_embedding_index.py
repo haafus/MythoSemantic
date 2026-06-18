@@ -109,7 +109,7 @@ class TestTopResults:
         assert results[0]["text_preview"] == "short"
 
     def test_result_fields(self):
-        items = [self._item("a", text="hello", tradition="Norse", major_tradition="Euro", filename="doc.txt")]
+        items = [self._item("a", text="hello", tradition="Norse", major_tradition="Euro", filename="doc.txt", text_id="doc")]
         index = _make_index(items)
         results = EmbeddingIndexService._top_results(index, np.array([0.8]), 1)
         r = results[0]
@@ -119,7 +119,7 @@ class TestTopResults:
         assert r["similarity_score"] == 0.8
         assert r["distance"] == pytest.approx(0.2)
         assert r["filename"] == "doc.txt"
-        assert r["book_title"] == "doc.txt"
+        assert r["book_title"] == "doc"
 
     def test_limit_clamped_to_items(self):
         items = [self._item("a")]
