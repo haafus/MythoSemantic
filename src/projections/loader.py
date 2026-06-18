@@ -23,9 +23,6 @@ class EmbeddingDataLoader:
 
     def _iter_collections(self, model_name: str | None = None):
         names = [collection_name_for_model(model_name)] if model_name else self._list_collection_names()
-        if not names:
-            raise RuntimeError("Model-based Chroma collections not found")
-
         for name in names:
             try:
                 yield self.client.get_collection(name=name)
@@ -105,18 +102,9 @@ class EmbeddingDataLoader:
 
     def get_available_models(self) -> list[str]:
         models: set[str] = set()
-
-        try:
-            if not self._list_collection_names():
-                return []
-
-            for collection in self._iter_collections():
-                model = (collection.metadata or {}).get("model")
-                if model:
-                    models.add(model)
-
-            return sorted(models)
-        except Exception:
-            logger.exception("Failed to get available models")
-            return []
+        for collection in self._iter_collections():
+            model = (collection.metadata or {}).get("model")
+            if model:
+                models.add(model)
+        return sorted(models)
 
