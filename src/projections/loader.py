@@ -14,40 +14,28 @@ class EmbeddingDataLoader:
     def __init__(self):
         self.client = chromadb.PersistentClient(path=str(settings.embeddings_dir))
 
-    def _get_collections(self, model_name: str | None = None) -> list:
-        if model_name:
-            return [self.client.get_collection(name=collection_name_for_model(model_name))]
-        return list(self.client.list_collections())
-
     def load_data(
         self, model_name: str, batch_size: int = 5000
     ) -> list[dict[str, Any]]:
+        collection = self.client.get_collection(name=collection_name_for_model(model_name))
         all_data: list[dict[str, Any]] = []
+        offset = 0
 
-        for collection in self._get_collections(model_name=model_name):
-            offset = 0
+        while True:
+            results = collection.get(
+                limit=batch_size,
+                offset=offset,
+                include=["embeddings", "metadatas", "documents"],
+            )
 
-            while True:
-                try:
-                    results = collection.get(
-                        limit=batch_size,
-                        offset=offset,
-                        include=["embeddings", "metadatas", "documents"],
-                    )
-                except Exception:
-                    logger.exception("Failed to fetch data from '%s' at offset %d", collection.name, offset)
-                    break
+            if not results.get("ids"):
+                break
 
-                if not results.get("ids"):
-                    break
+            all_data.extend(self._process_batch(results))
+            offset += batch_size
 
-                batch_data = self._process_batch(results)
-                all_data.extend(batch_data)
-
-                offset += batch_size
-
-                if len(results["ids"]) < batch_size:
-                    break
+            if len(results["ids"]) < batch_size:
+                break
 
         return all_data
 
@@ -87,8 +75,7 @@ class EmbeddingDataLoader:
         return batch_data
 
     def get_available_models(self) -> list[str]:
-        models: set[str] = set()
-        for collection in self._get_collections():
-            models.add(collection.metadata["model"])
-        return sorted(models)
+        return sorted(
+            col.metadata["model"] for col in self.client.list_collections()
+        )
 
