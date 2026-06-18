@@ -150,16 +150,22 @@ def build(model, llm, force, sample):
         ("Graphs", _build_graphs, {"llm": llm, "force": force, "max_texts": max_texts}),
     ]
 
+    import time
+
+    start_all = time.monotonic()
     for name, fn, kwargs in steps:
         click.echo(click.style(f"[start] {name}", fg="cyan", bold=True))
+        start = time.monotonic()
         try:
             fn(**kwargs)
-            click.echo(click.style(f"[done]  {name}", fg="green"))
+            elapsed = time.monotonic() - start
+            click.echo(click.style(f"[done]  {name}", fg="green") + f" ({elapsed:.1f}s)")
         except Exception as e:
             click.echo(click.style(f"[fail]  {name}: {e}", fg="red"), err=True)
             sys.exit(1)
 
-    click.echo(click.style("\nBuild finished.", fg="green", bold=True))
+    total = time.monotonic() - start_all
+    click.echo(click.style(f"\nBuild finished.", fg="green", bold=True) + f" ({total:.1f}s)")
 
 
 def _build_corpus(force: bool = False, max_texts: int | None = None):
