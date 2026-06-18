@@ -53,7 +53,7 @@ def mytho():
 @mytho.command()
 @click.option("--force", is_flag=True, help="Overwrite existing files.")
 def corpus(force: bool):
-    """Download and build the text corpus (Gutenberg cleanup is automatic)."""
+    """Download and build the text corpus."""
     from corpus.builder import build_corpus
 
     build_corpus(force=force)
