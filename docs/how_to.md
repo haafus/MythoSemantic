@@ -120,9 +120,9 @@ mytho embeddings --model bge-m3 --force
 Модуль анализа эмбеддингов из Chroma DB и генерации HTML/CSV/JSON-артефактов в `outputs/projections/`.
 
 Основные файлы:
-- `src/projection/loader.py` читает данные из Chroma.
-- `src/projection/analyzer.py` собирает статистику.
-- `src/projection/visualization.py` строит UMAP-проекцию, heatmap и distribution chart.
+- `src/projections/loader.py` читает данные из Chroma.
+- `src/projections/analyzer.py` собирает статистику.
+- `src/projections/visualization.py` строит UMAP-проекцию, heatmap и distribution chart.
 
 Возможности:
 - Получить статистику по модели.
@@ -188,7 +188,7 @@ mytho status
 
 ## clean
 
-Поиск и удаление осиротевших файлов: corpus-тексты без записи в каталоге, embedding-коллекции без модели в реестре, чанки без текста в корпусе, projection-директории без коллекции, graph-директории без текста в корпусе.
+Поиск и удаление осиротевших файлов: corpus-тексты без записи в каталоге, embedding-коллекции без модели в реестре, чанки без текста в корпусе, projections-директории без коллекции, graph-директории без текста в корпусе.
 
 По умолчанию — dry run (только показывает что будет удалено):
 
