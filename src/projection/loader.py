@@ -176,7 +176,6 @@ class EmbeddingDataLoader:
         all_data: list[dict[str, Any]] = []
 
         for collection in self._iter_collections(model_name=model_name):
-            col_model = (collection.metadata or {}).get("model", collection.name)
             offset = 0
 
             while True:
@@ -197,7 +196,7 @@ class EmbeddingDataLoader:
                 if not results.get("ids"):
                     break
 
-                batch_data = self._process_batch(results, col_model)
+                batch_data = self._process_batch(results)
                 all_data.extend(batch_data)
 
                 offset += batch_size
@@ -207,7 +206,7 @@ class EmbeddingDataLoader:
 
         return all_data
 
-    def _process_batch(self, results: dict, model_name: str) -> list[dict[str, Any]]:
+    def _process_batch(self, results: dict) -> list[dict[str, Any]]:
         batch_data = []
         ids = results.get("ids", [])
         embeddings = results.get("embeddings", [])
@@ -232,7 +231,6 @@ class EmbeddingDataLoader:
                         "chunk_index": meta.get("chunk_index", 0),
                         "embedding": embedding,
                         "text": doc,
-                        "model": model_name,
                         "filename": meta.get("filename", "unknown"),
                         "url": meta.get("url", ""),
                     }
