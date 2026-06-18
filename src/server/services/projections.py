@@ -5,7 +5,6 @@ import struct
 from functools import lru_cache
 from pathlib import Path
 
-from model_registry import key_to_model
 from server.services.models import get_model_output_dir
 
 SAVED_HTML_METHOD_FILES = {
@@ -56,7 +55,7 @@ def get_projection_data(model_key: str, method: str) -> dict | None:
                 return _load_saved_html_projection(
                     str(path),
                     path.stat().st_mtime,
-                    key_to_model(model_key),
+                    model_key,
                     method,
                 )
 

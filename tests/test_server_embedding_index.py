@@ -62,8 +62,8 @@ class TestNormalizeMatrix:
 
 
 class TestTopResults:
-    def _item(self, id, text="", tradition="Greek", **kw):
-        return {"id": id, "text": text, "tradition": tradition, "major_tradition": "", "chunk_index": 0, "filename": "", **kw}
+    def _item(self, text_id, text="", tradition="Greek", **kw):
+        return {"text_id": text_id, "text": text, "tradition": tradition, "major_tradition": "", "chunk_index": 0, "filename": "", **kw}
 
     def test_returns_top_k(self):
         items = [self._item("a"), self._item("b"), self._item("c")]
@@ -109,11 +109,11 @@ class TestTopResults:
         assert results[0]["text_preview"] == "short"
 
     def test_result_fields(self):
-        items = [self._item("a", text="hello", tradition="Norse", major_tradition="Euro", filename="doc.txt", text_id="doc")]
+        items = [self._item("doc", text="hello", tradition="Norse", major_tradition="Euro", filename="doc.txt")]
         index = _make_index(items)
         results = EmbeddingIndexService._top_results(index, np.array([0.8]), 1)
         r = results[0]
-        assert r["id"] == "a"
+        assert r["id"] == "doc"
         assert r["tradition"] == "Norse"
         assert r["major_tradition"] == "Euro"
         assert r["similarity_score"] == 0.8
