@@ -20,13 +20,9 @@ class EmbeddingDataLoader:
         if auto_migrate:
             self._auto_migrate_all()
 
-    @staticmethod
-    def _collection_name(collection) -> str:
-        return collection if isinstance(collection, str) else collection.name
-
     def _list_collection_names(self) -> list[str]:
         try:
-            return sorted(self._collection_name(collection) for collection in self.client.list_collections())
+            return sorted(col.name for col in self.client.list_collections())
         except Exception as e:
             logger.warning(f"Failed to list Chroma collections: {e}")
             return []

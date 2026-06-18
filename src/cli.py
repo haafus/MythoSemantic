@@ -227,13 +227,11 @@ def _status_embeddings(settings):
         collections = client.list_collections()
         model_collections = []
         for col in collections:
-            name = col if isinstance(col, str) else col.name
-            if is_model_collection_name(name):
-                coll = client.get_collection(name=name)
-                count = coll.count()
-                result = coll.get(limit=1, include=["metadatas"])
+            if is_model_collection_name(col.name):
+                count = col.count()
+                result = col.get(limit=1, include=["metadatas"])
                 metadatas = result.get("metadatas", [])
-                model_name = metadatas[0].get("model", name) if metadatas else name
+                model_name = metadatas[0].get("model", col.name) if metadatas else col.name
                 model_collections.append((model_name, count))
 
         if not model_collections:
