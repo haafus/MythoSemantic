@@ -53,31 +53,9 @@ def list_embedding_aliases() -> dict[str, str]:
     return {**emb.get("models", {}), **emb.get("inactive", {})}
 
 
-_key_to_model_cache: dict[str, str] = {}
-
-
 def model_to_key(model_name: str) -> str:
     return (model_name or "").replace("/", "_").replace("\\", "_")
 
 
-def key_to_model(model_key: str, models: list[str] | None = None) -> str:
-    if not model_key:
-        return model_key
-    if "/" in model_key:
-        return model_key
-    if models is None and model_key in _key_to_model_cache:
-        return _key_to_model_cache[model_key]
-
-    if models is None:
-        from projections.loader import EmbeddingDataLoader
-        candidates = EmbeddingDataLoader().get_available_models()
-    else:
-        candidates = models
-    for model in candidates:
-        if model_to_key(model) == model_key:
-            _key_to_model_cache[model_key] = model
-            return model
-
-    result = model_key.replace("_", "/")
-    _key_to_model_cache[model_key] = result
-    return result
+def key_to_model(model_key: str) -> str:
+    return model_key.replace("_", "/") if model_key else model_key
