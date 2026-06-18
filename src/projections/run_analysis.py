@@ -34,40 +34,35 @@ def analyze_embeddings(
     motif_analysis: bool = False,
     force: bool = False,
 ) -> EmbeddingAnalyzer | None:
-    try:
-        from .loader import EmbeddingDataLoader
+    from .loader import EmbeddingDataLoader
 
-        available_models = EmbeddingDataLoader().get_available_models()
+    available_models = EmbeddingDataLoader().get_available_models()
 
-        if not available_models:
-            logger.error("ERROR: No available models in the Chroma database!")
-            return None
-
-        models_to_analyze = [resolve_embedding_model(model_name)] if model_name else available_models
-        logger.info(f"Models queued for analysis: {models_to_analyze}")
-
-        analyzer: EmbeddingAnalyzer | None = None
-        for current_model in models_to_analyze:
-            logger.info(f"Starting model analysis: {current_model}")
-
-            analyzer = EmbeddingAnalyzer(model_name=current_model)
-
-            if not analyzer.data:
-                logger.warning(f"No data found for model {current_model}, skipping...")
-                continue
-
-            if generate_all_plots:
-                _generate_all_plots(analyzer, force=force)
-
-            if motif_analysis:
-                _generate_motif_plot(analyzer, force=force)
-
-        logger.info("Projection analysis complete.")
-        return analyzer
-
-    except Exception:
-        logger.exception("Critical error during embedding analysis")
+    if not available_models:
+        logger.error("ERROR: No available models in the Chroma database!")
         return None
+
+    models_to_analyze = [resolve_embedding_model(model_name)] if model_name else available_models
+    logger.info(f"Models queued for analysis: {models_to_analyze}")
+
+    analyzer: EmbeddingAnalyzer | None = None
+    for current_model in models_to_analyze:
+        logger.info(f"Starting model analysis: {current_model}")
+
+        analyzer = EmbeddingAnalyzer(model_name=current_model)
+
+        if not analyzer.data:
+            logger.warning(f"No data found for model {current_model}, skipping...")
+            continue
+
+        if generate_all_plots:
+            _generate_all_plots(analyzer, force=force)
+
+        if motif_analysis:
+            _generate_motif_plot(analyzer, force=force)
+
+    logger.info("Projection analysis complete.")
+    return analyzer
 
 
 def _generate_all_plots(analyzer: EmbeddingAnalyzer, force: bool = False) -> None:
