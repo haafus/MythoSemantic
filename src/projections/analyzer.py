@@ -23,7 +23,8 @@ class EmbeddingAnalyzer:
 
     def set_model(self, model_name: str) -> None:
         self.model_name = model_name
-        self.output_dir = settings.model_output_dir(model_name)
+        from model_registry import model_to_key
+        self.output_dir = settings.projections_dir / model_to_key(model_name)
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         logger.info(f"Loading data for model: {model_name}...")

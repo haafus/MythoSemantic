@@ -104,8 +104,5 @@ class Settings(BaseSettings):
     def assets_dir(self) -> Path:
         return self.web_root / "assets"
 
-    def model_output_dir(self, model_name: str) -> Path:
-        from model_registry import model_to_key
-        return self.projections_dir / model_to_key(model_name)
 
 settings = Settings()

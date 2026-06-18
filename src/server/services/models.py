@@ -23,7 +23,3 @@ def list_model_summaries() -> list[dict[str, str]]:
     return result
 
 
-def get_model_output_dir(model_key: str):
-    from settings import settings
-
-    return settings.projections_dir / model_key

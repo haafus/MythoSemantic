@@ -5,7 +5,7 @@ import struct
 from functools import lru_cache
 from pathlib import Path
 
-from server.services.models import get_model_output_dir
+from settings import settings
 
 SAVED_HTML_METHOD_FILES = {
     "umap": "umap_2d_traditions.html",
@@ -35,7 +35,7 @@ PLOTLY_DTYPE_FORMATS = {
 
 
 def get_projection_data(model_key: str, method: str) -> dict | None:
-    output_dir = get_model_output_dir(model_key)
+    output_dir = settings.projections_dir / model_key
     candidates = [
         output_dir / f"{method}_2d_coords.json",
         output_dir / f"{method}_coords.json",
@@ -65,7 +65,7 @@ def get_projection_data(model_key: str, method: str) -> dict | None:
 def get_saved_html_plot(model_key: str, method: str, output_dir: Path | None = None) -> dict:
     safe_dir = model_key
     if output_dir is None:
-        output_dir = get_model_output_dir(model_key)
+        output_dir = settings.projections_dir / model_key
     filename = SAVED_HTML_METHOD_FILES.get(method, f"{method}.html")
     html_path = output_dir / filename
 

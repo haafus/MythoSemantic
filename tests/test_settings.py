@@ -18,13 +18,6 @@ def test_derived_paths():
     assert s.corpus_metadata_path == Path("outputs/corpus/corpus.json")
 
 
-def test_model_output_dir():
-    from settings import Settings
-
-    s = Settings()
-    assert s.model_output_dir("BAAI/bge-m3") == Path("outputs/projections/BAAI_bge-m3")
-    assert s.model_output_dir("sentence-transformers/LaBSE") == Path("outputs/projections/sentence-transformers_LaBSE")
-
 
 def test_env_override(monkeypatch):
     monkeypatch.setenv("MYTHO_CORPUS_DIR", "/tmp/my_corpus")

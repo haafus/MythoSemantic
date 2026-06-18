@@ -2,11 +2,9 @@ from unittest.mock import patch
 
 from model_registry import key_to_model, model_to_key
 from server.services.models import (
-    get_model_output_dir,
     list_model_summaries,
     list_models_raw,
 )
-from settings import settings
 
 
 class TestModelToKey:
@@ -54,8 +52,3 @@ class TestListModelSummaries:
         assert result[0]["safe_dir"] == "BAAI_bge-m3"
 
 
-class TestGetModelOutputDir:
-    def test_returns_path(self, tmp_path, monkeypatch):
-        monkeypatch.setattr(settings, "projections_dir", tmp_path)
-        result = get_model_output_dir("BAAI_bge-m3")
-        assert result.parent == tmp_path
