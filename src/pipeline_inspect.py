@@ -234,7 +234,8 @@ def projections_orphans(settings) -> list[dict[str, Any]]:
     if "error" in emb_info:
         return []
 
-    known_dirs = {settings.safe_model_name(c["model"]) for c in emb_info["collections"]}
+    from model_registry import model_to_key
+    known_dirs = {model_to_key(c["model"]) for c in emb_info["collections"]}
 
     return [m for m in info["models"] if m["name"] not in known_dirs]
 

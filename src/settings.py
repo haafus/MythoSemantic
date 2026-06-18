@@ -104,11 +104,8 @@ class Settings(BaseSettings):
     def assets_dir(self) -> Path:
         return self.web_root / "assets"
 
-    @staticmethod
-    def safe_model_name(model_name: str) -> str:
-        return model_name.replace("/", "_").replace("\\", "_")
-
     def model_output_dir(self, model_name: str) -> Path:
-        return self.projections_dir / self.safe_model_name(model_name)
+        from model_registry import model_to_key
+        return self.projections_dir / model_to_key(model_name)
 
 settings = Settings()

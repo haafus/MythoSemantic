@@ -6,7 +6,7 @@ from typing import Any
 
 import numpy as np
 
-from server.services.models import key_to_model
+from model_registry import key_to_model
 
 logger = logging.getLogger(__name__)
 

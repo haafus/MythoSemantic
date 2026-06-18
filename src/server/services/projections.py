@@ -5,7 +5,8 @@ import struct
 from functools import lru_cache
 from pathlib import Path
 
-from server.services.models import get_model_output_dir, key_to_model, model_to_key
+from model_registry import key_to_model, model_to_key
+from server.services.models import get_model_output_dir
 
 SAVED_HTML_METHOD_FILES = {
     "umap": "umap_2d_traditions.html",
