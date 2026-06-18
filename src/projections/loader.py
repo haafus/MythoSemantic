@@ -53,12 +53,8 @@ class EmbeddingDataLoader:
 
         for i, doc_id in enumerate(ids):
             try:
-                if i >= len(embeddings) or embeddings[i] is None:
-                    continue
-
-                meta = metadatas[i] if i < len(metadatas) else {}
-                doc = documents[i] if i < len(documents) else ""
-
+                meta = metadatas[i]
+                doc = documents[i]
                 embedding = np.array(embeddings[i]) if isinstance(embeddings[i], list) else embeddings[i]
 
                 batch_data.append(
