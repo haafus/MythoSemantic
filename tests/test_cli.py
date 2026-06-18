@@ -53,7 +53,5 @@ class TestBuildCommand:
         result = runner.invoke(mytho, ["build", "--help"])
         assert result.exit_code == 0
         assert "--force" in result.output
-        assert "--skip-corpus" in result.output
-        assert "--skip-embeddings" in result.output
-        assert "--skip-projections" in result.output
-        assert "--skip-graphs" in result.output
+        assert "--model" in result.output
+        assert "--llm-model" in result.output

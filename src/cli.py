@@ -133,23 +133,16 @@ def server(host: str | None, port: int | None):
 @click.option("--model", "-m", default=None, help="Embedding model (default from config).")
 @click.option("--llm-model", default=None, help="LLM model for graphs (from config/models.json).")
 @click.option("--force", is_flag=True, help="Force regeneration of all steps.")
-@click.option("--skip-corpus", is_flag=True, help="Skip corpus download.")
-@click.option("--skip-embeddings", is_flag=True, help="Skip embedding generation.")
-@click.option("--skip-projections", is_flag=True, help="Skip projections generation.")
-@click.option("--skip-graphs", is_flag=True, help="Skip graph extraction.")
-def build(model, llm_model, force, skip_corpus, skip_embeddings, skip_projections, skip_graphs):
+def build(model, llm_model, force):
     """Run the full analysis pipeline end-to-end."""
     steps = [
-        ("Corpus", skip_corpus, _build_corpus, {"force": force}),
-        ("Embeddings", skip_embeddings, _build_embeddings, {"model": model, "force": force}),
-        ("Projections", skip_projections, _build_projections, {"model": model, "force": force}),
-        ("Graphs", skip_graphs, _build_graphs, {"llm_model": llm_model, "force": force}),
+        ("Corpus", _build_corpus, {"force": force}),
+        ("Embeddings", _build_embeddings, {"model": model, "force": force}),
+        ("Projections", _build_projections, {"model": model, "force": force}),
+        ("Graphs", _build_graphs, {"llm_model": llm_model, "force": force}),
     ]
 
-    for name, skip, fn, kwargs in steps:
-        if skip:
-            click.echo(click.style(f"[skip] {name}", fg="yellow"))
-            continue
+    for name, fn, kwargs in steps:
         click.echo(click.style(f"[start] {name}", fg="cyan", bold=True))
         try:
             fn(**kwargs)
