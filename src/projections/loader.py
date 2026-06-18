@@ -103,8 +103,6 @@ class EmbeddingDataLoader:
     def get_available_models(self) -> list[str]:
         models: set[str] = set()
         for collection in self._iter_collections():
-            model = (collection.metadata or {}).get("model")
-            if model:
-                models.add(model)
+            models.add(collection.metadata["model"])
         return sorted(models)
 
