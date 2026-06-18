@@ -35,9 +35,6 @@ def mytho():
     setup_logging()
 
 
-# ---------------------------------------------------------------------------
-# corpus
-# ---------------------------------------------------------------------------
 @mytho.command()
 @click.option("--force", "-f", is_flag=True, help="Overwrite existing files.")
 def corpus(force: bool):
@@ -47,9 +44,6 @@ def corpus(force: bool):
     build_corpus(force=force)
 
 
-# ---------------------------------------------------------------------------
-# embeddings
-# ---------------------------------------------------------------------------
 @mytho.command()
 @click.option("--model", "-m", default=None, help="Embedding model to use.")
 @click.option("--force", "-f", is_flag=True, help="Regenerate even if collection exists.")
@@ -60,9 +54,6 @@ def embeddings(model: str | None, force: bool):
     build_embeddings(model_name=model, force=force)
 
 
-# ---------------------------------------------------------------------------
-# projections
-# ---------------------------------------------------------------------------
 @mytho.command()
 @click.option("--model", "-m", default=None, help="Embedding model name (all models if omitted).")
 @click.option("--motif-analysis", is_flag=True, help="Generate motif UMAP from LLM plot summaries.")
@@ -74,9 +65,6 @@ def projections(model: str | None, motif_analysis: bool, force: bool):
     analyze_embeddings(model_name=model, motif_analysis=motif_analysis, force=force)
 
 
-# ---------------------------------------------------------------------------
-# graphs
-# ---------------------------------------------------------------------------
 @mytho.command()
 @click.option("--model", "-m", default=None, help="LLM model name from config/models.json registry.")
 @click.option("--force", "-f", is_flag=True, help="Overwrite existing graph outputs.")
@@ -87,9 +75,6 @@ def graphs(model: str | None, force: bool):
     generate_graphs(llm=model, force=force)
 
 
-# ---------------------------------------------------------------------------
-# server
-# ---------------------------------------------------------------------------
 @mytho.command()
 @click.option("--host", "-h", default=None, help="Bind address (default from config).")
 @click.option("--port", "-p", default=None, type=int, help="Port (default from config).")
@@ -107,9 +92,6 @@ def server(host: str | None, port: int | None):
     )
 
 
-# ---------------------------------------------------------------------------
-# build — run everything end-to-end
-# ---------------------------------------------------------------------------
 SAMPLE_MAX_TEXTS = 3
 
 
@@ -184,9 +166,6 @@ def _build_graphs(llm: str | None = None, force: bool = False, max_texts: int | 
     generate_graphs(llm=llm, force=force, max_texts=max_texts)
 
 
-# ---------------------------------------------------------------------------
-# status
-# ---------------------------------------------------------------------------
 @mytho.command()
 def status():
     """Show the current state of the data pipeline."""
@@ -260,9 +239,6 @@ def _header(name: str, size: int):
     click.echo(f"{name}:  {format_size(size)}")
 
 
-# ---------------------------------------------------------------------------
-# clean
-# ---------------------------------------------------------------------------
 @mytho.command()
 @click.option("--apply", is_flag=True, help="Actually delete orphan files (default is dry run).")
 def clean(apply: bool):
