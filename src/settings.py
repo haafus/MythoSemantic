@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from pydantic_settings import BaseSettings
 
 # ---------------------------------------------------------------------------
@@ -61,8 +61,6 @@ class ServerSettings(BaseModel):
 
 
 class Settings(BaseSettings):
-    project_root: Path = Field(default_factory=lambda: Path(__file__).resolve().parent.parent)
-
     corpus_dir: Path = Path("outputs/corpus")
     embeddings_dir: Path = Path("outputs/embeddings")
     projections_dir: Path = Path("outputs/projections")
@@ -93,12 +91,8 @@ class Settings(BaseSettings):
         return self.corpus_dir / "corpus.json"
 
     @property
-    def server_dir(self) -> Path:
-        return self.project_root / "src" / "server"
-
-    @property
     def web_root(self) -> Path:
-        return self.server_dir / "web"
+        return Path("src/server/web")
 
     @property
     def assets_dir(self) -> Path:

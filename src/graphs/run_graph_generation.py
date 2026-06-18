@@ -163,7 +163,7 @@ def deduplicate_relations(relations: list[dict]) -> list[dict]:
 
 
 def generate_graphs(llm: str | None = None, force: bool = False, max_texts: int | None = None) -> None:
-    prompts_path = settings.project_root / "config" / "graphs_prompts.json"
+    prompts_path = Path("config/graphs_prompts.json")
     try:
         prompts = json.loads(prompts_path.read_text(encoding="utf-8"))
     except Exception:
