@@ -36,18 +36,9 @@ def corpus(force: bool):
 @click.option("--force", is_flag=True, help="Regenerate even if collection exists.")
 def embeddings(model: str | None, force: bool):
     """Generate embeddings for the corpus."""
-    import time
-
     from embedding.build_embeddings import build_embeddings
 
-    t0 = time.monotonic()
-    try:
-        build_embeddings(model_name=model, force=force)
-        elapsed = time.monotonic() - t0
-        click.echo(click.style(f"Embeddings generated successfully in {elapsed:.1f}s", fg="green"))
-    except Exception as e:
-        click.echo(click.style(f"Error: {e}", fg="red"), err=True)
-        raise
+    build_embeddings(model_name=model, force=force)
 
 
 # ---------------------------------------------------------------------------
