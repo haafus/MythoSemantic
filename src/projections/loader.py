@@ -20,7 +20,7 @@ class EmbeddingDataLoader:
         return list(self.client.list_collections())
 
     def load_data(
-        self, model_name: str | None = None, batch_size: int = 5000, max_records: int | None = None
+        self, model_name: str | None = None, batch_size: int = 5000
     ) -> list[dict[str, Any]]:
         all_data: list[dict[str, Any]] = []
 
@@ -28,10 +28,6 @@ class EmbeddingDataLoader:
             offset = 0
 
             while True:
-                if max_records and len(all_data) >= max_records:
-                    logger.info(f"Record limit reached: {max_records}")
-                    return all_data[:max_records]
-
                 try:
                     results = collection.get(
                         limit=batch_size,
