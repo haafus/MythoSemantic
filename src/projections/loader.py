@@ -19,35 +19,14 @@ class EmbeddingDataLoader:
             col.metadata["model"] for col in self.client.list_collections()
         )
 
-    def load_data(
-        self, model_name: str, batch_size: int = 5000
-    ) -> tuple[list[dict[str, Any]], np.ndarray]:
+    def load_data(self, model_name: str) -> tuple[list[dict[str, Any]], np.ndarray]:
         collection = self.client.get_collection(name=collection_name_for_model(model_name))
-        all_records: list[dict[str, Any]] = []
-        all_embeddings: list[list[float]] = []
-        offset = 0
+        results = collection.get(include=["embeddings", "metadatas", "documents"])
 
-        while True:
-            results = collection.get(
-                limit=batch_size,
-                offset=offset,
-                include=["embeddings", "metadatas", "documents"],
-            )
-
-            if not results.get("ids"):
-                break
-
-            for meta, emb, doc in zip(
-                results["metadatas"], results["embeddings"], results["documents"], strict=True
-            ):
-                all_records.append({**meta, "text": doc})
-                all_embeddings.append(emb)
-
-            offset += batch_size
-
-            if len(results["ids"]) < batch_size:
-                break
-
-        embeddings = np.array(all_embeddings, dtype=np.float32) if all_embeddings else np.empty((0, 0), dtype=np.float32)
-        return all_records, embeddings
+        records = [
+            {**meta, "text": doc}
+            for meta, doc in zip(results["metadatas"], results["documents"], strict=True)
+        ]
+        embeddings = np.array(results["embeddings"], dtype=np.float32) if records else np.empty((0, 0), dtype=np.float32)
+        return records, embeddings
 
