@@ -51,7 +51,7 @@ class EmbeddingBuilder:
         self.current_chunking = self._chunking_strategies[strategy_name]
 
     def _chunk_text(self, text: str) -> list[str]:
-        if not text or not text.strip():
+        if not text:
             return []
         return [chunk for chunk in self.current_chunking(text) if chunk.strip()]
 
