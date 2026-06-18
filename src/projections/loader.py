@@ -120,12 +120,3 @@ class EmbeddingDataLoader:
             logger.exception("Failed to get available models")
             return []
 
-    def close(self):
-        if hasattr(self, "client"):
-            self.client = None
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close()
