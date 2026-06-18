@@ -79,27 +79,3 @@ def delete_collection(client: chromadb.PersistentClient, collection_name: str) -
         raise
 
 
-def query_chroma_collection(
-    collection: chromadb.Collection,
-    query_embedding: list[float],
-    top_k: int = 5,
-) -> list[dict[str, Any]]:
-    results = collection.query(
-        query_embeddings=[query_embedding],
-        n_results=top_k,
-        include=["documents", "metadatas", "distances"],
-    )
-
-    if not results or not results.get("documents") or not results["documents"][0]:
-        return []
-
-    formatted = []
-    for doc, meta, dist in zip(results["documents"][0], results["metadatas"][0], results["distances"][0], strict=False):
-        formatted.append(
-            {
-                "document": doc,
-                "metadata": meta,
-                "distance": dist,
-            }
-        )
-    return formatted

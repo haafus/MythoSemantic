@@ -7,10 +7,7 @@ import chromadb
 import numpy as np
 from tqdm import tqdm
 
-from .chroma_manager import (
-    collection_name_for_model,
-    query_chroma_collection,
-)
+from .chroma_manager import collection_name_for_model
 from .chroma_writer import ChromaWriter
 from .chunking import create_chunking_strategies
 from corpus.corpus_iterator import iter_corpus_files
@@ -179,16 +176,6 @@ class EmbeddingBuilder:
         if encode_seconds > 0 and encode_tokens > 0:
             speed = encode_tokens / encode_seconds
             logger.info(f"Embedding speed: {speed:,.0f} tokens/sec (batch_size={batch_size}, {encode_tokens:,} tokens in {encode_seconds:.1f}s)")
-
-    def query_chroma(self, query: str, top_k: int = 5) -> list[dict[str, Any]]:
-        collection_name = collection_name_for_model(self._models.model_name)
-        try:
-            collection = self.chroma_client.get_collection(name=collection_name)
-        except Exception as err:
-            raise RuntimeError(f"Collection '{collection_name}' not found in ChromaDB.") from err
-
-        query_embedding = self._generate_embeddings([query])[0]
-        return query_chroma_collection(collection=collection, query_embedding=query_embedding.tolist(), top_k=top_k)
 
     # --- Resource management -----------------------------------------------
 
