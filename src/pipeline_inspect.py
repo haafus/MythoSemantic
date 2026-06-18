@@ -231,6 +231,9 @@ def projections_orphans(settings) -> list[dict[str, Any]]:
         return []
 
     emb_info = embeddings_status(settings)
+    if "error" in emb_info:
+        return []
+
     known_dirs = {settings.safe_model_name(c["model"]) for c in emb_info["collections"]}
 
     return [m for m in info["models"] if m["name"] not in known_dirs]
