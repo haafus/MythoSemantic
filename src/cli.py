@@ -6,26 +6,6 @@ import click
 from log_setup import setup_logging
 
 
-class _LazyEmbeddingGroup(click.Group):
-    """Defers import of embedding.cli until a subcommand is actually invoked."""
-
-    _loaded = False
-
-    def _load(self):
-        if not self._loaded:
-            from embedding.cli import generate
-
-            for cmd in [generate]:
-                self.add_command(cmd)
-            self._loaded = True
-
-    def list_commands(self, ctx):
-        self._load()
-        return super().list_commands(ctx)
-
-    def get_command(self, ctx, cmd_name):
-        self._load()
-        return super().get_command(ctx, cmd_name)
 
 
 @click.group()
@@ -49,16 +29,25 @@ def corpus(force: bool):
 
 
 # ---------------------------------------------------------------------------
-# embeddings — delegate to the existing click group
+# embeddings
 # ---------------------------------------------------------------------------
-@mytho.group(cls=_LazyEmbeddingGroup)
-@click.option("--verbose", "-v", is_flag=True, help="Enable verbose output.")
-@click.pass_context
-def embeddings(ctx, verbose: bool):
-    """Generate, query, and manage embeddings."""
-    ctx.ensure_object(dict)
-    if verbose:
-        logging.getLogger().setLevel(logging.DEBUG)
+@mytho.command()
+@click.option("--model", "-m", default=None, help="Embedding model to use.")
+@click.option("--force", is_flag=True, help="Regenerate even if collection exists.")
+def embeddings(model: str | None, force: bool):
+    """Generate embeddings for the corpus."""
+    import time
+
+    from embedding.build_embeddings import build_embeddings
+
+    t0 = time.monotonic()
+    try:
+        build_embeddings(model_name=model, force=force)
+        elapsed = time.monotonic() - t0
+        click.echo(click.style(f"Embeddings generated successfully in {elapsed:.1f}s", fg="green"))
+    except Exception as e:
+        click.echo(click.style(f"Error: {e}", fg="red"), err=True)
+        raise
 
 
 # ---------------------------------------------------------------------------
