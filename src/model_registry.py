@@ -54,7 +54,7 @@ def list_embedding_aliases() -> dict[str, str]:
 
 
 def model_to_key(model_name: str) -> str:
-    return (model_name or "").replace("/", "_").replace("\\", "_")
+    return (model_name or "").replace("/", "_")
 
 
 def key_to_model(model_key: str) -> str:
