@@ -62,6 +62,7 @@ def analyze_embeddings(
             if motif_analysis:
                 _generate_motif_plot(analyzer, force=force)
 
+        logger.info("Projection analysis complete.")
         return analyzer
 
     except Exception:

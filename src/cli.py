@@ -60,7 +60,6 @@ def corpus(force: bool):
     from corpus.builder import build_corpus
 
     build_corpus(force=force)
-    click.echo(click.style("Corpus build completed.", fg="green"))
 
 
 # ---------------------------------------------------------------------------
@@ -74,7 +73,6 @@ def embeddings(model: str | None, force: bool):
     from embedding.build_embeddings import build_embeddings
 
     build_embeddings(model_name=model, force=force)
-    click.echo(click.style("Embedding generation completed.", fg="green"))
 
 
 # ---------------------------------------------------------------------------
@@ -89,7 +87,6 @@ def projections(model: str | None, motif_analysis: bool, force: bool):
     from projections.run_analysis import analyze_embeddings
 
     analyze_embeddings(model_name=model, motif_analysis=motif_analysis, force=force)
-    click.echo(click.style("Projection analysis completed.", fg="green"))
 
 
 # ---------------------------------------------------------------------------
@@ -103,7 +100,6 @@ def graphs(model: str | None, force: bool):
     from graphs.run_graph_generation import generate_graphs
 
     generate_graphs(llm=model, force=force)
-    click.echo(click.style("Graph generation completed.", fg="green"))
 
 
 # ---------------------------------------------------------------------------

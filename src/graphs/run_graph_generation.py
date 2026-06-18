@@ -276,3 +276,5 @@ def generate_graphs(llm: str | None = None, force: bool = False, max_texts: int 
 
         except Exception:
             logger.exception("Error saving files or generating graph for %s", book_id)
+
+    logger.info("Graph generation complete.")
