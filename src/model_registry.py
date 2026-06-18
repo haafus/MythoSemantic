@@ -58,4 +58,4 @@ def model_to_key(model_name: str) -> str:
 
 
 def key_to_model(model_key: str) -> str:
-    return model_key.replace("_", "/") if model_key else model_key
+    return model_key.replace("_", "/")
