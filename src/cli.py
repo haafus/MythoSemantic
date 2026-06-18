@@ -92,9 +92,6 @@ def server(host: str | None, port: int | None):
     )
 
 
-SAMPLE_MAX_TEXTS = 3
-
-
 @mytho.command()
 @click.option("--model", "-m", default=None, help="Embedding model (default from config).")
 @click.option("--llm", default=None, help="LLM model for graphs (from config/models.json).")
@@ -105,7 +102,7 @@ def build(model, llm, force, sample):
     if sample:
         from model_registry import active_embedding_models
         model = model or active_embedding_models()[0]
-        max_texts = SAMPLE_MAX_TEXTS
+        max_texts = 3
         click.echo(click.style(f"[sample] model={model}, max_texts={max_texts}", fg="yellow"))
     else:
         max_texts = None
