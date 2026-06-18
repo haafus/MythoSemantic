@@ -1,6 +1,6 @@
-"""Chroma query functionality, removed from CLI.
+"""Chroma query and collection removal, removed from CLI.
 
-Usage example:
+Usage example (query):
     from embedding.builder import EmbeddingBuilder
     builder = EmbeddingBuilder(embedding_model="BAAI/bge-m3")
     results = builder.query_chroma("creation of the world", top_k=5)
@@ -51,3 +51,16 @@ def query_chroma_collection(
             }
         )
     return formatted
+
+
+def delete_chroma_collection(model: str) -> None:
+    """Was CLI command `mytho embeddings remove --model <model>`."""
+    from embedding.chroma_manager import collection_name_for_model, delete_collection
+    from model_registry import resolve_embedding_model
+    from settings import settings
+
+    model_name = resolve_embedding_model(model)
+    collection = collection_name_for_model(model_name)
+    client = chromadb.PersistentClient(path=str(settings.chroma_dir))
+    deleted = delete_collection(client, collection)
+    print(f"Collection '{collection}' {'deleted' if deleted else 'does not exist'}")
