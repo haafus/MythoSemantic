@@ -222,11 +222,11 @@ def _plot_umap_scatter(
 
 def plot_interactive_2d(
     data: list[dict],
+    embeddings: np.ndarray,
     save_html: bool = True,
     output_dir: Path | None = None,
     model_name: str | None = None,
 ) -> go.Figure | None:
-    embeddings = np.stack([item["embedding"] for item in data])
     return _plot_umap_scatter(
         data, embeddings,
         title_prefix="UMAP visualization by tradition",
@@ -239,11 +239,11 @@ def plot_interactive_2d(
 
 def plot_residual_umap(
     data: list[dict],
+    embeddings: np.ndarray,
     save_html: bool = True,
     output_dir: Path | None = None,
     model_name: str | None = None,
 ) -> go.Figure | None:
-    embeddings = np.stack([item["embedding"] for item in data])
     residuals = _compute_tradition_residuals(data, embeddings)
     return _plot_umap_scatter(
         data, residuals,
@@ -257,11 +257,11 @@ def plot_residual_umap(
 
 def plot_residual_normalized_umap(
     data: list[dict],
+    embeddings: np.ndarray,
     save_html: bool = True,
     output_dir: Path | None = None,
     model_name: str | None = None,
 ) -> go.Figure | None:
-    embeddings = np.stack([item["embedding"] for item in data])
     residuals = _compute_tradition_residuals(data, embeddings)
     residuals = Normalizer(norm="l2").fit_transform(residuals)
     return _plot_umap_scatter(
@@ -276,11 +276,11 @@ def plot_residual_normalized_umap(
 
 def plot_rlace_umap(
     data: list[dict],
+    embeddings: np.ndarray,
     save_html: bool = True,
     output_dir: Path | None = None,
     model_name: str | None = None,
 ) -> go.Figure | None:
-    embeddings = np.stack([item["embedding"] for item in data])
     erased = _concept_erasure(data, embeddings)
     return _plot_umap_scatter(
         data, erased,
@@ -293,17 +293,18 @@ def plot_rlace_umap(
 
 
 def plot_distance_heatmap(
-    data: list[dict], output_dir: Path | None = None, model_name: str | None = None, save_html: bool = True
+    data: list[dict], embeddings: np.ndarray,
+    output_dir: Path | None = None, model_name: str | None = None, save_html: bool = True
 ) -> go.Figure | None:
     if output_dir is None:
         output_dir = settings.projections_dir
 
     traditions_data: dict[str, list] = {}
-    for item in data:
+    for item, emb in zip(data, embeddings, strict=True):
         trad = item.get("tradition", "unknown")
         if trad not in traditions_data:
             traditions_data[trad] = []
-        traditions_data[trad].append(item["embedding"])
+        traditions_data[trad].append(emb)
 
     centroids = {}
     for trad, embeddings in traditions_data.items():
@@ -353,7 +354,8 @@ def plot_distance_heatmap(
 
 
 def plot_tradition_distribution(
-    data: list[dict], output_dir: Path | None = None, model_name: str | None = None, save_html: bool = True
+    data: list[dict], embeddings: np.ndarray,
+    output_dir: Path | None = None, model_name: str | None = None, save_html: bool = True
 ) -> go.Figure | None:
     if output_dir is None:
         output_dir = settings.projections_dir

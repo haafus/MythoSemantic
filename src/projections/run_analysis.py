@@ -72,6 +72,7 @@ def analyze_embeddings(
 
 def _generate_all_plots(analyzer: EmbeddingAnalyzer, force: bool = False) -> None:
     data = analyzer.data
+    embeddings = analyzer.embeddings
     out = analyzer.output_dir
 
     umap_plots = [
@@ -92,7 +93,7 @@ def _generate_all_plots(analyzer: EmbeddingAnalyzer, force: bool = False) -> Non
             continue
         logger.info("Generating %s...", label)
         try:
-            plot_fn(data, output_dir=out, model_name=analyzer.model_name)
+            plot_fn(data, embeddings, output_dir=out, model_name=analyzer.model_name)
             generated = True
         except Exception:
             logger.exception("Error creating %s", label)
@@ -103,7 +104,7 @@ def _generate_all_plots(analyzer: EmbeddingAnalyzer, force: bool = False) -> Non
             continue
         logger.info("Generating %s...", label)
         try:
-            plot_fn(data, output_dir=out, model_name=analyzer.model_name)
+            plot_fn(data, embeddings, output_dir=out, model_name=analyzer.model_name)
             generated = True
         except Exception:
             logger.exception("Error creating %s", label)

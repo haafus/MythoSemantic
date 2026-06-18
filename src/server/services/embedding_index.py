@@ -93,12 +93,11 @@ class EmbeddingIndexService:
     def _load_index(self, model_name: str) -> ModelIndex:
         from projections.loader import EmbeddingDataLoader
 
-        items = EmbeddingDataLoader().load_data(model_name=model_name)
+        items, embeddings = EmbeddingDataLoader().load_data(model_name=model_name)
         if not items:
             raise KeyError(f"No embedding data found for {model_name}")
 
-        matrix = np.stack([item["embedding"] for item in items]).astype(np.float32)
-        normalized_matrix = self._normalize_matrix(matrix)
+        normalized_matrix = self._normalize_matrix(embeddings)
         id_to_index: dict[str, int] = {}
         for idx, item in enumerate(items):
             point_id = item["text_id"]

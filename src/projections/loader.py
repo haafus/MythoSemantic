@@ -21,9 +21,10 @@ class EmbeddingDataLoader:
 
     def load_data(
         self, model_name: str, batch_size: int = 5000
-    ) -> list[dict[str, Any]]:
+    ) -> tuple[list[dict[str, Any]], np.ndarray]:
         collection = self.client.get_collection(name=collection_name_for_model(model_name))
-        all_data: list[dict[str, Any]] = []
+        all_records: list[dict[str, Any]] = []
+        all_embeddings: list[list[float]] = []
         offset = 0
 
         while True:
@@ -36,20 +37,17 @@ class EmbeddingDataLoader:
             if not results.get("ids"):
                 break
 
-            all_data.extend(self._process_batch(results))
+            for meta, emb, doc in zip(
+                results["metadatas"], results["embeddings"], results["documents"], strict=True
+            ):
+                all_records.append({**meta, "text": doc})
+                all_embeddings.append(emb)
+
             offset += batch_size
 
             if len(results["ids"]) < batch_size:
                 break
 
-        return all_data
-
-    @staticmethod
-    def _process_batch(results: dict) -> list[dict[str, Any]]:
-        return [
-            {**meta, "embedding": np.array(emb), "text": doc}
-            for meta, emb, doc in zip(
-                results["metadatas"], results["embeddings"], results["documents"], strict=True
-            )
-        ]
+        embeddings = np.array(all_embeddings, dtype=np.float32) if all_embeddings else np.empty((0, 0), dtype=np.float32)
+        return all_records, embeddings
 

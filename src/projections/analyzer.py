@@ -2,6 +2,8 @@ import logging
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+
 from settings import settings
 
 from .loader import EmbeddingDataLoader
@@ -13,6 +15,7 @@ class EmbeddingAnalyzer:
     def __init__(self, model_name: str | None = None):
         self.model_name: str | None = None
         self.data: list[dict[str, Any]] = []
+        self.embeddings: np.ndarray = np.empty((0, 0), dtype=np.float32)
         self.output_dir: Path = settings.projections_dir
 
         if model_name:
@@ -25,7 +28,7 @@ class EmbeddingAnalyzer:
 
         logger.info(f"Loading data for model: {model_name}...")
         loader = EmbeddingDataLoader()
-        self.data = loader.load_data(model_name=model_name)
+        self.data, self.embeddings = loader.load_data(model_name=model_name)
 
         if not self.data:
             logger.warning(f"No data found for model '{model_name}' ")
