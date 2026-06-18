@@ -5,7 +5,7 @@ from typing import Any
 import chromadb
 import numpy as np
 
-from embeddings.chroma_manager import collection_name_for_model, is_model_collection_name
+from embeddings.chroma_manager import collection_name_for_model
 from settings import settings
 
 logger = logging.getLogger(__name__)
@@ -15,7 +15,6 @@ class EmbeddingDataLoader:
     def __init__(self, auto_migrate: bool = True):
         self.client = chromadb.PersistentClient(path=str(settings.embeddings_dir))
         self._metadata_map: dict[str, str] | None = None
-        self._collection_names_cache: dict[str, list[str]] = {}
 
         if auto_migrate:
             self._auto_migrate_all()
@@ -28,20 +27,9 @@ class EmbeddingDataLoader:
             return []
 
     def _resolve_collection_names(self, model_name: str | None = None) -> list[str]:
-        cache_key = model_name or "*"
-        if cache_key in self._collection_names_cache:
-            return self._collection_names_cache[cache_key]
-
-        available = [name for name in self._list_collection_names() if is_model_collection_name(name)]
-
         if model_name:
-            expected_name = collection_name_for_model(model_name)
-            names = [expected_name] if expected_name in available else []
-        else:
-            names = available
-
-        self._collection_names_cache[cache_key] = names
-        return names
+            return [collection_name_for_model(model_name)]
+        return self._list_collection_names()
 
     def _iter_collections(self, model_name: str | None = None):
         names = self._resolve_collection_names(model_name=model_name)
