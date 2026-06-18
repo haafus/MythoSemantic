@@ -133,7 +133,7 @@ def server(host: str | None, port: int | None):
 # ---------------------------------------------------------------------------
 # build — run everything end-to-end
 # ---------------------------------------------------------------------------
-SAMPLE_MAX_TEXTS = 5
+SAMPLE_MAX_TEXTS = 3
 
 
 @mytho.command()
