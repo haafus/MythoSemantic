@@ -44,34 +44,12 @@ class EmbeddingDataLoader:
 
         return all_data
 
-    def _process_batch(self, results: dict) -> list[dict[str, Any]]:
-        batch_data = []
-        ids = results.get("ids", [])
-        embeddings = results.get("embeddings", [])
-        metadatas = results.get("metadatas", [])
-        documents = results.get("documents", [])
-
-        for i, doc_id in enumerate(ids):
-            try:
-                meta = metadatas[i]
-                doc = documents[i]
-                embedding = np.array(embeddings[i])
-
-                batch_data.append(
-                    {
-                        "text_id": meta["text_id"],
-                        "tradition": meta["tradition"],
-                        "major_tradition": meta["major_tradition"],
-                        "chunk_index": meta["chunk_index"],
-                        "embedding": embedding,
-                        "text": doc,
-                        "filename": meta["filename"],
-                        "url": meta["url"],
-                    }
-                )
-            except Exception as e:
-                logger.warning(f"Failed to process document {doc_id}: {e}")
-                continue
-
-        return batch_data
+    @staticmethod
+    def _process_batch(results: dict) -> list[dict[str, Any]]:
+        return [
+            {**meta, "embedding": np.array(emb), "text": doc}
+            for meta, emb, doc in zip(
+                results["metadatas"], results["embeddings"], results["documents"], strict=True
+            )
+        ]
 
