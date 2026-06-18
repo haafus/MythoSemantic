@@ -259,7 +259,7 @@ def graphs_orphans(settings) -> list[tuple[Path, int]]:
     """Find orphan graph directories in graphs_dir.
 
     Matches subdirectory names against normalized text_ids from corpus.
-    If corpus metadata is missing, all graph directories are orphans.
+    If corpus metadata is missing, returns [] (can't determine orphans).
     """
     from corpus.corpus_iterator import normalize_catalog_id
 
@@ -267,19 +267,19 @@ def graphs_orphans(settings) -> list[tuple[Path, int]]:
     if not graphs_dir.exists():
         return []
 
-    subdirs = [d for d in graphs_dir.iterdir() if d.is_dir()]
-    if not subdirs:
+    meta_path = settings.corpus_metadata_path
+    if not meta_path.exists():
         return []
 
-    meta_path = settings.corpus_metadata_path
-    known_text_ids: set[str] = set()
-    if meta_path.exists():
-        try:
-            with open(meta_path, encoding="utf-8") as f:
-                meta_entries = json.load(f)
-            known_text_ids = {normalize_catalog_id(e["id"]) for e in meta_entries if e.get("id")}
-        except Exception:
-            pass
+    try:
+        with open(meta_path, encoding="utf-8") as f:
+            meta_entries = json.load(f)
+    except Exception:
+        return []
+
+    known_text_ids = {normalize_catalog_id(e["id"]) for e in meta_entries if e.get("id")}
+
+    subdirs = [d for d in graphs_dir.iterdir() if d.is_dir()]
 
     orphans = []
     for item in subdirs:

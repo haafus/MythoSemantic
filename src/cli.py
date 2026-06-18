@@ -309,10 +309,7 @@ def clean(apply: bool):
             name = path.name
             click.echo(f"  {name:<50} {format_size(size):>8}")
             if apply:
-                if path.is_dir():
-                    shutil.rmtree(path)
-                else:
-                    path.unlink(missing_ok=True)
+                shutil.rmtree(path)
         click.echo()
 
     if total_items == 0:

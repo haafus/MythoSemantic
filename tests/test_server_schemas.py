@@ -154,5 +154,5 @@ class TestSavedPlotResponse:
         assert r.url is None
 
     def test_found(self):
-        r = SavedPlotResponse(exists=True, url="/analysis/model/plot.html", path="/tmp/plot.html")
+        r = SavedPlotResponse(exists=True, url="/projections/model/plot.html", path="/tmp/plot.html")
         assert r.exists
