@@ -6,9 +6,41 @@ import click
 from log_setup import setup_logging
 
 
+COMMAND_ORDER = [
+    "corpus", "embeddings", "projection", "graphs",
+    None,
+    "build", "status", "clean", "server",
+]
 
 
-@click.group()
+class OrderedGroup(click.Group):
+    def format_commands(self, ctx, formatter):
+        commands = []
+        for name in COMMAND_ORDER:
+            if name is None:
+                commands.append((None, None))
+            elif name in self.commands:
+                cmd = self.commands[name]
+                help_text = cmd.get_short_help_str(limit=formatter.width)
+                commands.append((name, help_text))
+
+        if commands:
+            labels = iter(["Pipeline", "Management"])
+            section: list[tuple[str, str]] = []
+            for name, help_text in commands:
+                if name is None:
+                    if section:
+                        with formatter.section(next(labels)):
+                            formatter.write_dl(section)
+                        section = []
+                else:
+                    section.append((name, help_text or ""))
+            if section:
+                with formatter.section(next(labels)):
+                    formatter.write_dl(section)
+
+
+@click.group(cls=OrderedGroup)
 @click.version_option(package_name="mythoscope")
 def mytho():
     """MythoScope — computational framework for comparative mythology."""
