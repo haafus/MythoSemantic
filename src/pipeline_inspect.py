@@ -143,6 +143,9 @@ def embeddings_orphan_chunks(settings, *, skip_collections: set[str] | None = No
     if not chroma_path.exists():
         return []
 
+    if skip_collections is None:
+        skip_collections = {c["name"] for c in embeddings_orphan_collections(settings)}
+
     meta_path = settings.corpus_metadata_path
     if not meta_path.exists():
         return []
@@ -154,8 +157,6 @@ def embeddings_orphan_chunks(settings, *, skip_collections: set[str] | None = No
         return []
 
     known_text_ids = {normalize_catalog_id(e["id"]) for e in meta_entries if e.get("id")}
-    skip = skip_collections or set()
-
     results = []
     try:
         import chromadb
@@ -165,7 +166,7 @@ def embeddings_orphan_chunks(settings, *, skip_collections: set[str] | None = No
         for col in client.list_collections():
             if not is_model_collection_name(col.name):
                 continue
-            if col.name in skip:
+            if col.name in skip_collections:
                 continue
             all_meta = col.get(include=["metadatas"])
             orphan_ids = []
