@@ -5,10 +5,9 @@ import click
 from log_setup import setup_logging
 
 
-COMMAND_ORDER = [
-    "corpus", "embeddings", "projections", "graphs",
-    None,
-    "build", "status", "clean", "server",
+COMMAND_SECTIONS = [
+    ("Pipeline", ["corpus", "embeddings", "projections", "graphs"]),
+    ("Management", ["build", "status", "clean", "server"]),
 ]
 
 
@@ -18,29 +17,15 @@ class OrderedGroup(click.Group):
         formatter.write("\nRun 'mytho COMMAND --help' for details on a specific command.\n")
 
     def format_commands(self, ctx, formatter):
-        commands = []
-        for name in COMMAND_ORDER:
-            if name is None:
-                commands.append((None, None))
-            elif name in self.commands:
-                cmd = self.commands[name]
-                help_text = cmd.get_short_help_str(limit=formatter.width)
-                commands.append((name, help_text))
-
-        if commands:
-            labels = iter(["Pipeline", "Management"])
-            section: list[tuple[str, str]] = []
-            for name, help_text in commands:
-                if name is None:
-                    if section:
-                        with formatter.section(next(labels)):
-                            formatter.write_dl(section)
-                        section = []
-                else:
-                    section.append((name, help_text or ""))
-            if section:
-                with formatter.section(next(labels)):
-                    formatter.write_dl(section)
+        for label, names in COMMAND_SECTIONS:
+            rows = []
+            for name in names:
+                if name in self.commands:
+                    help_text = self.commands[name].get_short_help_str(limit=formatter.width)
+                    rows.append((name, help_text or ""))
+            if rows:
+                with formatter.section(label):
+                    formatter.write_dl(rows)
 
 
 @click.group(cls=OrderedGroup)
