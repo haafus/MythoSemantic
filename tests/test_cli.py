@@ -54,4 +54,4 @@ class TestBuildCommand:
         assert result.exit_code == 0
         assert "--force" in result.output
         assert "--model" in result.output
-        assert "--llm-model" in result.output
+        assert "--llm" in result.output

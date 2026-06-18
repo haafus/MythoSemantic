@@ -131,15 +131,15 @@ def server(host: str | None, port: int | None):
 # ---------------------------------------------------------------------------
 @mytho.command()
 @click.option("--model", "-m", default=None, help="Embedding model (default from config).")
-@click.option("--llm-model", default=None, help="LLM model for graphs (from config/models.json).")
+@click.option("--llm", default=None, help="LLM model for graphs (from config/models.json).")
 @click.option("--force", is_flag=True, help="Force regeneration of all steps.")
-def build(model, llm_model, force):
+def build(model, llm, force):
     """Run the full analysis pipeline end-to-end."""
     steps = [
         ("Corpus", _build_corpus, {"force": force}),
         ("Embeddings", _build_embeddings, {"model": model, "force": force}),
         ("Projections", _build_projections, {"model": model, "force": force}),
-        ("Graphs", _build_graphs, {"llm_model": llm_model, "force": force}),
+        ("Graphs", _build_graphs, {"llm_model": llm, "force": force}),
     ]
 
     for name, fn, kwargs in steps:
