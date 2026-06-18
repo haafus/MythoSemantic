@@ -183,12 +183,12 @@ def generate_graphs(llm: str | None = None, force: bool = False, max_texts: int 
         return
 
     graphs_cfg = settings.graphs
-    llm = LLMProcessor(
+    processor = LLMProcessor(
         model_alias=llm,
         use_json_mode=graphs_cfg.use_json_mode,
     )
 
-    logger.info(f"Starting graph generation (model={llm.model_name}, force={force})...")
+    logger.info(f"Starting graph generation (model={processor.model_name}, force={force})...")
 
     if max_texts is not None:
         corpus = corpus[:max_texts]
@@ -245,7 +245,7 @@ def generate_graphs(llm: str | None = None, force: bool = False, max_texts: int 
 
         for i in range(start_chunk, len(chunks)):
             logger.info(f"  [Chunk {i + 1}/{len(chunks)}] Extracting entities...")
-            chunk_results = extract_from_chunk(llm, chunks[i], chunk_prompts)
+            chunk_results = extract_from_chunk(processor, chunks[i], chunk_prompts)
             for key in results:
                 results[key].extend(chunk_results[key])
             save_checkpoint(book_out_dir, i + 1, results)
