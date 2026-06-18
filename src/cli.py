@@ -250,7 +250,6 @@ def clean(apply: bool):
 
     total_bytes = 0
     total_items = 0
-    action = "Removing" if apply else "Would remove"
 
     # Corpus
     orphans = corpus_orphans(settings)
@@ -264,26 +263,26 @@ def clean(apply: bool):
                 path.unlink(missing_ok=True)
         click.echo()
 
-    # Chroma orphan collections
+    # Chroma orphan collections + chunks
     orphan_cols = chroma_orphan_collections(settings)
-    orphan_chunks = chroma_orphan_chunks(settings)
+    skip_col_names = {c["name"] for c in orphan_cols}
+    orphan_chunks = chroma_orphan_chunks(settings, skip_collections=skip_col_names)
     if orphan_cols or orphan_chunks:
         click.echo(click.style("Chroma:", bold=True))
         for col in orphan_cols:
             total_items += 1
             click.echo(f"  orphan collection: {col['model']:<30} {col['count']:>6} chunks")
-            if apply:
-                import chromadb
-                from embedding.chroma_manager import delete_collection
-                client = chromadb.PersistentClient(path=str(settings.chroma_dir))
-                delete_collection(client, col["name"])
         for info in orphan_chunks:
             n = len(info["orphan_ids"])
             total_items += n
             click.echo(f"  orphan chunks in {info['model']:<30} {n:>6} / {info['total_count']}")
-            if apply:
-                import chromadb
-                client = chromadb.PersistentClient(path=str(settings.chroma_dir))
+        if apply:
+            import chromadb
+            from embedding.chroma_manager import delete_collection
+            client = chromadb.PersistentClient(path=str(settings.chroma_dir))
+            for col in orphan_cols:
+                delete_collection(client, col["name"])
+            for info in orphan_chunks:
                 collection = client.get_collection(name=info["collection"])
                 collection.delete(ids=info["orphan_ids"])
         click.echo()

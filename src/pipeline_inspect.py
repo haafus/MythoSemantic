@@ -75,6 +75,9 @@ def corpus_status(settings) -> dict[str, Any]:
 
 
 def corpus_orphans(settings) -> list[tuple[Path, int]]:
+    if not settings.corpus_metadata_path.exists():
+        return []
+
     info = corpus_status(settings)
     corpus_dir: Path = info["corpus_dir"]
     known: set[str] = info["known_paths"]
@@ -133,7 +136,7 @@ def chroma_orphan_collections(settings) -> list[dict[str, Any]]:
     return [c for c in info["collections"] if c["name"] not in known_names]
 
 
-def chroma_orphan_chunks(settings) -> list[dict[str, Any]]:
+def chroma_orphan_chunks(settings, *, skip_collections: set[str] | None = None) -> list[dict[str, Any]]:
     from corpus.corpus_iterator import normalize_catalog_id
 
     chroma_path = Path(settings.chroma_dir)
@@ -151,7 +154,7 @@ def chroma_orphan_chunks(settings) -> list[dict[str, Any]]:
         return []
 
     known_text_ids = {normalize_catalog_id(e["id"]) for e in meta_entries if e.get("id")}
-    orphan_collection_names = {c["name"] for c in chroma_orphan_collections(settings)}
+    skip = skip_collections or set()
 
     results = []
     try:
@@ -162,7 +165,7 @@ def chroma_orphan_chunks(settings) -> list[dict[str, Any]]:
         for col in client.list_collections():
             if not is_model_collection_name(col.name):
                 continue
-            if col.name in orphan_collection_names:
+            if col.name in skip:
                 continue
             all_meta = col.get(include=["metadatas"])
             orphan_ids = []
@@ -253,10 +256,10 @@ def graphs_status(settings) -> dict[str, Any]:
 
 
 def graphs_orphans(settings) -> list[tuple[Path, int]]:
-    """Find orphan graph items in graphs_dir.
+    """Find orphan graph directories in graphs_dir.
 
-    New format: <text_id>/characters.html (dirs matched by text_id).
-    Legacy format: web_*-characters.html (flat files, no corpus match possible).
+    Matches subdirectory names against normalized text_ids from corpus.
+    If corpus metadata is missing, all graph directories are orphans.
     """
     from corpus.corpus_iterator import normalize_catalog_id
 
@@ -264,22 +267,23 @@ def graphs_orphans(settings) -> list[tuple[Path, int]]:
     if not graphs_dir.exists():
         return []
 
+    subdirs = [d for d in graphs_dir.iterdir() if d.is_dir()]
+    if not subdirs:
+        return []
+
     meta_path = settings.corpus_metadata_path
-    if not meta_path.exists():
-        return []
-
-    try:
-        with open(meta_path, encoding="utf-8") as f:
-            meta_entries = json.load(f)
-    except Exception:
-        return []
-
-    known_text_ids = {normalize_catalog_id(e["id"]) for e in meta_entries if e.get("id")}
+    known_text_ids: set[str] = set()
+    if meta_path.exists():
+        try:
+            with open(meta_path, encoding="utf-8") as f:
+                meta_entries = json.load(f)
+            known_text_ids = {normalize_catalog_id(e["id"]) for e in meta_entries if e.get("id")}
+        except Exception:
+            pass
 
     orphans = []
-    for item in graphs_dir.iterdir():
-        if item.is_dir():
-            if item.name not in known_text_ids:
-                orphans.append((item, dir_size(item)))
+    for item in subdirs:
+        if item.name not in known_text_ids:
+            orphans.append((item, dir_size(item)))
 
     return orphans
