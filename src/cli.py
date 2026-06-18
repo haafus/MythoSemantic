@@ -14,6 +14,10 @@ COMMAND_ORDER = [
 
 
 class OrderedGroup(click.Group):
+    def format_help(self, ctx, formatter):
+        super().format_help(ctx, formatter)
+        formatter.write("\nRun 'mytho COMMAND --help' for details on a specific command.\n")
+
     def format_commands(self, ctx, formatter):
         commands = []
         for name in COMMAND_ORDER:
