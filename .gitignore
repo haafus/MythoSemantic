@@ -5,11 +5,9 @@ __pycache__/
 # generated artifacts — reproduce via pipeline, store outside git
 outputs/embeddings/
 outputs/projections/
-outputs/logs/
-outputs/graphs/
 outputs/corpus/
-outputs/chroma/
-outputs/analysis/
+outputs/graphs/
+outputs/logs/
 
 # data formats that should not be in git
 *.npy
