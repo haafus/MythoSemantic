@@ -14,6 +14,11 @@ class EmbeddingDataLoader:
     def __init__(self):
         self.client = chromadb.PersistentClient(path=str(settings.embeddings_dir))
 
+    def get_available_models(self) -> list[str]:
+        return sorted(
+            col.metadata["model"] for col in self.client.list_collections()
+        )
+
     def load_data(
         self, model_name: str, batch_size: int = 5000
     ) -> list[dict[str, Any]]:
@@ -73,9 +78,4 @@ class EmbeddingDataLoader:
                 continue
 
         return batch_data
-
-    def get_available_models(self) -> list[str]:
-        return sorted(
-            col.metadata["model"] for col in self.client.list_collections()
-        )
 
