@@ -7,6 +7,9 @@ outputs/embeddings/
 outputs/projections/
 outputs/logs/
 outputs/graphs/
+outputs/corpus/
+outputs/chroma/
+outputs/analysis/
 
 # data formats that should not be in git
 *.npy
