@@ -3,7 +3,7 @@ import pytest
 pytest.importorskip("chromadb")
 
 from corpus.corpus_iterator import CorpusFileInfo
-from embedding.chroma_writer import ChromaWriter, _safe_id_part, _safe_meta
+from embedding.chroma_writer import ChromaWriter, _safe_id_part
 
 
 def _info(**overrides) -> CorpusFileInfo:
@@ -40,17 +40,6 @@ class TestSafeIdPart:
         assert _safe_id_part("///name///") == "name"
 
 
-class TestSafeMeta:
-    def test_none_returns_empty_string(self):
-        assert _safe_meta(None) == ""
-
-    def test_string_returned_as_is(self):
-        assert _safe_meta("hello") == "hello"
-
-    def test_empty_string_returned(self):
-        assert _safe_meta("") == ""
-
-
 class TestBuildEntries:
     @pytest.fixture
     def writer(self):
@@ -60,7 +49,7 @@ class TestBuildEntries:
         chunks = ["chunk1", "chunk2", "chunk3"]
         info = _info(text_id="my_text", tradition="Buddhism")
 
-        ids, metadatas = writer.build_entries(chunks, info, "BAAI/bge-m3", "paragraph")
+        ids, metadatas = writer.build_entries(chunks, info, "BAAI/bge-m3")
 
         assert len(ids) == 3
         assert all("my_text" in id_ for id_ in ids)
@@ -78,27 +67,29 @@ class TestBuildEntries:
             url="http://example.com",
         )
 
-        ids, metadatas = writer.build_entries(chunks, info, "model-x", "sentence")
+        ids, metadatas = writer.build_entries(chunks, info, "model-x")
 
         assert len(metadatas) == 1
         m = metadatas[0]
         assert m["filename"] == "file.txt"
         assert m["tradition"] == "Buddhism"
         assert m["major_tradition"] == "Eastern"
-        assert m["model"] == "model-x"
-        assert m["chunking"] == "sentence"
         assert m["chunk_index"] == 0
+        assert m["text_id"] == "tid"
+        assert m["url"] == "http://example.com"
+        assert "model" not in m
+        assert "chunking" not in m
 
     def test_filename_preserved_as_is(self, writer):
         chunks = ["text"]
         info = _info(filename="document.txt")
 
-        _, metadatas = writer.build_entries(chunks, info, "m", "c")
+        _, metadatas = writer.build_entries(chunks, info, "m")
         assert metadatas[0]["filename"] == "document.txt"
 
     def test_default_info_uses_defaults(self, writer):
         chunks = ["text"]
-        ids, metadatas = writer.build_entries(chunks, _info(), "model", "chunk")
+        ids, metadatas = writer.build_entries(chunks, _info(), "model")
 
         assert metadatas[0]["tradition"] == "unknown"
         assert metadatas[0]["filename"] == "unknown"

@@ -174,9 +174,9 @@ class EmbeddingDataLoader:
         self, model_name: str | None = None, batch_size: int = 5000, max_records: int | None = None
     ) -> list[dict[str, Any]]:
         all_data: list[dict[str, Any]] = []
-        where_filter = {"model": model_name} if model_name else None
 
         for collection in self._iter_collections(model_name=model_name):
+            col_model = (collection.metadata or {}).get("model", collection.name)
             offset = 0
 
             while True:
@@ -186,7 +186,6 @@ class EmbeddingDataLoader:
 
                 try:
                     results = collection.get(
-                        where=where_filter,
                         limit=batch_size,
                         offset=offset,
                         include=["embeddings", "metadatas", "documents"],
@@ -198,7 +197,7 @@ class EmbeddingDataLoader:
                 if not results.get("ids"):
                     break
 
-                batch_data = self._process_batch(results)
+                batch_data = self._process_batch(results, col_model)
                 all_data.extend(batch_data)
 
                 offset += batch_size
@@ -208,7 +207,7 @@ class EmbeddingDataLoader:
 
         return all_data
 
-    def _process_batch(self, results: dict) -> list[dict[str, Any]]:
+    def _process_batch(self, results: dict, model_name: str) -> list[dict[str, Any]]:
         batch_data = []
         ids = results.get("ids", [])
         embeddings = results.get("embeddings", [])
@@ -233,9 +232,8 @@ class EmbeddingDataLoader:
                         "chunk_index": meta.get("chunk_index", 0),
                         "embedding": embedding,
                         "text": doc,
-                        "model": meta.get("model", "unknown"),
+                        "model": model_name,
                         "filename": meta.get("filename", "unknown"),
-                        "chunking": meta.get("chunking", "unknown"),
                         "url": meta.get("url", ""),
                     }
                 )
@@ -252,12 +250,10 @@ class EmbeddingDataLoader:
             if not self._resolve_collection_names():
                 return []
 
-            # Each collection holds exactly one model, so a single record is
-            # enough — no need to page through the entire collection.
             for collection in self._iter_collections():
-                result = collection.get(limit=1, include=["metadatas"])
-                metadatas = result.get("metadatas", [])
-                models.update(m.get("model") for m in metadatas if m and "model" in m)
+                model = (collection.metadata or {}).get("model")
+                if model:
+                    models.add(model)
 
             return sorted(models)
         except Exception:

@@ -14,9 +14,6 @@ def _safe_id_part(value: Any) -> str:
     return re.sub(r"[^0-9A-Za-z_.-]+", "_", str(value or "unknown")).strip("_") or "unknown"
 
 
-def _safe_meta(val: Any) -> str:
-    return "" if val is None else val
-
 
 class ChromaWriter:
     def __init__(self, chroma_batch_size: int = 100, queue_maxsize: int = 10):
@@ -25,7 +22,7 @@ class ChromaWriter:
         self._write_error: Exception | None = None
 
     def build_entries(
-        self, chunks: list[str], info: CorpusFileInfo, model_name: str, chunking_name: str
+        self, chunks: list[str], info: CorpusFileInfo, model_name: str,
     ) -> tuple[list[str], list[dict[str, Any]]]:
         text_id_safe = _safe_id_part(info.text_id)
         model_id = _safe_id_part(model_name)
@@ -38,8 +35,6 @@ class ChromaWriter:
                 "tradition": info.tradition,
                 "major_tradition": info.major_tradition,
                 "chunk_index": i,
-                "model": _safe_meta(model_name),
-                "chunking": _safe_meta(chunking_name),
                 "text_id": info.text_id,
                 "url": info.url,
             }

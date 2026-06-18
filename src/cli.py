@@ -228,11 +228,8 @@ def _status_embeddings(settings):
         model_collections = []
         for col in collections:
             if is_model_collection_name(col.name):
-                count = col.count()
-                result = col.get(limit=1, include=["metadatas"])
-                metadatas = result.get("metadatas", [])
-                model_name = metadatas[0].get("model", col.name) if metadatas else col.name
-                model_collections.append((model_name, count))
+                model_name = (col.metadata or {}).get("model", col.name)
+                model_collections.append((model_name, col.count()))
 
         if not model_collections:
             click.echo("  No embedding collections")

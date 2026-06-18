@@ -74,7 +74,10 @@ class EmbeddingBuilder:
             logger.warning("No files found in corpus/. Check the folder structure.")
             return
 
-        collection = self.chroma_client.get_or_create_collection(name=collection_name)
+        collection = self.chroma_client.get_or_create_collection(
+            name=collection_name,
+            metadata={"model": self._models.model_name, "chunking": self.current_chunking.name},
+        )
 
         existing_ids = set(collection.get(include=[])["ids"])
         if existing_ids:
@@ -104,7 +107,7 @@ class EmbeddingBuilder:
                 chunks_accounted = 0
                 try:
                     ids, metadatas = self._chroma.build_entries(
-                        chunks, file_info, self._models.model_name, self.current_chunking.name
+                        chunks, file_info, self._models.model_name,
                     )
 
                     missing = [
