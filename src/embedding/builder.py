@@ -13,7 +13,7 @@ from .chroma_manager import (
 )
 from .chroma_writer import ChromaWriter
 from .chunking import create_chunking_strategies
-from corpus.corpus_iterator import iter_corpus_files, read_corpus_file
+from corpus.corpus_iterator import iter_corpus_files
 from .model_manager import ModelManager
 
 logger = logging.getLogger(__name__)
@@ -86,7 +86,7 @@ class EmbeddingBuilder:
         file_chunks: list[tuple[dict, list[str]]] = []
         total_chunks = 0
         for fi in files_info:
-            content = read_corpus_file(fi)
+            content = fi.read()
             chunks = self._chunk_text(content)
             if chunks:
                 file_chunks.append((fi, chunks))
@@ -165,7 +165,7 @@ class EmbeddingBuilder:
                     added_total += len(missing_chunks)
 
                 except Exception:
-                    logger.exception("Error processing %s", file_info.get('filename', 'unknown'))
+                    logger.exception("Error processing %s", file_info.filename)
                 finally:
                     remaining = n_chunks - chunks_accounted
                     if remaining > 0:

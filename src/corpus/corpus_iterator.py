@@ -1,6 +1,7 @@
 import json
 import logging
 import re
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Generator
 
@@ -11,12 +12,21 @@ def _normalize_catalog_id(value: Any) -> str:
     return re.sub(r"\s+", "_", str(value or "").strip())
 
 
-def iter_corpus_files(corpus_dir: Path) -> Generator[dict[str, Any], None, None]:
-    """Yield metadata dicts for every entry in *corpus_dir*/corpus.json.
+@dataclass(frozen=True, slots=True)
+class CorpusFileInfo:
+    filename: str
+    path: str
+    text_id: str
+    catalog_id: str
+    major_tradition: str
+    tradition: str
+    url: str
 
-    The returned dict intentionally does NOT include file content — callers
-    read one file at a time so the whole corpus is never held in memory.
-    """
+    def read(self) -> str:
+        return Path(self.path).read_text(encoding="utf-8")
+
+
+def iter_corpus_files(corpus_dir: Path) -> Generator[CorpusFileInfo, None, None]:
     metadata_file = corpus_dir / "corpus.json"
 
     if not metadata_file.exists():
@@ -42,18 +52,12 @@ def iter_corpus_files(corpus_dir: Path) -> Generator[dict[str, Any], None, None]
             logger.warning("Skipping entry '%s': file not found at %s", tid, txt_file)
             continue
 
-        text_id = _normalize_catalog_id(tid)
-
-        yield {
-            "filename": txt_file.name,
-            "path": str(txt_file),
-            "text_id": text_id,
-            "catalog_id": tid,
-            "major_tradition": item.get("major_tradition", "unknown"),
-            "tradition": item.get("tradition", "unknown"),
-            "url": item.get("url", ""),
-        }
-
-
-def read_corpus_file(file_info: dict[str, Any]) -> str:
-    return Path(file_info["path"]).read_text(encoding="utf-8")
+        yield CorpusFileInfo(
+            filename=txt_file.name,
+            path=str(txt_file),
+            text_id=_normalize_catalog_id(tid),
+            catalog_id=tid,
+            major_tradition=item.get("major_tradition", "unknown"),
+            tradition=item.get("tradition", "unknown"),
+            url=item.get("url", ""),
+        )

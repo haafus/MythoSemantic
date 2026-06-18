@@ -2,9 +2,9 @@ import logging
 import queue
 import re
 import threading
-from pathlib import Path
 from typing import Any
 
+from corpus.corpus_iterator import CorpusFileInfo
 from .chroma_manager import save_to_chroma_collection
 
 logger = logging.getLogger(__name__)
@@ -25,28 +25,27 @@ class ChromaWriter:
         self._write_error: Exception | None = None
 
     def build_entries(
-        self, chunks: list[str], info: dict[str, Any], model_name: str, chunking_name: str
+        self, chunks: list[str], info: CorpusFileInfo, model_name: str, chunking_name: str
     ) -> tuple[list[str], list[dict[str, Any]]]:
-        text_id = info.get("text_id") or Path(info.get("path", "")).stem or "unknown"
-        text_id_safe = _safe_id_part(text_id)
+        text_id_safe = _safe_id_part(info.text_id)
         model_id = _safe_id_part(model_name)
 
         ids = [f"{text_id_safe}_{model_id}_{i}" for i in range(len(chunks))]
 
-        filename = info.get("filename", "unknown")
-        if isinstance(filename, str) and filename.endswith(".txt"):
+        filename = info.filename
+        if filename.endswith(".txt"):
             filename = filename[:-4]
 
         metadatas = [
             {
-                "filename": _safe_meta(filename) or "unknown",
-                "tradition": _safe_meta(info.get("tradition", "unknown")),
-                "major_tradition": _safe_meta(info.get("major_tradition", "unknown")),
+                "filename": filename or "unknown",
+                "tradition": info.tradition,
+                "major_tradition": info.major_tradition,
                 "chunk_index": i,
                 "model": _safe_meta(model_name),
                 "chunking": _safe_meta(chunking_name),
-                "text_id": _safe_meta(text_id),
-                "url": _safe_meta(info.get("url", "")),
+                "text_id": info.text_id,
+                "url": info.url,
             }
             for i in range(len(chunks))
         ]

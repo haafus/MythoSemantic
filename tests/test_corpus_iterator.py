@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from corpus.corpus_iterator import _normalize_catalog_id, iter_corpus_files
+from corpus.corpus_iterator import CorpusFileInfo, _normalize_catalog_id, iter_corpus_files
 
 
 class TestNormalizeCatalogId:
@@ -47,7 +47,7 @@ class TestIterCorpusFiles:
         ])
 
         results = list(iter_corpus_files(corpus))
-        filenames = {r["filename"] for r in results}
+        filenames = {r.filename for r in results}
         assert filenames == {"file1.txt", "file2.txt"}
 
     def test_metadata_populates_fields(self, tmp_path):
@@ -64,10 +64,24 @@ class TestIterCorpusFiles:
         results = list(iter_corpus_files(corpus))
         assert len(results) == 1
         r = results[0]
-        assert r["tradition"] == "Buddhism"
-        assert r["major_tradition"] == "Eastern"
-        assert r["url"] == "http://example.com"
-        assert r["text_id"] == "mytext"
+        assert r.tradition == "Buddhism"
+        assert r.major_tradition == "Eastern"
+        assert r.url == "http://example.com"
+        assert r.text_id == "mytext"
+
+    def test_returns_corpus_file_info(self, tmp_path):
+        corpus = self._create_corpus(tmp_path, [
+            {"id": "a", "tradition": "t", "major_tradition": "m", "path": "m/t/a/a.txt"},
+        ])
+        results = list(iter_corpus_files(corpus))
+        assert isinstance(results[0], CorpusFileInfo)
+
+    def test_read_returns_content(self, tmp_path):
+        corpus = self._create_corpus(tmp_path, [
+            {"id": "a", "tradition": "t", "major_tradition": "m", "path": "m/t/a/a.txt", "content": "hello world"},
+        ])
+        results = list(iter_corpus_files(corpus))
+        assert results[0].read() == "hello world"
 
     def test_missing_corpus_json_raises(self, tmp_path):
         corpus_dir = tmp_path / "corpus"
@@ -108,5 +122,5 @@ class TestIterCorpusFiles:
             {"id": "big", "tradition": "t", "major_tradition": "m", "path": "m/t/big/big.txt", "content": "x" * 10000},
         ])
         results = list(iter_corpus_files(corpus))
-        assert "content" not in results[0]
-        assert "text" not in results[0]
+        assert not hasattr(results[0], "content")
+        assert not hasattr(results[0], "text")

@@ -2,7 +2,22 @@ import pytest
 
 pytest.importorskip("chromadb")
 
+from corpus.corpus_iterator import CorpusFileInfo
 from embedding.chroma_writer import ChromaWriter, _safe_id_part, _safe_meta
+
+
+def _info(**overrides) -> CorpusFileInfo:
+    defaults = {
+        "filename": "unknown",
+        "path": "",
+        "text_id": "unknown",
+        "catalog_id": "",
+        "major_tradition": "unknown",
+        "tradition": "unknown",
+        "url": "",
+    }
+    defaults.update(overrides)
+    return CorpusFileInfo(**defaults)
 
 
 class TestSafeIdPart:
@@ -43,7 +58,7 @@ class TestBuildEntries:
 
     def test_ids_format(self, writer):
         chunks = ["chunk1", "chunk2", "chunk3"]
-        info = {"text_id": "my_text", "tradition": "Buddhism"}
+        info = _info(text_id="my_text", tradition="Buddhism")
 
         ids, metadatas = writer.build_entries(chunks, info, "BAAI/bge-m3", "paragraph")
 
@@ -55,19 +70,19 @@ class TestBuildEntries:
 
     def test_metadata_fields(self, writer):
         chunks = ["text"]
-        info = {
-            "text_id": "tid",
-            "filename": "file.txt",
-            "tradition": "Buddhism",
-            "major_tradition": "Eastern",
-            "url": "http://example.com",
-        }
+        info = _info(
+            text_id="tid",
+            filename="file.txt",
+            tradition="Buddhism",
+            major_tradition="Eastern",
+            url="http://example.com",
+        )
 
         ids, metadatas = writer.build_entries(chunks, info, "model-x", "sentence")
 
         assert len(metadatas) == 1
         m = metadatas[0]
-        assert m["filename"] == "file"  # .txt stripped
+        assert m["filename"] == "file"
         assert m["tradition"] == "Buddhism"
         assert m["major_tradition"] == "Eastern"
         assert m["model"] == "model-x"
@@ -76,29 +91,22 @@ class TestBuildEntries:
 
     def test_txt_extension_stripped_from_filename(self, writer):
         chunks = ["text"]
-        info = {"filename": "document.txt"}
+        info = _info(filename="document.txt")
 
         _, metadatas = writer.build_entries(chunks, info, "m", "c")
         assert metadatas[0]["filename"] == "document"
 
     def test_non_txt_extension_kept(self, writer):
         chunks = ["text"]
-        info = {"filename": "document.pdf"}
+        info = _info(filename="document.pdf")
 
         _, metadatas = writer.build_entries(chunks, info, "m", "c")
         assert metadatas[0]["filename"] == "document.pdf"
 
-    def test_empty_info_uses_defaults(self, writer):
+    def test_default_info_uses_defaults(self, writer):
         chunks = ["text"]
-        ids, metadatas = writer.build_entries(chunks, {}, "model", "chunk")
+        ids, metadatas = writer.build_entries(chunks, _info(), "model", "chunk")
 
         assert metadatas[0]["tradition"] == "unknown"
         assert metadatas[0]["filename"] == "unknown"
         assert "unknown" in ids[0]
-
-    def test_text_id_from_path_fallback(self, writer):
-        chunks = ["text"]
-        info = {"path": "/data/corpus/my_document.txt"}
-
-        ids, _ = writer.build_entries(chunks, info, "m", "c")
-        assert "my_document" in ids[0]
