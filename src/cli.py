@@ -260,12 +260,12 @@ def status():
         click.echo(f"  {info['count']} graph files")
     click.echo()
 
-    click.echo(click.style(f"Total: {format_size(total)}", bold=True))
+    click.echo(f"Total: {format_size(total)}")
 
 
 def _header(name: str, size: int):
     from pipeline_inspect import format_size
-    click.echo(click.style(f"{name}:", bold=True) + f"  {format_size(size)}")
+    click.echo(f"{name}:  {format_size(size)}")
 
 
 # ---------------------------------------------------------------------------
@@ -307,7 +307,7 @@ def clean(apply: bool):
     skip_col_names = {c["name"] for c in orphan_cols}
     orphan_chunks = embeddings_orphan_chunks(settings, skip_collections=skip_col_names)
     if orphan_cols or orphan_chunks:
-        click.echo(click.style("Embeddings:", bold=True))
+        click.echo("Embeddings:")
         for col in orphan_cols:
             total_items += 1
             click.echo(f"  orphan collection: {col['model']:<30} {col['count']:>6} chunks")
