@@ -13,6 +13,20 @@ import chromadb
 from typing import Any
 
 
+def query_chroma(builder, query: str, top_k: int = 5) -> list[dict[str, Any]]:
+    """Was EmbeddingBuilder.query_chroma()."""
+    from embedding.chroma_manager import collection_name_for_model
+
+    collection_name = collection_name_for_model(builder._models.model_name)
+    try:
+        collection = builder.chroma_client.get_collection(name=collection_name)
+    except Exception as err:
+        raise RuntimeError(f"Collection '{collection_name}' not found in ChromaDB.") from err
+
+    query_embedding = builder._generate_embeddings([query])[0]
+    return query_chroma_collection(collection=collection, query_embedding=query_embedding.tolist(), top_k=top_k)
+
+
 def query_chroma_collection(
     collection: chromadb.Collection,
     query_embedding: list[float],
@@ -37,17 +51,3 @@ def query_chroma_collection(
             }
         )
     return formatted
-
-
-def query_chroma(builder, query: str, top_k: int = 5) -> list[dict[str, Any]]:
-    """Was EmbeddingBuilder.query_chroma()."""
-    from embedding.chroma_manager import collection_name_for_model
-
-    collection_name = collection_name_for_model(builder._models.model_name)
-    try:
-        collection = builder.chroma_client.get_collection(name=collection_name)
-    except Exception as err:
-        raise RuntimeError(f"Collection '{collection_name}' not found in ChromaDB.") from err
-
-    query_embedding = builder._generate_embeddings([query])[0]
-    return query_chroma_collection(collection=collection, query_embedding=query_embedding.tolist(), top_k=top_k)
