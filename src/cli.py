@@ -133,17 +133,29 @@ def server(host: str | None, port: int | None):
 # ---------------------------------------------------------------------------
 # build — run everything end-to-end
 # ---------------------------------------------------------------------------
+SAMPLE_MAX_TEXTS = 5
+
+
 @mytho.command()
 @click.option("--model", "-m", default=None, help="Embedding model (default from config).")
 @click.option("--llm", default=None, help="LLM model for graphs (from config/models.json).")
 @click.option("--force", is_flag=True, help="Force regeneration of all steps.")
-def build(model, llm, force):
+@click.option("--sample", is_flag=True, help="Quick run: first embedding model, limited texts.")
+def build(model, llm, force, sample):
     """Run the full analysis pipeline end-to-end."""
+    if sample:
+        from model_registry import active_embedding_models
+        model = model or active_embedding_models()[0]
+        max_texts = SAMPLE_MAX_TEXTS
+        click.echo(click.style(f"[sample] model={model}, max_texts={max_texts}", fg="yellow"))
+    else:
+        max_texts = None
+
     steps = [
-        ("Corpus", _build_corpus, {"force": force}),
+        ("Corpus", _build_corpus, {"force": force, "max_texts": max_texts}),
         ("Embeddings", _build_embeddings, {"model": model, "force": force}),
         ("Projections", _build_projections, {"model": model, "force": force}),
-        ("Graphs", _build_graphs, {"llm": llm, "force": force}),
+        ("Graphs", _build_graphs, {"llm": llm, "force": force, "max_texts": max_texts}),
     ]
 
     for name, fn, kwargs in steps:
@@ -158,10 +170,10 @@ def build(model, llm, force):
     click.echo(click.style("\nBuild finished.", fg="green", bold=True))
 
 
-def _build_corpus(force: bool = False):
+def _build_corpus(force: bool = False, max_texts: int | None = None):
     from corpus.builder import build_corpus
 
-    build_corpus(force=force)
+    build_corpus(force=force, max_texts=max_texts)
 
 
 def _build_embeddings(model: str | None, force: bool = False):
@@ -176,10 +188,10 @@ def _build_projections(model: str | None, force: bool = False):
     analyze_embeddings(model_name=model, force=force)
 
 
-def _build_graphs(llm: str | None = None, force: bool = False):
+def _build_graphs(llm: str | None = None, force: bool = False, max_texts: int | None = None):
     from graphs.run_graph_generation import run_generate_graphs
 
-    run_generate_graphs(llm=llm, force=force)
+    run_generate_graphs(llm=llm, force=force, max_texts=max_texts)
 
 
 # ---------------------------------------------------------------------------

@@ -154,10 +154,12 @@ def _load_existing_metadata() -> dict[str, dict]:
         return {}
 
 
-def build_corpus(force: bool = False):
+def build_corpus(force: bool = False, max_texts: int | None = None):
     ensure_dir(settings.corpus_dir)
 
     download_list = load_download_list()
+    if max_texts is not None:
+        download_list = download_list[:max_texts]
 
     _update_traditions(force)
 
