@@ -1,4 +1,3 @@
-import json
 import logging
 from typing import Any
 
@@ -12,12 +11,8 @@ logger = logging.getLogger(__name__)
 
 
 class EmbeddingDataLoader:
-    def __init__(self, auto_migrate: bool = True):
+    def __init__(self):
         self.client = chromadb.PersistentClient(path=str(settings.embeddings_dir))
-        self._metadata_map: dict[str, str] | None = None
-
-        if auto_migrate:
-            self._auto_migrate_all()
 
     def _list_collection_names(self) -> list[str]:
         try:
@@ -41,122 +36,6 @@ class EmbeddingDataLoader:
                 yield self.client.get_collection(name=name)
             except Exception as e:
                 logger.warning(f"Failed to get collection '{name}': {e}")
-
-    def _load_metadata_map(self) -> dict[str, str]:
-        if self._metadata_map is not None:
-            return self._metadata_map
-
-        metadata_path = settings.corpus_metadata_path
-        if not metadata_path.exists():
-            logger.warning(f"Metadata file not found: {metadata_path}")
-            self._metadata_map = {}
-            return self._metadata_map
-
-        try:
-            self._metadata_map = {}
-            with open(metadata_path, encoding="utf-8") as f:
-                metadata = json.load(f)
-                for item in metadata:
-                    if "id" in item and "tradition" in item:
-                        self._metadata_map[str(item["id"])] = item["tradition"]
-                        self._metadata_map[str(item["id"]).replace(" ", "_")] = item["tradition"]
-        except Exception:
-            logger.exception("Failed to load metadata")
-            self._metadata_map = {}
-
-        return self._metadata_map
-
-    def _auto_migrate_all(self) -> None:
-        try:
-            if not self._resolve_collection_names():
-                return
-
-            for collection in self._iter_collections():
-                count = collection.count()
-
-                if count == 0:
-                    continue
-
-                if not self._needs_migration(collection):
-                    continue
-
-                logger.info(
-                    f"Records without tradition found in Chroma collection '{collection.name}'. Running migration..."
-                )
-                metadata_map = self._load_metadata_map()
-
-                if not metadata_map:
-                    logger.warning("No data to migrate")
-                    return
-
-                migrated = self._migrate_records(collection, metadata_map)
-                logger.info(f"Migration complete. Updated {migrated} records.")
-
-        except Exception:
-            logger.exception("Auto-migration failed")
-
-    def _needs_migration(self, collection) -> bool:
-        try:
-            sample = collection.get(limit=min(5, collection.count()), include=["metadatas"])
-            if not sample["metadatas"]:
-                return False
-
-            return any(
-                "tradition" not in meta or meta.get("tradition") == "unknown" for meta in sample["metadatas"] if meta
-            )
-        except Exception as e:
-            logger.warning(f"Failed to check migration need: {e}")
-            return False
-
-    def _migrate_records(self, collection, metadata_map: dict[str, str]) -> int:
-        batch_size = 1000
-        offset = 0
-        migrated = 0
-
-        while True:
-            try:
-                results = collection.get(limit=batch_size, offset=offset, include=["metadatas"])
-
-                if not results["ids"]:
-                    break
-
-                updates = self._prepare_updates(results, metadata_map)
-
-                for doc_id, meta in updates:
-                    try:
-                        collection.update(ids=[doc_id], metadatas=[meta])
-                        migrated += 1
-                    except Exception as e:
-                        logger.warning(f"Failed to update {doc_id}: {e}")
-
-                offset += batch_size
-
-                if migrated > 0 and offset % (batch_size * 5) == 0:
-                    logger.info(f"  Migrated {migrated} records...")
-
-                if len(results["ids"]) < batch_size:
-                    break
-
-            except Exception:
-                logger.exception("Migration batch failed at offset %d", offset)
-                break
-
-        return migrated
-
-    def _prepare_updates(self, results: dict, metadata_map: dict[str, str]) -> list[tuple]:
-        updates = []
-        for doc_id, meta in zip(results["ids"], results["metadatas"], strict=False):
-            if not meta:
-                continue
-
-            if "tradition" not in meta or meta.get("tradition") == "unknown":
-                text_id = meta.get("text_id", doc_id)
-                tradition = metadata_map.get(str(text_id), "unknown")
-                if tradition != "unknown":
-                    meta["tradition"] = tradition
-                    updates.append((doc_id, meta))
-
-        return updates
 
     def load_data(
         self, model_name: str | None = None, batch_size: int = 5000, max_records: int | None = None
