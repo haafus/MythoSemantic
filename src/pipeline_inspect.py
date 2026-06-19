@@ -121,17 +121,15 @@ def embeddings_status(settings) -> dict[str, Any]:
 
 
 def embeddings_orphan_collections(settings) -> list[dict[str, Any]]:
-    from embeddings.chroma_manager import collection_name_for_model
     from model_registry import list_embedding_aliases
 
     info = embeddings_status(settings)
     if not info["exists"]:
         return []
 
-    aliases = list_embedding_aliases()
-    known_names = {collection_name_for_model(full_name) for full_name in aliases.values()}
+    known_models = set(list_embedding_aliases().values())
 
-    return [c for c in info["collections"] if c["name"] not in known_names]
+    return [c for c in info["collections"] if c["model"] not in known_models]
 
 
 def embeddings_orphan_chunks(settings, *, skip_collections: set[str] | None = None) -> list[dict[str, Any]]:

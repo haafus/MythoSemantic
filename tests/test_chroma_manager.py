@@ -16,31 +16,31 @@ assert _spec is not None and _spec.loader is not None
 _mod = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_mod)
 
-collection_name_for_model = _mod.collection_name_for_model
+_collection_name = _mod._collection_name
 
 
 class TestCollectionNameForModel:
     def test_returns_string(self):
-        name = collection_name_for_model("BAAI/bge-m3")
+        name = _collection_name("BAAI/bge-m3")
         assert isinstance(name, str)
         assert len(name) > 0
 
     def test_deterministic(self):
-        assert collection_name_for_model("model-a") == collection_name_for_model("model-a")
+        assert _collection_name("model-a") == _collection_name("model-a")
 
     def test_different_models_different_names(self):
-        assert collection_name_for_model("model-a") != collection_name_for_model("model-b")
+        assert _collection_name("model-a") != _collection_name("model-b")
 
     def test_contains_hash(self):
-        name = collection_name_for_model("BAAI/bge-m3")
+        name = _collection_name("BAAI/bge-m3")
         assert "_" in name
 
     def test_safe_characters(self):
-        name = collection_name_for_model("sentence-transformers/LaBSE")
+        name = _collection_name("sentence-transformers/LaBSE")
         assert "/" not in name
 
     def test_max_length(self):
-        name = collection_name_for_model("very-long-model-name/" + "a" * 100)
+        name = _collection_name("very-long-model-name/" + "a" * 100)
         assert len(name) <= 63
 
 

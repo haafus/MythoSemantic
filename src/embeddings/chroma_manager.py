@@ -10,13 +10,13 @@ from settings import settings
 
 logger = logging.getLogger(__name__)
 
-MAX_CHROMA_COLLECTION_NAME = 63
-MODEL_COLLECTION_HASH_LEN = 8
+_MAX_COLLECTION_NAME = 63
+_COLLECTION_HASH_LEN = 8
 
 
-def collection_name_for_model(model_name: Any) -> str:
+def _collection_name(model_name: str) -> str:
     raw_name = str(model_name or "unknown").strip()
-    digest = hashlib.sha1(raw_name.encode("utf-8")).hexdigest()[:MODEL_COLLECTION_HASH_LEN]
+    digest = hashlib.sha1(raw_name.encode("utf-8")).hexdigest()[:_COLLECTION_HASH_LEN]
 
     safe_name = re.sub(r"[^0-9A-Za-z_-]+", "_", raw_name).strip("_-").lower()
     safe_name = re.sub(r"_+", "_", safe_name)
@@ -24,7 +24,7 @@ def collection_name_for_model(model_name: Any) -> str:
         safe_name = "model"
 
     suffix = f"_{digest}"
-    max_base_len = MAX_CHROMA_COLLECTION_NAME - len(suffix)
+    max_base_len = _MAX_COLLECTION_NAME - len(suffix)
     safe_name = safe_name[:max_base_len].strip("_-")
     if len(safe_name) < 3:
         safe_name = f"{safe_name}_model".strip("_-")
@@ -67,11 +67,11 @@ class ChromaStore:
     def __init__(self):
         self._client = chromadb.PersistentClient(path=str(settings.embeddings_dir))
 
-    def get_or_create_collection(self, name: str, **kwargs) -> chromadb.Collection:
-        return self._client.get_or_create_collection(name=name, **kwargs)
+    def get_or_create_collection(self, model_name: str, **kwargs) -> chromadb.Collection:
+        return self._client.get_or_create_collection(name=_collection_name(model_name), **kwargs)
 
-    def get_collection(self, name: str) -> chromadb.Collection:
-        return self._client.get_collection(name=name)
+    def get_collection(self, model_name: str) -> chromadb.Collection:
+        return self._client.get_collection(name=_collection_name(model_name))
 
     def list_collections(self):
         return self._client.list_collections()
@@ -82,7 +82,7 @@ class ChromaStore:
         )
 
     def load_data(self, model_name: str) -> tuple[list[dict[str, Any]], np.ndarray]:
-        collection = self._client.get_collection(name=collection_name_for_model(model_name))
+        collection = self._client.get_collection(name=_collection_name(model_name))
         results = collection.get(include=["embeddings", "metadatas", "documents"])
 
         records = [
@@ -92,9 +92,9 @@ class ChromaStore:
         embeddings = np.array(results["embeddings"], dtype=np.float32) if records else np.empty((0, 0), dtype=np.float32)
         return records, embeddings
 
-    def delete_collection(self, collection_name: str) -> bool:
+    def delete_collection(self, model_name: str) -> bool:
         try:
-            self._client.delete_collection(name=collection_name)
+            self._client.delete_collection(name=_collection_name(model_name))
             return True
         except Exception as error:
             msg = str(error).lower()

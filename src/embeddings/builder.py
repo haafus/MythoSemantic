@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 from tqdm import tqdm
 
-from .chroma_manager import ChromaStore, build_chroma_entries, collection_name_for_model
+from .chroma_manager import ChromaStore, build_chroma_entries
 from .chunking import create_chunking_strategies
 from corpus.corpus_iterator import iter_corpus_files
 from .model_manager import EmbeddingEncoder
@@ -38,7 +38,7 @@ class EmbeddingBuilder:
         return [chunk for chunk in self.current_chunking(text) if chunk.strip()]
 
     def save_all_corpus_to_chroma(self) -> None:
-        collection_name = collection_name_for_model(self._encoder.model_name)
+        model_name = self._encoder.model_name
         t0 = time.monotonic()
         files_info = list(iter_corpus_files(self.corpus_dir))
 
@@ -47,13 +47,13 @@ class EmbeddingBuilder:
             return
 
         collection = self._store.get_or_create_collection(
-            name=collection_name,
-            metadata={"model": self._encoder.model_name, "chunking": self.current_chunking.name},
+            model_name,
+            metadata={"model": model_name, "chunking": self.current_chunking.name},
         )
 
         existing_ids = set(collection.get(include=[])["ids"])
         if existing_ids:
-            logger.info(f"Collection '{collection_name}' has {len(existing_ids)} existing chunks, resuming")
+            logger.info(f"Collection '{collection.name}' has {len(existing_ids)} existing chunks, resuming")
 
         batch_size = self.batch_size
         added_total = 0
@@ -61,7 +61,7 @@ class EmbeddingBuilder:
         total_chunks = 0
         encode_seconds = 0.0
 
-        logger.info(f"Embedding {len(files_info)} files to collection '{collection_name}'")
+        logger.info(f"Embedding {len(files_info)} files to collection '{collection.name}'")
 
         with tqdm(desc="Embedding", unit="chunk") as pbar:
             for file_info in files_info:
@@ -73,7 +73,7 @@ class EmbeddingBuilder:
                 total_chunks += n_chunks
                 try:
                     ids, metadatas = build_chroma_entries(
-                        chunks, file_info, self._encoder.model_name,
+                        chunks, file_info, model_name,
                     )
 
                     missing = [
@@ -123,13 +123,13 @@ class EmbeddingBuilder:
                     logger.exception("Error processing %s", file_info.filename)
 
         collection.modify(metadata={
-            "model": self._encoder.model_name,
+            "model": model_name,
             "chunking": self.current_chunking.name,
             "total_chunks": total_chunks,
         })
 
         elapsed = time.monotonic() - t0
-        logger.info(f"Done: {added_total} added, {skipped_total} skipped, {total_chunks} total in '{collection_name}' ({elapsed:.1f}s)")
+        logger.info(f"Done: {added_total} added, {skipped_total} skipped, {total_chunks} total in '{collection.name}' ({elapsed:.1f}s)")
         if encode_seconds > 0 and added_total > 0:
             speed = added_total / encode_seconds
             logger.info(f"Encode speed: {speed:,.1f} chunks/sec ({added_total} chunks in {encode_seconds:.1f}s)")

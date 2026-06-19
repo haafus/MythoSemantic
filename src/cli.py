@@ -276,9 +276,9 @@ def clean(apply: bool):
             from embeddings.chroma_manager import ChromaStore
             store = ChromaStore()
             for col in orphan_cols:
-                store.delete_collection(col["name"])
+                store.delete_collection(col["model"])
             for info in orphan_chunks:
-                collection = store.get_collection(info["collection"])
+                collection = store.get_collection(info["model"])
                 collection.delete(ids=info["orphan_ids"])
         click.echo()
 
