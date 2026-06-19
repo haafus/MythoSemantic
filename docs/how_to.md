@@ -269,6 +269,36 @@ curl http://127.0.0.1:8000/api/health
 
 Открыть интерфейс: `http://127.0.0.1:8000/`.
 
+### Публикация в интернет (Caddy)
+
+По умолчанию сервер слушает `127.0.0.1` и недоступен извне. Для публичного доступа используйте [Caddy](https://caddyserver.com) как reverse proxy — он автоматически получает и обновляет HTTPS-сертификаты от Let's Encrypt.
+
+Установка (Ubuntu/Debian):
+
+```bash
+sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+sudo apt update && sudo apt install caddy
+```
+
+Создайте `/etc/caddy/Caddyfile`:
+
+```
+mythoscope.example.com {
+    reverse_proxy localhost:8000
+}
+```
+
+Запуск:
+
+```bash
+sudo systemctl enable caddy
+sudo systemctl start caddy
+```
+
+Caddy сам получит TLS-сертификат, настроит редирект HTTP → HTTPS и проксирует запросы в uvicorn. В проекте ничего менять не нужно — `mytho server` продолжает слушать localhost.
+
 ## config/template
 
 HTML-шаблоны для старого UI.
