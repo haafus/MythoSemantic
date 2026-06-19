@@ -44,7 +44,7 @@ def build_embeddings(
                 except Exception:
                     pass
 
-            builder.set_model(model)
+            builder.load_model(model)
             logger.info(f"   Model: {model}")
             logger.info(f"   Model batch size: {builder.batch_size}")
             builder.save_all_corpus_to_chroma()

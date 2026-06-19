@@ -114,8 +114,8 @@ class EmbeddingIndexService:
         if self._model_manager is None:
             from embeddings.model_manager import ModelManager
             self._model_manager = ModelManager()
-        self._model_manager.set_model(model_name)
-        raw = self._model_manager.model.encode(
+        self._model_manager.load(model_name)
+        raw = self._model_manager.encoder.encode(
             [query],
             normalize_embeddings=True,
             convert_to_numpy=True,

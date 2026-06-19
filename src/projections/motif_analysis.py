@@ -86,13 +86,13 @@ def embed_summaries(summaries: list[str], model_name: str) -> np.ndarray:
 
     logger.info(f"Embedding {len(summaries)} summaries with {model_name}...")
     manager = ModelManager()
-    manager.set_model(model_name)
-    embeddings: np.ndarray = manager.model.encode(
+    manager.load(model_name)
+    embeddings: np.ndarray = manager.encoder.encode(
         summaries,
         show_progress_bar=True,
         normalize_embeddings=True,
     )
-    manager.close()
+    manager.unload()
     return embeddings
 
 

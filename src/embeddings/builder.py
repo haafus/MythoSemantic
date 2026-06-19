@@ -22,7 +22,7 @@ class EmbeddingBuilder:
         self.corpus_dir = Path(settings.corpus_dir)
         self.batch_size = emb.batch_size
 
-        self._models = ModelManager()
+        self._model = ModelManager()
 
         chroma_dir = Path(settings.embeddings_dir)
         chroma_dir.mkdir(parents=True, exist_ok=True)
@@ -31,10 +31,10 @@ class EmbeddingBuilder:
         self._chunking_strategies = create_chunking_strategies()
         self.set_chunking_strategy(emb.default_chunking)
 
-        self._models.set_model(embedding_model)
+        self._model.load(embedding_model)
 
-    def set_model(self, model_name: str) -> None:
-        self._models.set_model(model_name)
+    def load_model(self, model_name: str) -> None:
+        self._model.load(model_name)
 
     def set_chunking_strategy(self, strategy_name: str) -> None:
         if strategy_name not in self._chunking_strategies:
@@ -48,7 +48,7 @@ class EmbeddingBuilder:
         return [chunk for chunk in self.current_chunking(text) if chunk.strip()]
 
     def save_all_corpus_to_chroma(self) -> None:
-        collection_name = collection_name_for_model(self._models.model_name)
+        collection_name = collection_name_for_model(self._model.name)
         t0 = time.monotonic()
         files_info = list(iter_corpus_files(self.corpus_dir))
 
@@ -58,7 +58,7 @@ class EmbeddingBuilder:
 
         collection = self.chroma_client.get_or_create_collection(
             name=collection_name,
-            metadata={"model": self._models.model_name, "chunking": self.current_chunking.name},
+            metadata={"model": self._model.name, "chunking": self.current_chunking.name},
         )
 
         existing_ids = set(collection.get(include=[])["ids"])
@@ -83,7 +83,7 @@ class EmbeddingBuilder:
                 total_chunks += n_chunks
                 try:
                     ids, metadatas = build_chroma_entries(
-                        chunks, file_info, self._models.model_name,
+                        chunks, file_info, self._model.name,
                     )
 
                     missing = [
@@ -109,7 +109,7 @@ class EmbeddingBuilder:
                         b_chunks = missing_chunks[b_start:b_end]
 
                         t_enc = time.monotonic()
-                        b_embs = self._models.model.encode(
+                        b_embs = self._model.encoder.encode(
                             b_chunks,
                             batch_size=batch_size,
                             show_progress_bar=False,
@@ -134,7 +134,7 @@ class EmbeddingBuilder:
                     logger.exception("Error processing %s", file_info.filename)
 
         collection.modify(metadata={
-            "model": self._models.model_name,
+            "model": self._model.name,
             "chunking": self.current_chunking.name,
             "total_chunks": total_chunks,
         })
@@ -147,4 +147,4 @@ class EmbeddingBuilder:
 
     def close(self) -> None:
         if hasattr(self, "_models"):
-            self._models.close()
+            self._model.unload()
