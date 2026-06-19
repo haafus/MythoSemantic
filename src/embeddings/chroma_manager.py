@@ -1,5 +1,4 @@
 import hashlib
-import logging
 import re
 from typing import Any
 
@@ -8,7 +7,6 @@ import numpy as np
 
 from settings import settings
 
-logger = logging.getLogger(__name__)
 
 class ChromaStore:
     _MAX_COLLECTION_NAME = 63
