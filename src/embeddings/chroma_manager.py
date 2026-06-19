@@ -1,7 +1,6 @@
 import hashlib
 import logging
 import re
-from pathlib import Path
 from typing import Any
 
 import chromadb
@@ -94,8 +93,6 @@ def _client() -> chromadb.PersistentClient:
 
 
 def get_available_models() -> list[str]:
-    if not Path(settings.embeddings_dir).exists():
-        return []
     return sorted(
         col.metadata["model"] for col in _client().list_collections()
     )
