@@ -34,7 +34,7 @@ def analyze_embeddings(
     motif_analysis: bool = False,
     force: bool = False,
 ) -> EmbeddingAnalyzer | None:
-    from .loader import EmbeddingDataLoader
+    from embeddings.loader import EmbeddingDataLoader
 
     available_models = EmbeddingDataLoader().get_available_models()
 

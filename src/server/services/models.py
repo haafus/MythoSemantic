@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 
 def list_models_raw() -> list[str]:
-    from projections.loader import EmbeddingDataLoader
+    from embeddings.loader import EmbeddingDataLoader
 
     try:
         return EmbeddingDataLoader().get_available_models()

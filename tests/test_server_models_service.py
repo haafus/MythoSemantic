@@ -31,13 +31,13 @@ class TestKeyToModel:
 
 class TestListModelsRaw:
     def test_returns_models_from_loader(self):
-        with patch("projections.loader.EmbeddingDataLoader") as mock_cls:
+        with patch("embeddings.loader.EmbeddingDataLoader") as mock_cls:
             mock_cls.return_value.get_available_models.return_value = ["model/a", "model/b"]
             result = list_models_raw()
         assert result == ["model/a", "model/b"]
 
     def test_returns_empty_on_error(self):
-        with patch("projections.loader.EmbeddingDataLoader", side_effect=Exception("no db")):
+        with patch("embeddings.loader.EmbeddingDataLoader", side_effect=Exception("no db")):
             result = list_models_raw()
         assert result == []
 

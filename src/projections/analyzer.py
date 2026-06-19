@@ -6,7 +6,7 @@ import numpy as np
 
 from settings import settings
 
-from .loader import EmbeddingDataLoader
+from embeddings.loader import EmbeddingDataLoader
 
 logger = logging.getLogger(__name__)
 

@@ -26,4 +26,3 @@ class EmbeddingDataLoader:
         ]
         embeddings = np.array(results["embeddings"], dtype=np.float32) if records else np.empty((0, 0), dtype=np.float32)
         return records, embeddings
-
