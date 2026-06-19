@@ -1,19 +1,16 @@
 import logging
 import threading
-from collections import OrderedDict
 from typing import Any
 
 import numpy as np
 
 logger = logging.getLogger(__name__)
 
-MAX_CACHED_MODELS = 2
-
 
 class EmbeddingModelCache:
-    def __init__(self, max_models: int = MAX_CACHED_MODELS):
-        self._models: OrderedDict[str, Any] = OrderedDict()
-        self._max_models = max_models
+    def __init__(self):
+        self._model: Any = None
+        self._model_name: str | None = None
         self._lock = threading.RLock()
 
     def encode(self, model_name: str, texts: list[str]) -> np.ndarray:
@@ -30,15 +27,10 @@ class EmbeddingModelCache:
         from sentence_transformers import SentenceTransformer
 
         with self._lock:
-            if model_name in self._models:
-                self._models.move_to_end(model_name)
-                return self._models[model_name]
+            if self._model_name == model_name:
+                return self._model
 
-            model = SentenceTransformer(model_name)
-            self._models[model_name] = model
-
-            while len(self._models) > self._max_models:
-                evicted_name, _ = self._models.popitem(last=False)
-                logger.info(f"Evicted model cache: {evicted_name}")
-
-            return model
+            logger.info(f"Loading search model: {model_name}")
+            self._model = SentenceTransformer(model_name)
+            self._model_name = model_name
+            return self._model
