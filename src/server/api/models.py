@@ -1,11 +1,16 @@
 from fastapi import APIRouter
 
+from embeddings.chroma_manager import get_available_models
+from model_registry import model_to_key
 from server.schemas import ModelListResponse
-from server.services.models import list_model_summaries
 
 router = APIRouter(prefix="/api/models", tags=["models"])
 
 
 @router.get("", response_model=ModelListResponse)
 def list_models() -> dict:
-    return {"models": list_model_summaries()}
+    models = [
+        {"name": m, "key": model_to_key(m), "safe_dir": model_to_key(m)}
+        for m in get_available_models()
+    ]
+    return {"models": models}
