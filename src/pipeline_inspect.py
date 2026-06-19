@@ -105,17 +105,15 @@ def embeddings_status(settings) -> dict[str, Any]:
 
     try:
         import chromadb
-        from embeddings.chroma_manager import is_model_collection_name
 
         client = chromadb.PersistentClient(path=str(chroma_path))
         for col in client.list_collections():
-            if is_model_collection_name(col.name):
-                model_name = (col.metadata or {}).get("model", col.name)
-                result["collections"].append({
-                    "name": col.name,
-                    "model": model_name,
-                    "count": col.count(),
-                })
+            model_name = (col.metadata or {}).get("model", col.name)
+            result["collections"].append({
+                "name": col.name,
+                "model": model_name,
+                "count": col.count(),
+            })
     except Exception as e:
         result["error"] = str(e)
 
@@ -160,12 +158,9 @@ def embeddings_orphan_chunks(settings, *, skip_collections: set[str] | None = No
     results = []
     try:
         import chromadb
-        from embeddings.chroma_manager import is_model_collection_name
 
         client = chromadb.PersistentClient(path=str(chroma_path))
         for col in client.list_collections():
-            if not is_model_collection_name(col.name):
-                continue
             if col.name in skip_collections:
                 continue
             all_meta = col.get(include=["metadatas"])

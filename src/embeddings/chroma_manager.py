@@ -35,13 +35,6 @@ def collection_name_for_model(model_name: Any) -> str:
     return f"{safe_name}{suffix}"
 
 
-def is_model_collection_name(collection_name: str) -> bool:
-    if not collection_name:
-        return False
-    return bool(re.fullmatch(r"[a-z0-9][a-z0-9_-]{2,53}_[0-9a-f]{8}", collection_name))
-
-
-
 def save_to_chroma_collection(
     collection: chromadb.Collection,
     ids: list[str],

@@ -17,7 +17,6 @@ _mod = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_mod)
 
 collection_name_for_model = _mod.collection_name_for_model
-is_model_collection_name = _mod.is_model_collection_name
 
 
 class TestCollectionNameForModel:
@@ -45,13 +44,3 @@ class TestCollectionNameForModel:
         assert len(name) <= 63
 
 
-class TestIsModelCollectionName:
-    def test_valid_collection_name(self):
-        name = collection_name_for_model("BAAI/bge-m3")
-        assert is_model_collection_name(name) is True
-
-    def test_invalid_collection_name(self):
-        assert is_model_collection_name("random_string") is False
-
-    def test_empty_string(self):
-        assert is_model_collection_name("") is False
