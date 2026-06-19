@@ -5,20 +5,8 @@ from settings import settings
 
 from .builder import EmbeddingBuilder
 from .chroma_manager import collection_name_for_model, delete_collection
-from .chunking import create_chunking_strategies
-from corpus.corpus_iterator import iter_corpus_files
 
 logger = logging.getLogger(__name__)
-
-
-def _count_corpus_chunks(corpus_dir, chunking: str) -> int:
-    strategies = create_chunking_strategies()
-    chunk_fn = strategies[chunking]
-    total = 0
-    for file_info in iter_corpus_files(corpus_dir):
-        content = file_info.read()
-        total += sum(1 for c in chunk_fn(content) if c.strip())
-    return total
 
 
 def build_embeddings(
@@ -37,8 +25,6 @@ def build_embeddings(
     logger.info(f"   Source: {settings.corpus_dir}")
     logger.info(f"   Embeddings: {settings.embeddings_dir}")
 
-    expected_chunks: int | None = None
-
     try:
         for model in models_to_run:
             collection_name = collection_name_for_model(model)
@@ -49,15 +35,12 @@ def build_embeddings(
                 try:
                     coll = builder.chroma_client.get_collection(name=collection_name)
                     count = coll.count()
+                    expected = (coll.metadata or {}).get("total_chunks")
+                    if expected and count >= expected:
+                        logger.info(f"   Skipping {model}: collection complete ({count} chunks)")
+                        continue
                     if count > 0:
-                        if expected_chunks is None:
-                            expected_chunks = _count_corpus_chunks(
-                                settings.corpus_dir, settings.embedding.default_chunking,
-                            )
-                        if count >= expected_chunks:
-                            logger.info(f"   Skipping {model}: collection complete ({count} chunks)")
-                            continue
-                        logger.info(f"   Resuming {model}: {count}/{expected_chunks} chunks")
+                        logger.info(f"   Resuming {model}: {count} chunks exist")
                 except Exception:
                     pass
 

@@ -66,7 +66,7 @@ def build_chroma_entries(
 def save_to_chroma_collection(
     collection: chromadb.Collection,
     ids: list[str],
-    embeddings: list[list[float]],
+    embeddings: np.ndarray | list[list[float]],
     metadatas: list[dict[str, Any]],
     documents: list[str],
 ):

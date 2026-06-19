@@ -65,26 +65,22 @@ class EmbeddingBuilder:
         if existing_ids:
             logger.info(f"Collection '{collection_name}' has {len(existing_ids)} existing chunks, resuming")
 
-        file_chunks: list[tuple[dict, list[str]]] = []
-        total_chunks = 0
-        for fi in files_info:
-            content = fi.read()
-            chunks = self._chunk_text(content)
-            if chunks:
-                file_chunks.append((fi, chunks))
-                total_chunks += len(chunks)
-
         batch_size = self.batch_size
         added_total = 0
         skipped_total = 0
+        total_chunks = 0
         encode_seconds = 0.0
-        encode_tokens = 0
 
-        logger.info(f"Saving {len(files_info)} files ({total_chunks} chunks) to collection '{collection_name}'")
+        logger.info(f"Embedding {len(files_info)} files to collection '{collection_name}'")
 
-        with tqdm(total=total_chunks, desc="Embedding", unit="chunk") as pbar:
-            for file_info, chunks in file_chunks:
+        with tqdm(desc="Embedding", unit="chunk") as pbar:
+            for file_info in files_info:
+                content = file_info.read()
+                chunks = self._chunk_text(content)
+                if not chunks:
+                    continue
                 n_chunks = len(chunks)
+                total_chunks += n_chunks
                 try:
                     ids, metadatas = build_chroma_entries(
                         chunks, file_info, self._models.model_name,
@@ -112,9 +108,6 @@ class EmbeddingBuilder:
                         b_end = min(b_start + batch_size, len(missing_chunks))
                         b_chunks = missing_chunks[b_start:b_end]
 
-                        tokenized = self._models.model.tokenizer(b_chunks, padding=False, truncation=True)
-                        encode_tokens += sum(len(ids) for ids in tokenized["input_ids"])
-
                         t_enc = time.monotonic()
                         b_embs = self._models.model.encode(
                             b_chunks,
@@ -128,7 +121,7 @@ class EmbeddingBuilder:
                         save_to_chroma_collection(
                             collection=collection,
                             ids=missing_ids[b_start:b_end],
-                            embeddings=b_embs.tolist(),
+                            embeddings=b_embs,
                             metadatas=missing_metas[b_start:b_end],
                             documents=b_chunks,
                         )
@@ -140,11 +133,17 @@ class EmbeddingBuilder:
                 except Exception:
                     logger.exception("Error processing %s", file_info.filename)
 
+        collection.modify(metadata={
+            "model": self._models.model_name,
+            "chunking": self.current_chunking.name,
+            "total_chunks": total_chunks,
+        })
+
         elapsed = time.monotonic() - t0
-        logger.info(f"Total added: {added_total}, skipped: {skipped_total} chunks in collection '{collection_name}' ({elapsed:.1f}s)")
-        if encode_seconds > 0 and encode_tokens > 0:
-            speed = encode_tokens / encode_seconds
-            logger.info(f"Embedding speed: {speed:,.0f} tokens/sec (batch_size={batch_size}, {encode_tokens:,} tokens in {encode_seconds:.1f}s)")
+        logger.info(f"Done: {added_total} added, {skipped_total} skipped, {total_chunks} total in '{collection_name}' ({elapsed:.1f}s)")
+        if encode_seconds > 0 and added_total > 0:
+            speed = added_total / encode_seconds
+            logger.info(f"Encode speed: {speed:,.1f} chunks/sec ({added_total} chunks in {encode_seconds:.1f}s)")
 
     def close(self) -> None:
         if hasattr(self, "_models"):
