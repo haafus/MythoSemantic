@@ -11,26 +11,31 @@ for stub_name in ["networkx", "openai"]:
         sys.modules[stub_name] = types.ModuleType(stub_name)
         _stubs_added.append(stub_name)
 
-_graph_gen_stub = types.ModuleType("graphs.graph_generator")
-_graph_gen_stub.generate_and_save_graph = lambda *a, **kw: None  # type: ignore[attr-defined]
-sys.modules["graphs.graph_generator"] = _graph_gen_stub
-
 _llm_stub = types.ModuleType("llm_processing")
 _llm_stub.LLMProcessor = type("LLMProcessor", (), {})  # type: ignore[attr-defined]
 sys.modules["llm_processing"] = _llm_stub
 
-_spec = importlib.util.spec_from_file_location(
-    "graphs.run_graph_generation",
-    os.path.join(_parent, "run_graph_generation.py"),
-)
-assert _spec is not None and _spec.loader is not None
-_mod = importlib.util.module_from_spec(_spec)
-sys.modules["graphs.run_graph_generation"] = _mod
-_spec.loader.exec_module(_mod)
 
-chunk_text = _mod.chunk_text
-deduplicate_entities = _mod.deduplicate_entities
-deduplicate_relations = _mod.deduplicate_relations
+def _load_module(name: str, filename: str):
+    spec = importlib.util.spec_from_file_location(name, os.path.join(_parent, filename))
+    assert spec is not None and spec.loader is not None
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules[name] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+
+_chunking = _load_module("graphs.chunking", "chunking.py")
+_extraction = _load_module("graphs.extraction", "extraction.py")
+_checkpointing = _load_module("graphs.checkpointing", "checkpointing.py")
+
+chunk_text = _chunking.chunk_text
+deduplicate_entities = _extraction.deduplicate_entities
+deduplicate_relations = _extraction.deduplicate_relations
+extract_from_chunk = _extraction.extract_from_chunk
+load_checkpoint = _checkpointing.load_checkpoint
+save_checkpoint = _checkpointing.save_checkpoint
+clear_checkpoint = _checkpointing.clear_checkpoint
 
 
 class TestChunkText:
@@ -97,12 +102,6 @@ class TestDeduplicateRelations:
         ]
         result = deduplicate_relations(rels)
         assert len(result) == 1
-
-
-load_checkpoint = _mod.load_checkpoint
-save_checkpoint = _mod.save_checkpoint
-clear_checkpoint = _mod.clear_checkpoint
-extract_from_chunk = _mod.extract_from_chunk
 
 
 class TestCheckpoint:
