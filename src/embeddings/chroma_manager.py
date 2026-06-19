@@ -73,6 +73,9 @@ class ChromaStore:
     def get_collection(self, name: str) -> chromadb.Collection:
         return self._client.get_collection(name=name)
 
+    def list_collections(self):
+        return self._client.list_collections()
+
     def get_available_models(self) -> list[str]:
         return sorted(
             col.metadata["model"] for col in self._client.list_collections()

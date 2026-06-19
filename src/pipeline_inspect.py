@@ -104,10 +104,10 @@ def embeddings_status(settings) -> dict[str, Any]:
         return result
 
     try:
-        import chromadb
+        from embeddings.chroma_manager import ChromaStore
 
-        client = chromadb.PersistentClient(path=str(chroma_path))
-        for col in client.list_collections():
+        store = ChromaStore()
+        for col in store.list_collections():
             model_name = (col.metadata or {}).get("model", col.name)
             result["collections"].append({
                 "name": col.name,
@@ -157,10 +157,10 @@ def embeddings_orphan_chunks(settings, *, skip_collections: set[str] | None = No
     known_text_ids = {normalize_catalog_id(e["id"]) for e in meta_entries if e.get("id")}
     results = []
     try:
-        import chromadb
+        from embeddings.chroma_manager import ChromaStore
 
-        client = chromadb.PersistentClient(path=str(chroma_path))
-        for col in client.list_collections():
+        store = ChromaStore()
+        for col in store.list_collections():
             if col.name in skip_collections:
                 continue
             all_meta = col.get(include=["metadatas"])
