@@ -5,13 +5,6 @@ from server.run_server import create_app
 client = TestClient(create_app())
 
 
-class TestHealthEndpoint:
-    def test_returns_ok(self):
-        response = client.get("/api/health")
-        assert response.status_code == 200
-        assert response.json() == {"status": "ok"}
-
-
 class TestSPAFallback:
     def test_spa_serves_index(self):
         response = client.get("/nonexistent/page")

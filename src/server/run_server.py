@@ -46,10 +46,6 @@ def create_app() -> FastAPI:
 
         return response
 
-    @app.get("/api/health")
-    def health() -> dict[str, str]:
-        return {"status": "ok"}
-
     @app.get("/")
     def index() -> FileResponse:
         return _index_response()
