@@ -79,7 +79,7 @@ class EmbeddingBuilder:
             metadata={"model": model_name, "chunking": self.current_chunking.name},
         )
 
-        existing_ids = set(collection.get(include=[])["ids"])
+        existing_ids = collection.existing_ids()
         if existing_ids:
             logger.info(f"Collection '{collection.name}' has {len(existing_ids)} existing chunks, resuming")
 

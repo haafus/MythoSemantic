@@ -8,6 +8,52 @@ import numpy as np
 from settings import settings
 
 
+class ChromaCollection:
+    def __init__(self, collection: chromadb.Collection):
+        self._collection = collection
+
+    @property
+    def name(self) -> str:
+        return self._collection.name
+
+    @property
+    def metadata(self) -> dict:
+        return self._collection.metadata or {}
+
+    def count(self) -> int:
+        return self._collection.count()
+
+    def existing_ids(self) -> set[str]:
+        return set(self._collection.get(include=[])["ids"])
+
+    def upsert(
+        self,
+        ids: list[str],
+        embeddings: np.ndarray | list[list[float]],
+        metadatas: list[dict[str, Any]],
+        documents: list[str],
+    ) -> None:
+        self._collection.upsert(
+            ids=ids, embeddings=embeddings, metadatas=metadatas, documents=documents,
+        )
+
+    def modify(self, metadata: dict) -> None:
+        self._collection.modify(metadata=metadata)
+
+    def delete(self, ids: list[str]) -> None:
+        self._collection.delete(ids=ids)
+
+    def load_data(self) -> tuple[list[dict[str, Any]], np.ndarray]:
+        results = self._collection.get(include=["embeddings", "metadatas", "documents"])
+
+        records = [
+            {**meta, "text": doc}
+            for meta, doc in zip(results["metadatas"], results["documents"], strict=True)
+        ]
+        embeddings = np.array(results["embeddings"], dtype=np.float32) if records else np.empty((0, 0), dtype=np.float32)
+        return records, embeddings
+
+
 class ChromaStore:
     _MAX_COLLECTION_NAME = 63
     _COLLECTION_HASH_LEN = 8
@@ -36,30 +82,23 @@ class ChromaStore:
 
         return f"{safe_name}{suffix}"
 
-    def get_or_create_collection(self, model_name: str, **kwargs) -> chromadb.Collection:
-        return self._client.get_or_create_collection(name=self._collection_name(model_name), **kwargs)
+    def get_or_create_collection(self, model_name: str, **kwargs) -> ChromaCollection:
+        return ChromaCollection(
+            self._client.get_or_create_collection(name=self._collection_name(model_name), **kwargs)
+        )
 
-    def get_collection(self, model_name: str) -> chromadb.Collection:
-        return self._client.get_collection(name=self._collection_name(model_name))
+    def get_collection(self, model_name: str) -> ChromaCollection:
+        return ChromaCollection(
+            self._client.get_collection(name=self._collection_name(model_name))
+        )
 
-    def list_collections(self):
-        return self._client.list_collections()
+    def list_collections(self) -> list[ChromaCollection]:
+        return [ChromaCollection(col) for col in self._client.list_collections()]
 
     def get_available_models(self) -> list[str]:
         return sorted(
             col.metadata["model"] for col in self._client.list_collections()
         )
-
-    def load_data(self, model_name: str) -> tuple[list[dict[str, Any]], np.ndarray]:
-        collection = self._client.get_collection(name=self._collection_name(model_name))
-        results = collection.get(include=["embeddings", "metadatas", "documents"])
-
-        records = [
-            {**meta, "text": doc}
-            for meta, doc in zip(results["metadatas"], results["documents"], strict=True)
-        ]
-        embeddings = np.array(results["embeddings"], dtype=np.float32) if records else np.empty((0, 0), dtype=np.float32)
-        return records, embeddings
 
     def delete_collection(self, model_name: str) -> bool:
         try:

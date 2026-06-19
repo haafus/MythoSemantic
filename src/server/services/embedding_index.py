@@ -82,7 +82,7 @@ class EmbeddingIndexService:
     def _load_index(self, model_name: str) -> ModelIndex:
         from embeddings.chroma_manager import ChromaStore
 
-        items, embeddings = ChromaStore().load_data(model_name=model_name)
+        items, embeddings = ChromaStore().get_collection(model_name).load_data()
         if not items:
             raise KeyError(f"No embedding data found for {model_name}")
 
