@@ -88,9 +88,11 @@ mytho corpus --type all --force
 Модуль генерации эмбеддингов и записи в Chroma DB.
 
 Основные файлы:
+- `src/embeddings/build_embeddings.py` оркестрирует генерацию для нескольких моделей (skip/resume по метаданным коллекции).
 - `src/embeddings/builder.py` читает корпус, режет тексты на чанки, считает эмбеддинги и пишет в Chroma.
-- `src/embeddings/build_embeddings.py` оркестрирует генерацию для нескольких моделей.
-- `src/embeddings/chunking.py` содержит стратегии chunking.
+- `src/embeddings/chunking.py` содержит стратегии chunking (character, sentence, paragraph).
+- `src/embeddings/chroma_manager.py` все операции с ChromaDB: создание коллекций, upsert, загрузка данных, список моделей.
+- `src/embeddings/model_manager.py` загрузка/выгрузка SentenceTransformer моделей.
 - `config/models.json` задает модели и алиасы.
 
 Возможности:
@@ -120,9 +122,9 @@ mytho embeddings --model bge-m3 --force
 Модуль анализа эмбеддингов из Chroma DB и генерации HTML/CSV/JSON-артефактов в `outputs/projections/`.
 
 Основные файлы:
-- `src/projections/loader.py` читает данные из Chroma.
-- `src/projections/analyzer.py` собирает статистику.
+- `src/projections/analyzer.py` загружает данные из Chroma и собирает статистику.
 - `src/projections/visualization.py` строит UMAP-проекцию, heatmap и distribution chart.
+- `src/projections/run_analysis.py` оркестрирует анализ для нескольких моделей.
 
 Возможности:
 - Получить статистику по модели.
@@ -153,7 +155,10 @@ mytho projections --model "BAAI/bge-m3" --no-plots
 
 Основные файлы:
 - `config/graphs_prompts.json` содержит промпты для извлечения сущностей.
-- `src/graphs/run_graph_generation.py` режет тексты на чанки и агрегирует сущности.
+- `src/graphs/run_graph_generation.py` оркестрирует генерацию: итерация по текстам, чанкинг, агрегация.
+- `src/graphs/extraction.py` извлекает сущности через LLM и дедуплицирует их.
+- `src/graphs/chunking.py` разбивает тексты на чанки с перекрытием.
+- `src/graphs/checkpointing.py` сохранение/загрузка промежуточных результатов.
 - `src/graphs/graph_generator.py` строит HTML-граф через NetworkX и Cytoscape.
 - `src/llm_processing.py` вызывает OpenAI-compatible API.
 
@@ -204,14 +209,47 @@ mytho clean --apply
 
 ## server
 
-Современный FastAPI-сервер и SPA-интерфейс.
+FastAPI-сервер и SPA-интерфейс.
 
-Возможности:
-- API для списка моделей, корпуса, географии, похожих фрагментов и кластеризации.
-- Раздача веб-интерфейса из `src/server/web`.
-- Раздача готовых HTML-артефактов из `outputs/projections/`, `config/template/`, `outputs/corpus/`.
+Основные файлы:
+- `src/server/run_server.py` создание приложения, middleware, статика, SPA fallback.
+- `src/server/api/models.py` список доступных embedding-моделей.
+- `src/server/api/corpus.py` каталог текстов, чтение документов, скачивание архива.
+- `src/server/api/geography.py` традиции с географией.
+- `src/server/api/projections.py` данные проекций и сохранённые HTML-графики.
+- `src/server/api/points.py` информация о точках эмбеддингов и соседи.
+- `src/server/api/search.py` семантический поиск (синхронный и асинхронный), warmup.
+- `src/server/schemas.py` Pydantic-схемы запросов и ответов.
+- `src/server/services/` сервисный слой (бизнес-логика, загрузка данных).
 
-Запуск:
+### API эндпоинты
+
+| Метод | Путь | Описание |
+|-------|------|----------|
+| GET | `/api/health` | Проверка работоспособности |
+| GET | `/api/models` | Список embedding-моделей |
+| GET | `/api/corpus/catalog` | Каталог текстов корпуса |
+| GET | `/api/corpus/documents` | Текст документа по ID |
+| GET | `/api/corpus/archive` | ZIP-архив корпуса |
+| GET | `/api/geography/traditions` | Традиции с координатами |
+| GET | `/api/similarity/projections/{model}/{method}` | JSON-данные проекции |
+| GET | `/api/similarity/saved-html/{model}/{method}` | URL сохранённого HTML-графика |
+| GET | `/api/similarity/points/{model}/{point_id}` | Информация о точке |
+| GET | `/api/similarity/points/{model}/{point_id}/neighbors` | Ближайшие соседи точки |
+| POST | `/api/similarity/search` | Синхронный семантический поиск |
+| POST | `/api/similarity/search/jobs` | Запуск асинхронного поиска |
+| GET | `/api/similarity/search/jobs/{job_id}` | Статус/результат асинхронного поиска |
+| POST | `/api/similarity/search/warmup` | Предзагрузка модели и индекса |
+
+### Интерактивная документация
+
+FastAPI автоматически генерирует документацию из Pydantic-схем:
+
+- `http://localhost:8000/docs` — Swagger UI (интерактивное тестирование эндпоинтов)
+- `http://localhost:8000/redoc` — ReDoc (читаемая документация)
+- `http://localhost:8000/openapi.json` — OpenAPI-схема (для кодогенерации или Postman)
+
+### Запуск
 
 ```bash
 mytho server
