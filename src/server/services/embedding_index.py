@@ -5,7 +5,6 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from embeddings.model_cache import EmbeddingModelCache
 from model_registry import key_to_model
 
 logger = logging.getLogger(__name__)
@@ -26,7 +25,7 @@ class EmbeddingIndexService:
     def __init__(self):
         self._indexes: OrderedDict[str, ModelIndex] = OrderedDict()
         self._index_lock = threading.RLock()
-        self._model_cache = EmbeddingModelCache()
+        self._model_manager = None
 
     def get_index(self, model_key: str) -> ModelIndex:
         model_name = key_to_model(model_key)
@@ -84,7 +83,7 @@ class EmbeddingIndexService:
     def search(self, model_key: str, query: str, top_k: int = 20) -> list[dict]:
         model_name = key_to_model(model_key)
         index = self.get_index(model_name)
-        query_embedding = self._model_cache.encode(model_name, [query])
+        query_embedding = self._encode_query(model_name, query)
         similarities = index.normalized_matrix @ query_embedding
         return self._top_results(index, similarities, top_k)
 
@@ -117,7 +116,20 @@ class EmbeddingIndexService:
 
     def warmup(self, model_key: str) -> None:
         self.get_index(model_key)
-        self._model_cache.encode(model_key, ["warmup"])
+        self._encode_query(key_to_model(model_key), "warmup")
+
+    def _encode_query(self, model_name: str, query: str) -> np.ndarray:
+        if self._model_manager is None:
+            from embeddings.model_manager import ModelManager
+            self._model_manager = ModelManager()
+        self._model_manager.set_model(model_name)
+        raw = self._model_manager.model.encode(
+            [query],
+            normalize_embeddings=True,
+            convert_to_numpy=True,
+            show_progress_bar=False,
+        )
+        return np.asarray(raw[0], dtype=np.float32)
 
     @staticmethod
     def _normalize_matrix(matrix: np.ndarray) -> np.ndarray:

@@ -6,7 +6,7 @@ from typing import Any
 import torch
 from sentence_transformers import SentenceTransformer
 
-from model_registry import active_embedding_models, resolve_embedding_model
+from model_registry import resolve_embedding_model
 
 logger = logging.getLogger(__name__)
 
@@ -33,9 +33,6 @@ class ModelManager:
 
     def set_model(self, model_name: str) -> None:
         model_name = resolve_embedding_model(model_name)
-        available = active_embedding_models()
-        if model_name not in available:
-            raise ValueError(f"Model '{model_name}' not found. Available: {available}")
 
         if self.model is not None and self.model_name == model_name:
             return
