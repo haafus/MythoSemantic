@@ -5,7 +5,7 @@ import time
 import zipfile
 from pathlib import Path
 
-from corpus.utils import sanitize_filename
+from corpus.utils import corpus_text_path, load_traditions, read_document, sanitize_filename
 from settings import settings
 
 logger = logging.getLogger(__name__)
@@ -21,18 +21,12 @@ def to_int(value, default: int = 0) -> int:
         return default
 
 
-
-def source_root() -> Path:
-    return settings.corpus_dir
-
-
 def get_catalog_documents() -> list[dict]:
     cached = _catalog_cache.get("corpus")
     if cached and time.monotonic() - cached[0] < _CATALOG_TTL:
         return cached[1]
 
-    root = source_root()
-    metadata_path = root / "corpus.json"
+    metadata_path = settings.corpus_dir / "corpus.json"
 
     metadata_rows = []
     if metadata_path.exists():
@@ -43,7 +37,7 @@ def get_catalog_documents() -> list[dict]:
             logger.warning("Failed to read metadata %s: %s", metadata_path, e)
 
     documents = []
-    traditions_info = get_traditions_info()
+    traditions_info = load_traditions(settings.corpus_dir)
 
     for row in metadata_rows:
         tradition_info = traditions_info.get(row.get("tradition", ""), {})
@@ -73,68 +67,28 @@ def get_catalog_documents() -> list[dict]:
     return documents
 
 
-
-def resolve_document_path(
-    doc_id: str, major_tradition: str, tradition: str,
-) -> tuple[Path | None, str]:
-    corpus_root = source_root().resolve()
-    major_path = sanitize_filename(major_tradition)
-    tradition_path = sanitize_filename(tradition)
-    title_path = sanitize_filename(doc_id)
-    file_path = (corpus_root / major_path / tradition_path / f"{title_path}.txt").resolve()
-
-    try:
-        file_path.relative_to(corpus_root)
-    except ValueError:
-        return None, title_path
-
-    return file_path, title_path
-
-
-def read_document(doc_id: str, major_tradition: str, tradition: str) -> tuple[str, str]:
-    file_path, title_path = resolve_document_path(doc_id, major_tradition, tradition)
-    if not file_path:
-        raise PermissionError("Access denied")
-    if not file_path.exists():
-        raise FileNotFoundError(str(file_path))
-
-    return file_path.read_text(encoding="utf-8"), title_path
-
-
 def build_corpus_archive() -> io.BytesIO:
     documents = get_catalog_documents()
     buf = io.BytesIO()
 
     with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for doc in documents:
-            file_path, title_path = resolve_document_path(
-                doc.get("id", ""),
+            file_path = corpus_text_path(
+                settings.corpus_dir,
                 doc.get("major_tradition", ""),
                 doc.get("tradition", ""),
+                doc.get("id", ""),
             )
 
-            if not file_path or not file_path.exists():
+            if not file_path.exists():
                 continue
 
             archive_name = (
                 Path(sanitize_filename(doc.get("major_tradition", "Unknown")))
                 / sanitize_filename(doc.get("tradition", "Unknown"))
-                / f"{title_path}.txt"
+                / file_path.name
             ).as_posix()
             archive.write(file_path, archive_name)
 
     buf.seek(0)
     return buf
-
-
-def get_traditions_info() -> dict:
-    path = settings.corpus_dir / "traditions.json"
-    if not path.exists():
-        return {}
-    try:
-        with path.open("r", encoding="utf-8") as handle:
-            data = json.load(handle)
-        return data if isinstance(data, dict) else {}
-    except (OSError, json.JSONDecodeError) as e:
-        logger.warning("Failed to read %s: %s", path, e)
-    return {}

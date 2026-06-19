@@ -1,12 +1,8 @@
 import json
 
 import server.services.corpus as corpus_mod
-from server.services.corpus import (
-    get_catalog_documents,
-    get_traditions_info,
-    read_document,
-    resolve_document_path,
-)
+from corpus.utils import load_traditions, read_document
+from server.services.corpus import get_catalog_documents
 from settings import settings
 
 
@@ -25,47 +21,12 @@ def _patch_corpus(monkeypatch, tmp_path):
     monkeypatch.setattr(settings, "corpus_dir", tmp_path)
 
 
-class TestResolveDocumentPath:
-    def test_existing_file(self, tmp_path, monkeypatch):
-        _make_corpus(tmp_path)
-        _patch_corpus(monkeypatch, tmp_path)
-
-        file_path, title = resolve_document_path("Iliad", "European", "Greek")
-        assert file_path is not None
-        assert file_path.exists()
-        assert title == "Iliad"
-
-    def test_missing_file(self, tmp_path, monkeypatch):
-        _patch_corpus(monkeypatch, tmp_path)
-
-        file_path, title = resolve_document_path("Missing", "No", "Where")
-        assert file_path is not None
-        assert not file_path.exists()
-        assert title == "Missing"
-
-    def test_path_traversal_sanitized(self, tmp_path, monkeypatch):
-        _patch_corpus(monkeypatch, tmp_path)
-
-        file_path, title = resolve_document_path("../../etc/passwd", "a", "b")
-        assert file_path is not None
-        assert tmp_path.resolve() in file_path.resolve().parents
-        assert "/" not in title
-
-    def test_sanitizes_special_chars(self, tmp_path, monkeypatch):
-        _patch_corpus(monkeypatch, tmp_path)
-
-        _, title = resolve_document_path('bad<>file:name', "a", "b")
-        assert "<" not in title
-        assert ">" not in title
-        assert ":" not in title
-
-
 class TestReadDocument:
     def test_reads_text(self, tmp_path, monkeypatch):
         _make_corpus(tmp_path)
         _patch_corpus(monkeypatch, tmp_path)
 
-        text, title = read_document("Iliad", "European", "Greek")
+        text, title = read_document(tmp_path, "Iliad", "European", "Greek")
         assert "Achilles" in text
         assert title == "Iliad"
 
@@ -75,7 +36,7 @@ class TestReadDocument:
         import pytest
 
         with pytest.raises(FileNotFoundError):
-            read_document("Nonexistent", "A", "B")
+            read_document(tmp_path, "Nonexistent", "A", "B")
 
     def test_traversal_sanitized_raises_not_found(self, tmp_path, monkeypatch):
         _patch_corpus(monkeypatch, tmp_path)
@@ -83,7 +44,7 @@ class TestReadDocument:
         import pytest
 
         with pytest.raises(FileNotFoundError):
-            read_document("../../etc/passwd", "a", "b")
+            read_document(tmp_path, "../../etc/passwd", "a", "b")
 
 
 class TestGetCatalogDocuments:
@@ -129,17 +90,17 @@ class TestGetCatalogDocuments:
         assert docs[1]["major_tradition"] == "Z"
 
 
-class TestGetTraditionsInfo:
+class TestLoadTraditions:
     def test_from_corpus_dir(self, tmp_path, monkeypatch):
         info = {"Greek": {"color": "#ff0000", "description": "Ancient Greek"}}
         (tmp_path / "traditions.json").write_text(json.dumps(info))
         _patch_corpus(monkeypatch, tmp_path)
 
-        result = get_traditions_info()
+        result = load_traditions(tmp_path)
         assert result["Greek"]["color"] == "#ff0000"
 
     def test_missing_returns_empty(self, tmp_path, monkeypatch):
         _patch_corpus(monkeypatch, tmp_path)
 
-        result = get_traditions_info()
+        result = load_traditions(tmp_path)
         assert result == {}

@@ -1,8 +1,10 @@
 from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import PlainTextResponse, StreamingResponse
 
+from corpus.utils import read_document
 from server.schemas import CatalogResponse
-from server.services.corpus import build_corpus_archive, get_catalog_documents, read_document
+from server.services.corpus import build_corpus_archive, get_catalog_documents
+from settings import settings
 
 router = APIRouter(prefix="/api/corpus", tags=["corpus"])
 
@@ -20,7 +22,7 @@ def document(
     tradition: str = Query(...),
 ):
     try:
-        text, _ = read_document(doc_id, major_tradition, tradition)
+        text, _ = read_document(settings.corpus_dir, doc_id, major_tradition, tradition)
         return text
     except PermissionError as exc:
         raise HTTPException(status_code=403, detail="Access denied") from exc
