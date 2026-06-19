@@ -273,13 +273,12 @@ def clean(apply: bool):
             total_items += n
             click.echo(f"  orphan chunks in {info['model']:<30} {n:>6} / {info['total_count']}")
         if apply:
-            import chromadb
-            from embeddings.chroma_manager import delete_collection
-            client = chromadb.PersistentClient(path=str(settings.embeddings_dir))
+            from embeddings.chroma_manager import ChromaStore
+            store = ChromaStore()
             for col in orphan_cols:
-                delete_collection(client, col["name"])
+                store.delete_collection(col["name"])
             for info in orphan_chunks:
-                collection = client.get_collection(name=info["collection"])
+                collection = store.get_collection(info["collection"])
                 collection.delete(ids=info["orphan_ids"])
         click.echo()
 

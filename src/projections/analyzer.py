@@ -6,7 +6,7 @@ import numpy as np
 
 from settings import settings
 
-from embeddings.chroma_manager import load_data
+from embeddings.chroma_manager import ChromaStore
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ class EmbeddingAnalyzer:
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         logger.info(f"Loading data for model: {model_name}...")
-        self.data, self.embeddings = load_data(model_name=model_name)
+        self.data, self.embeddings = ChromaStore().load_data(model_name=model_name)
 
         if not self.data:
             logger.warning(f"No data found for model '{model_name}' ")

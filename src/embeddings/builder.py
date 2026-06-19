@@ -2,11 +2,10 @@ import logging
 import time
 from pathlib import Path
 
-import chromadb
 import numpy as np
 from tqdm import tqdm
 
-from .chroma_manager import build_chroma_entries, collection_name_for_model, save_to_chroma_collection
+from .chroma_manager import ChromaStore, build_chroma_entries, collection_name_for_model
 from .chunking import create_chunking_strategies
 from corpus.corpus_iterator import iter_corpus_files
 from .model_manager import EmbeddingEncoder
@@ -15,17 +14,17 @@ logger = logging.getLogger(__name__)
 
 
 class EmbeddingBuilder:
-    def __init__(self, encoder: EmbeddingEncoder):
+    def __init__(self, encoder: EmbeddingEncoder, store: ChromaStore):
         from settings import settings
 
         emb = settings.embedding
         self.corpus_dir = Path(settings.corpus_dir)
         self.batch_size = emb.batch_size
         self._encoder = encoder
+        self._store = store
 
-        chroma_dir = Path(settings.embeddings_dir)
-        chroma_dir.mkdir(parents=True, exist_ok=True)
-        self.chroma_client = chromadb.PersistentClient(path=str(chroma_dir))
+        self._chunking_strategies = create_chunking_strategies()
+        self.set_chunking_strategy(emb.default_chunking)
 
     def set_chunking_strategy(self, strategy_name: str) -> None:
         if strategy_name not in self._chunking_strategies:
@@ -47,7 +46,7 @@ class EmbeddingBuilder:
             logger.warning("No files found in corpus/. Check the folder structure.")
             return
 
-        collection = self.chroma_client.get_or_create_collection(
+        collection = self._store.get_or_create_collection(
             name=collection_name,
             metadata={"model": self._encoder.model_name, "chunking": self.current_chunking.name},
         )
@@ -109,8 +108,7 @@ class EmbeddingBuilder:
                         encode_seconds += time.monotonic() - t_enc
                         b_embs = np.asarray(b_embs, dtype=np.float32)
 
-                        save_to_chroma_collection(
-                            collection=collection,
+                        collection.upsert(
                             ids=missing_ids[b_start:b_end],
                             embeddings=b_embs,
                             metadatas=missing_metas[b_start:b_end],
@@ -135,6 +133,3 @@ class EmbeddingBuilder:
         if encode_seconds > 0 and added_total > 0:
             speed = added_total / encode_seconds
             logger.info(f"Encode speed: {speed:,.1f} chunks/sec ({added_total} chunks in {encode_seconds:.1f}s)")
-
-    def close(self) -> None:
-        pass

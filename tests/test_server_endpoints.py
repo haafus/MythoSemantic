@@ -30,7 +30,8 @@ class TestModelsEndpoint:
     def test_list_models(self):
         from unittest.mock import patch
 
-        with patch("server.api.models.get_available_models", return_value=[]):
+        with patch("server.api.models.ChromaStore") as MockStore:
+            MockStore.return_value.get_available_models.return_value = []
             response = client.get("/api/models")
         assert response.status_code == 200
         data = response.json()

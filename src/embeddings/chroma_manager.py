@@ -63,65 +63,43 @@ def build_chroma_entries(
     return ids, metadatas
 
 
-def save_to_chroma_collection(
-    collection: chromadb.Collection,
-    ids: list[str],
-    embeddings: np.ndarray | list[list[float]],
-    metadatas: list[dict[str, Any]],
-    documents: list[str],
-):
-    collection.upsert(
-        ids=ids,
-        embeddings=embeddings,
-        metadatas=metadatas,
-        documents=documents,
-    )
+class ChromaStore:
+    def __init__(self):
+        self._client = chromadb.PersistentClient(path=str(settings.embeddings_dir))
 
+    def get_or_create_collection(self, name: str, **kwargs) -> chromadb.Collection:
+        return self._client.get_or_create_collection(name=name, **kwargs)
 
-def _is_missing_collection_error(error: Exception) -> bool:
-    message = str(error).lower()
-    return "does not exist" in message or "doesn't exist" in message or "not found" in message
+    def get_collection(self, name: str) -> chromadb.Collection:
+        return self._client.get_collection(name=name)
 
+    def get_available_models(self) -> list[str]:
+        return sorted(
+            col.metadata["model"] for col in self._client.list_collections()
+        )
 
-def _is_readonly_database_error(error: Exception) -> bool:
-    message = str(error).lower()
-    return "readonly database" in message or "read-only database" in message
+    def load_data(self, model_name: str) -> tuple[list[dict[str, Any]], np.ndarray]:
+        collection = self._client.get_collection(name=collection_name_for_model(model_name))
+        results = collection.get(include=["embeddings", "metadatas", "documents"])
 
+        records = [
+            {**meta, "text": doc}
+            for meta, doc in zip(results["metadatas"], results["documents"], strict=True)
+        ]
+        embeddings = np.array(results["embeddings"], dtype=np.float32) if records else np.empty((0, 0), dtype=np.float32)
+        return records, embeddings
 
-def _client() -> chromadb.PersistentClient:
-    return chromadb.PersistentClient(path=str(settings.embeddings_dir))
-
-
-def get_available_models() -> list[str]:
-    return sorted(
-        col.metadata["model"] for col in _client().list_collections()
-    )
-
-
-def load_data(model_name: str) -> tuple[list[dict[str, Any]], np.ndarray]:
-    collection = _client().get_collection(name=collection_name_for_model(model_name))
-    results = collection.get(include=["embeddings", "metadatas", "documents"])
-
-    records = [
-        {**meta, "text": doc}
-        for meta, doc in zip(results["metadatas"], results["documents"], strict=True)
-    ]
-    embeddings = np.array(results["embeddings"], dtype=np.float32) if records else np.empty((0, 0), dtype=np.float32)
-    return records, embeddings
-
-
-def delete_collection(client: chromadb.PersistentClient, collection_name: str) -> bool:
-    try:
-        client.delete_collection(name=collection_name)
-        return True
-    except Exception as error:
-        if _is_missing_collection_error(error):
-            return False
-        if _is_readonly_database_error(error):
-            raise RuntimeError(
-                "Chroma database is read-only. Move chroma_path to a writable directory "
-                "or fix permissions for the Chroma DB files."
-            ) from error
-        raise
-
-
+    def delete_collection(self, collection_name: str) -> bool:
+        try:
+            self._client.delete_collection(name=collection_name)
+            return True
+        except Exception as error:
+            msg = str(error).lower()
+            if "does not exist" in msg or "doesn't exist" in msg or "not found" in msg:
+                return False
+            if "readonly database" in msg or "read-only database" in msg:
+                raise RuntimeError(
+                    "Chroma database is read-only. Move chroma_path to a writable directory "
+                    "or fix permissions for the Chroma DB files."
+                ) from error
+            raise
