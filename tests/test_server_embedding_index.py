@@ -37,30 +37,6 @@ class TestPointKey:
         assert EmbeddingIndexService._point_key("doc1", None) == "doc1"
 
 
-class TestNormalizeMatrix:
-    def test_unit_vectors(self):
-        m = np.array([[3.0, 4.0], [6.0, 8.0]], dtype=np.float32)
-        result = EmbeddingIndexService._normalize_matrix(m)
-        for row in result:
-            np.testing.assert_allclose(np.linalg.norm(row), 1.0, atol=1e-6)
-
-    def test_zero_vector_unchanged(self):
-        m = np.array([[0.0, 0.0], [1.0, 0.0]], dtype=np.float32)
-        result = EmbeddingIndexService._normalize_matrix(m)
-        np.testing.assert_allclose(result[0], [0.0, 0.0])
-        np.testing.assert_allclose(result[1], [1.0, 0.0])
-
-    def test_already_normalized(self):
-        m = np.array([[1.0, 0.0], [0.0, 1.0]], dtype=np.float32)
-        result = EmbeddingIndexService._normalize_matrix(m)
-        np.testing.assert_allclose(result, m)
-
-    def test_preserves_direction(self):
-        m = np.array([[3.0, 4.0]], dtype=np.float32)
-        result = EmbeddingIndexService._normalize_matrix(m)
-        np.testing.assert_allclose(result[0], [0.6, 0.8], atol=1e-6)
-
-
 class TestTopResults:
     def _item(self, text_id, text="", tradition="Greek", **kw):
         return {"text_id": text_id, "text": text, "tradition": tradition, "major_tradition": "", "chunk_index": 0, "filename": "", **kw}

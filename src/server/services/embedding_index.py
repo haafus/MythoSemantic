@@ -86,7 +86,7 @@ class EmbeddingIndexService:
         if not items:
             raise KeyError(f"No embedding data found for {model_name}")
 
-        normalized_matrix = self._normalize_matrix(embeddings)
+        normalized_matrix = embeddings
         id_to_index: dict[str, int] = {}
         for idx, item in enumerate(items):
             point_id = item["text_id"]
@@ -122,12 +122,6 @@ class EmbeddingIndexService:
             show_progress_bar=False,
         )
         return np.asarray(raw[0], dtype=np.float32)
-
-    @staticmethod
-    def _normalize_matrix(matrix: np.ndarray) -> np.ndarray:
-        norms = np.linalg.norm(matrix, axis=1, keepdims=True)
-        norms[norms == 0] = 1
-        return matrix / norms
 
     @staticmethod
     def _top_results(index: ModelIndex, similarities: np.ndarray, limit: int) -> list[dict]:
