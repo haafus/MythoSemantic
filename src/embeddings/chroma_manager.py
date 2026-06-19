@@ -35,6 +35,34 @@ def collection_name_for_model(model_name: Any) -> str:
     return f"{safe_name}{suffix}"
 
 
+def _safe_id_part(value: Any) -> str:
+    return re.sub(r"[^0-9A-Za-z_.-]+", "_", str(value or "unknown")).strip("_") or "unknown"
+
+
+def build_chroma_entries(
+    chunks: list[str], info: "CorpusFileInfo", model_name: str,
+) -> tuple[list[str], list[dict[str, Any]]]:
+    from corpus.corpus_iterator import CorpusFileInfo  # noqa: F811
+
+    text_id_safe = _safe_id_part(info.text_id)
+    model_id = _safe_id_part(model_name)
+
+    ids = [f"{text_id_safe}_{model_id}_{i}" for i in range(len(chunks))]
+
+    metadatas = [
+        {
+            "filename": info.filename,
+            "tradition": info.tradition,
+            "major_tradition": info.major_tradition,
+            "chunk_index": i,
+            "text_id": info.text_id,
+            "url": info.url,
+        }
+        for i in range(len(chunks))
+    ]
+    return ids, metadatas
+
+
 def save_to_chroma_collection(
     collection: chromadb.Collection,
     ids: list[str],
