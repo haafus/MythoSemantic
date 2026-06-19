@@ -1,6 +1,5 @@
 import logging
 import threading
-from collections import OrderedDict
 from dataclasses import dataclass
 
 import numpy as np
@@ -10,7 +9,6 @@ from model_registry import key_to_model
 logger = logging.getLogger(__name__)
 
 MAX_PREVIEW_CHARS = 700
-MAX_CACHED_INDEXES = 3
 
 
 @dataclass
@@ -23,7 +21,7 @@ class ModelIndex:
 
 class EmbeddingIndexService:
     def __init__(self):
-        self._indexes: OrderedDict[str, ModelIndex] = OrderedDict()
+        self._index: ModelIndex | None = None
         self._index_lock = threading.RLock()
         self._model_manager = None
 
@@ -31,18 +29,12 @@ class EmbeddingIndexService:
         model_name = key_to_model(model_key)
 
         with self._index_lock:
-            if model_name in self._indexes:
-                self._indexes.move_to_end(model_name)
-                return self._indexes[model_name]
+            if self._index is not None and self._index.model_name == model_name:
+                return self._index
 
-            index = self._load_index(model_name)
-            self._indexes[model_name] = index
-
-            while len(self._indexes) > MAX_CACHED_INDEXES:
-                evicted_name, _ = self._indexes.popitem(last=False)
-                logger.info(f"Evicted index cache for model: {evicted_name}")
-
-            return index
+            logger.info(f"Loading index for model: {model_name}")
+            self._index = self._load_index(model_name)
+            return self._index
 
     def get_point(self, model_key: str, point_id: str, chunk_index: int | None = None) -> dict:
         index = self.get_index(model_key)
