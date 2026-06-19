@@ -82,17 +82,17 @@ def generate_motif_summaries(
 
 
 def embed_summaries(summaries: list[str], model_name: str) -> np.ndarray:
-    from embeddings.model_manager import ModelManager
+    from embeddings.model_manager import EmbeddingEncoder
 
     logger.info(f"Embedding {len(summaries)} summaries with {model_name}...")
-    manager = ModelManager()
-    manager.load(model_name)
-    embeddings: np.ndarray = manager.encoder.encode(
+    encoder = EmbeddingEncoder()
+    encoder.load(model_name)
+    embeddings: np.ndarray = encoder.encode(
         summaries,
         show_progress_bar=True,
         normalize_embeddings=True,
     )
-    manager.unload()
+    encoder.unload()
     return embeddings
 
 

@@ -3,6 +3,7 @@ import logging
 import os
 from typing import Any
 
+import numpy as np
 import torch
 from sentence_transformers import SentenceTransformer
 
@@ -26,30 +27,35 @@ def _memory_info(device: str) -> str:
         return ""
 
 
-class ModelManager:
+class EmbeddingEncoder:
     def __init__(self) -> None:
-        self.name: str | None = None
-        self.encoder: Any = None
+        self.model_name: str | None = None
+        self._model: Any = None
 
     def load(self, model_name: str) -> None:
         model_name = resolve_embedding_model(model_name)
 
-        if self.encoder is not None and self.name == model_name:
+        if self._model is not None and self.model_name == model_name:
             return
 
         self.unload()
-        self.encoder = SentenceTransformer(model_name, trust_remote_code=True)
-        self.name = model_name
-        device = str(self.encoder.device)
+        self._model = SentenceTransformer(model_name, trust_remote_code=True)
+        self.model_name = model_name
+        device = str(self._model.device)
         mem = _memory_info(device)
         logger.info(f"Model '{model_name}' loaded on {device}{f' ({mem})' if mem else ''}.")
 
+    def encode(self, texts: list[str], **kwargs) -> np.ndarray:
+        if self._model is None:
+            raise RuntimeError("No model loaded. Call load() first.")
+        return self._model.encode(texts, **kwargs)
+
     def unload(self) -> None:
-        if self.encoder is None:
+        if self._model is None:
             return
-        device = str(self.encoder.device)
-        self.encoder = None
-        self.name = None
+        device = str(self._model.device)
+        self._model = None
+        self.model_name = None
         gc.collect()
         if device.startswith("cuda"):
             torch.cuda.empty_cache()

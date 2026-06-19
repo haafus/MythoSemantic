@@ -23,7 +23,7 @@ class EmbeddingIndexService:
     def __init__(self):
         self._index: ModelIndex | None = None
         self._index_lock = threading.RLock()
-        self._model_manager = None
+        self._encoder = None
 
     def get_index(self, model_key: str) -> ModelIndex:
         model_name = key_to_model(model_key)
@@ -111,11 +111,11 @@ class EmbeddingIndexService:
         self._encode_query(key_to_model(model_key), "warmup")
 
     def _encode_query(self, model_name: str, query: str) -> np.ndarray:
-        if self._model_manager is None:
-            from embeddings.model_manager import ModelManager
-            self._model_manager = ModelManager()
-        self._model_manager.load(model_name)
-        raw = self._model_manager.encoder.encode(
+        if self._encoder is None:
+            from embeddings.model_manager import EmbeddingEncoder
+            self._encoder = EmbeddingEncoder()
+        self._encoder.load(model_name)
+        raw = self._encoder.encode(
             [query],
             normalize_embeddings=True,
             convert_to_numpy=True,
