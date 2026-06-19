@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 from .chroma_manager import ChromaStore
 from .chunking import create_chunking_strategies
-from corpus.corpus_iterator import CorpusFileInfo, iter_corpus_files
+from corpus.iterator import CorpusFileInfo, iter_files
 from .model_manager import EmbeddingEncoder
 
 logger = logging.getLogger(__name__)
@@ -68,7 +68,7 @@ class EmbeddingBuilder:
     def save_all_corpus_to_chroma(self) -> None:
         model_name = self._encoder.model_name
         t0 = time.monotonic()
-        files_info = list(iter_corpus_files(self.corpus_dir))
+        files_info = list(iter_files(self.corpus_dir))
 
         if not files_info:
             logger.warning("No files found in corpus/. Check the folder structure.")

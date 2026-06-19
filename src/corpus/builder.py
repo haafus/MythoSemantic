@@ -11,7 +11,7 @@ from .clean_gutenberg import clean_gutenberg_in_builder
 from .downloader import download_file, load_download_list
 from .extraction import _decode_bytes, html_to_text, pdf_to_text
 from .utils import (
-    corpus_text_path,
+    text_path,
     count_sentences,
     count_words,
     ensure_dir,
@@ -96,7 +96,7 @@ def _download_and_process(item: dict) -> dict | None:
 
         stats = _finalize_text(text, url, tid)
 
-        filename = corpus_text_path(settings.corpus_dir, item.get("major_tradition", "Unknown"), item["tradition"], tid)
+        filename = text_path(settings.corpus_dir, item.get("major_tradition", "Unknown"), item["tradition"], tid)
 
         with data_lock:
             ensure_dir(filename.parent)

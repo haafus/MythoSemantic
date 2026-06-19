@@ -1,15 +1,12 @@
 import json
 import logging
-import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Generator
+from typing import Generator
+
+from .utils import normalize_catalog_id
 
 logger = logging.getLogger(__name__)
-
-
-def normalize_catalog_id(value: Any) -> str:
-    return re.sub(r"\s+", "_", str(value or "").strip())
 
 
 @dataclass(frozen=True, slots=True)
@@ -26,7 +23,7 @@ class CorpusFileInfo:
         return Path(self.path).read_text(encoding="utf-8")
 
 
-def iter_corpus_files(corpus_dir: Path) -> Generator[CorpusFileInfo, None, None]:
+def iter_files(corpus_dir: Path) -> Generator[CorpusFileInfo, None, None]:
     metadata_file = corpus_dir / "corpus.json"
 
     if not metadata_file.exists():

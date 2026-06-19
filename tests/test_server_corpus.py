@@ -1,7 +1,7 @@
 import json
 
 import server.services.corpus as corpus_mod
-from corpus.utils import load_traditions, read_document
+from corpus.utils import read_traditions, read_document
 from server.services.corpus import get_catalog_documents
 from settings import settings
 
@@ -90,17 +90,17 @@ class TestGetCatalogDocuments:
         assert docs[1]["major_tradition"] == "Z"
 
 
-class TestLoadTraditions:
+class TestReadTraditions:
     def test_from_corpus_dir(self, tmp_path, monkeypatch):
         info = {"Greek": {"color": "#ff0000", "description": "Ancient Greek"}}
         (tmp_path / "traditions.json").write_text(json.dumps(info))
         _patch_corpus(monkeypatch, tmp_path)
 
-        result = load_traditions(tmp_path)
+        result = read_traditions(tmp_path)
         assert result["Greek"]["color"] == "#ff0000"
 
     def test_missing_returns_empty(self, tmp_path, monkeypatch):
         _patch_corpus(monkeypatch, tmp_path)
 
-        result = load_traditions(tmp_path)
+        result = read_traditions(tmp_path)
         assert result == {}

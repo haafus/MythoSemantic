@@ -2,7 +2,7 @@ import json
 import logging
 from pathlib import Path
 
-from corpus.corpus_iterator import normalize_catalog_id
+from corpus.utils import normalize_catalog_id
 from llm_client import LLMProcessor
 from settings import settings
 

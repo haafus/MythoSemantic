@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from corpus.utils import load_traditions
+from corpus.utils import read_traditions
 from server.schemas import TraditionsResponse
 from server.services.corpus import get_catalog_documents
 from settings import settings
@@ -10,7 +10,7 @@ router = APIRouter(prefix="/api/geography", tags=["geography"])
 
 @router.get("/traditions", response_model=TraditionsResponse)
 def traditions() -> dict:
-    data = load_traditions(settings.corpus_dir)
+    data = read_traditions(settings.corpus_dir)
     books_by_tradition: dict[str, list[str]] = {}
     for doc in get_catalog_documents():
         trad = doc.get("tradition", "")

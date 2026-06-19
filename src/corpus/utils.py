@@ -6,6 +6,7 @@ import re
 import threading
 import unicodedata
 from pathlib import Path
+from typing import Any
 
 _color_lock = threading.Lock()
 _used_colors: set[str] = set()
@@ -22,6 +23,10 @@ def sanitize_filename(name: str) -> str:
 
 def md5(data: bytes) -> str:
     return hashlib.md5(data).hexdigest()
+
+
+def normalize_catalog_id(value: Any) -> str:
+    return re.sub(r"\s+", "_", str(value or "").strip())
 
 
 def normalize_text(text: str) -> str:
@@ -51,8 +56,7 @@ def ensure_dir(path: Path):
     path.mkdir(parents=True, exist_ok=True)
 
 
-def corpus_text_path(corpus_dir: Path, major_tradition: str, tradition: str, tid: str) -> Path:
-    """Canonical on-disk location of a corpus text: <major>/<tradition>/<title>.txt"""
+def text_path(corpus_dir: Path, major_tradition: str, tradition: str, tid: str) -> Path:
     major = sanitize_filename(major_tradition)
     trad = sanitize_filename(tradition)
     title = sanitize_filename(tid)
@@ -60,7 +64,7 @@ def corpus_text_path(corpus_dir: Path, major_tradition: str, tradition: str, tid
 
 
 def read_document(corpus_dir: Path, doc_id: str, major_tradition: str, tradition: str) -> tuple[str, str]:
-    file_path = corpus_text_path(corpus_dir, major_tradition, tradition, doc_id)
+    file_path = text_path(corpus_dir, major_tradition, tradition, doc_id)
     resolved = file_path.resolve()
     if not resolved.is_relative_to(corpus_dir.resolve()):
         raise PermissionError("Access denied")
@@ -70,7 +74,7 @@ def read_document(corpus_dir: Path, doc_id: str, major_tradition: str, tradition
     return resolved.read_text(encoding="utf-8"), title
 
 
-def load_traditions(corpus_dir: Path) -> dict:
+def read_traditions(corpus_dir: Path) -> dict:
     path = corpus_dir / "traditions.json"
     if not path.exists():
         return {}

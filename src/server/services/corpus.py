@@ -5,7 +5,7 @@ import time
 import zipfile
 from pathlib import Path
 
-from corpus.utils import corpus_text_path, load_traditions, read_document, sanitize_filename
+from corpus.utils import text_path, read_traditions, read_document, sanitize_filename
 from settings import settings
 
 logger = logging.getLogger(__name__)
@@ -37,7 +37,7 @@ def get_catalog_documents() -> list[dict]:
             logger.warning("Failed to read metadata %s: %s", metadata_path, e)
 
     documents = []
-    traditions_info = load_traditions(settings.corpus_dir)
+    traditions_info = read_traditions(settings.corpus_dir)
 
     for row in metadata_rows:
         tradition_info = traditions_info.get(row.get("tradition", ""), {})
@@ -73,7 +73,7 @@ def build_corpus_archive() -> io.BytesIO:
 
     with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for doc in documents:
-            file_path = corpus_text_path(
+            file_path = text_path(
                 settings.corpus_dir,
                 doc.get("major_tradition", ""),
                 doc.get("tradition", ""),

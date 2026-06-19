@@ -133,7 +133,7 @@ def embeddings_orphan_collections(settings) -> list[dict[str, Any]]:
 
 
 def embeddings_orphan_chunks(settings, *, skip_collections: set[str] | None = None) -> list[dict[str, Any]]:
-    from corpus.corpus_iterator import normalize_catalog_id
+    from corpus.utils import normalize_catalog_id
 
     chroma_path = Path(settings.embeddings_dir)
     if not chroma_path.exists():
@@ -259,7 +259,7 @@ def graphs_orphans(settings) -> list[tuple[Path, int]]:
     Matches subdirectory names against normalized text_ids from corpus.
     If corpus metadata is missing, returns [] (can't determine orphans).
     """
-    from corpus.corpus_iterator import normalize_catalog_id
+    from corpus.utils import normalize_catalog_id
 
     graphs_dir = Path(settings.graphs_dir)
     if not graphs_dir.exists():

@@ -20,7 +20,7 @@ _mod = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_mod)
 
 sanitize_filename = _mod.sanitize_filename
-corpus_text_path = _mod.corpus_text_path
+text_path = _mod.text_path
 md5 = _mod.md5
 normalize_text = _mod.normalize_text
 count_words = _mod.count_words
@@ -56,19 +56,19 @@ class TestSanitizeFilename:
         assert ".." not in sanitize_filename("foo/../bar")
 
 
-class TestCorpusTextPath:
+class TestTextPath:
     def test_canonical_layout(self, tmp_path):
-        path = corpus_text_path(tmp_path, "European", "Greek", "Iliad")
+        path = text_path(tmp_path, "European", "Greek", "Iliad")
         assert path == tmp_path / "European" / "Greek" / "Iliad.txt"
 
     def test_spaces_and_slashes_normalized(self, tmp_path):
-        path = corpus_text_path(tmp_path, "Near East", "Sumer/Akkad", "Epic of Gilgamesh")
+        path = text_path(tmp_path, "Near East", "Sumer/Akkad", "Epic of Gilgamesh")
         assert path.name == "Epic_of_Gilgamesh.txt"
         assert "Near_East" in path.parts
         assert "Sumer_Akkad" in path.parts
 
     def test_traversal_blocked(self, tmp_path):
-        path = corpus_text_path(tmp_path, "..", "..", "../../etc/passwd")
+        path = text_path(tmp_path, "..", "..", "../../etc/passwd")
         assert tmp_path in path.parents
         assert ".." not in path.parts
 
