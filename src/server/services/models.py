@@ -6,10 +6,10 @@ logger = logging.getLogger(__name__)
 
 
 def list_models_raw() -> list[str]:
-    from embeddings.loader import EmbeddingDataLoader
+    from embeddings.chroma_manager import get_available_models
 
     try:
-        return EmbeddingDataLoader().get_available_models()
+        return get_available_models()
     except Exception:
         logger.exception("Failed to get available models from ChromaDB")
         return []

@@ -4,6 +4,9 @@ import re
 from typing import Any
 
 import chromadb
+import numpy as np
+
+from settings import settings
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +65,28 @@ def _is_missing_collection_error(error: Exception) -> bool:
 def _is_readonly_database_error(error: Exception) -> bool:
     message = str(error).lower()
     return "readonly database" in message or "read-only database" in message
+
+
+def _client() -> chromadb.PersistentClient:
+    return chromadb.PersistentClient(path=str(settings.embeddings_dir))
+
+
+def get_available_models() -> list[str]:
+    return sorted(
+        col.metadata["model"] for col in _client().list_collections()
+    )
+
+
+def load_data(model_name: str) -> tuple[list[dict[str, Any]], np.ndarray]:
+    collection = _client().get_collection(name=collection_name_for_model(model_name))
+    results = collection.get(include=["embeddings", "metadatas", "documents"])
+
+    records = [
+        {**meta, "text": doc}
+        for meta, doc in zip(results["metadatas"], results["documents"], strict=True)
+    ]
+    embeddings = np.array(results["embeddings"], dtype=np.float32) if records else np.empty((0, 0), dtype=np.float32)
+    return records, embeddings
 
 
 def delete_collection(client: chromadb.PersistentClient, collection_name: str) -> bool:

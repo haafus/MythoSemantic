@@ -80,9 +80,9 @@ class EmbeddingIndexService:
         return self._top_results(index, similarities, top_k)
 
     def _load_index(self, model_name: str) -> ModelIndex:
-        from embeddings.loader import EmbeddingDataLoader
+        from embeddings.chroma_manager import load_data
 
-        items, embeddings = EmbeddingDataLoader().load_data(model_name=model_name)
+        items, embeddings = load_data(model_name=model_name)
         if not items:
             raise KeyError(f"No embedding data found for {model_name}")
 
