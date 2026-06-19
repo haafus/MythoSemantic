@@ -5,7 +5,7 @@
 ## Структура проекта
 
 ```
-config/          — статические конфиги, шаблоны, download_list.json
+config/          — статические конфиги, шаблоны, models.json, corpus.json
 outputs/         — всё, что генерируется при запуске (corpus, embeddings, projections, …)
 src/             — исходный код (все Python-пакеты, settings.py, main.py, cli.py)
 docs/            — документация
@@ -55,32 +55,28 @@ mytho clean
 
 Основные файлы:
 - `src/corpus/downloader.py` скачивает источники.
-- `src/corpus/utils.py` извлекает текст из HTML/PDF/TXT и нормализует его.
+- `src/corpus/extraction.py` извлекает текст из HTML/PDF/TXT.
+- `src/corpus/utils.py` утилиты: пути, нормализация текста, подсчёт слов/предложений, работа с традициями.
+- `src/corpus/iterator.py` итерация по файлам корпуса (`iter_files`, `CorpusFileInfo`).
 - `src/corpus/builder.py` строит структуру `outputs/corpus/`, метаданные и каталог.
 - `src/corpus/clean_gutenberg.py` автоматически удаляет Gutenberg-боллерплейт.
 
 Возможности:
 - Скачать и обработать источники.
 - Автоматически очистить Gutenberg-тексты (по маркерам в содержимом).
-- Сохранить тексты в `outputs/corpus/<major>/<tradition>/<title>/<title>.txt`.
-- Создать `outputs/corpus/corpus_metadata.json`, `outputs/corpus/traditions_info.json`.
+- Сохранить тексты в `outputs/corpus/<major>/<tradition>/<title>.txt`.
+- Создать `outputs/corpus/corpus.json` (метаданные), `outputs/corpus/traditions.json`.
 
-Запуск сборки всего корпуса:
-
-```bash
-mytho corpus --type all
-```
-
-Только переводы:
+Запуск сборки корпуса:
 
 ```bash
-mytho corpus --type translation
+mytho corpus
 ```
 
 Пересобрать с перезаписью:
 
 ```bash
-mytho corpus --type all --force
+mytho corpus --force
 ```
 
 ## embedding
@@ -91,9 +87,9 @@ mytho corpus --type all --force
 - `src/embeddings/build_embeddings.py` оркестрирует генерацию для нескольких моделей (skip/resume по метаданным коллекции).
 - `src/embeddings/builder.py` читает корпус, режет тексты на чанки, считает эмбеддинги и пишет в Chroma.
 - `src/embeddings/chunking.py` содержит стратегии chunking (character, sentence, paragraph).
-- `src/embeddings/chroma_manager.py` все операции с ChromaDB: создание коллекций, upsert, загрузка данных, список моделей.
-- `src/embeddings/model_manager.py` загрузка/выгрузка SentenceTransformer моделей.
-- `config/models.json` задает модели и алиасы.
+- `src/embeddings/chroma_manager.py` хранилище ChromaDB: `ChromaStore` (создание/удаление коллекций, список моделей) и `ChromaCollection` (upsert, загрузка данных, existing_ids).
+- `src/embeddings/model_manager.py` загрузка/выгрузка SentenceTransformer моделей (`EmbeddingEncoder`).
+- `src/model_registry.py` резолвит алиасы моделей из `config/models.json`.
 
 Возможности:
 - Построить эмбеддинги для нескольких моделей.
@@ -140,13 +136,7 @@ mytho projections
 Запустить анализ одной модели:
 
 ```bash
-mytho projections --model "BAAI/bge-m3"
-```
-
-Только статистика, без графиков:
-
-```bash
-mytho projections --model "BAAI/bge-m3" --no-plots
+mytho projections --model bge-m3
 ```
 
 ## graphs
@@ -160,17 +150,23 @@ mytho projections --model "BAAI/bge-m3" --no-plots
 - `src/graphs/chunking.py` разбивает тексты на чанки с перекрытием.
 - `src/graphs/checkpointing.py` сохранение/загрузка промежуточных результатов.
 - `src/graphs/graph_generator.py` строит HTML-граф через NetworkX и Cytoscape.
-- `src/llm_processing.py` вызывает OpenAI-compatible API.
+- `src/llm_client.py` вызывает OpenAI-compatible API (`LLMProcessor`).
 
 Возможности:
-- Пройти по книгам из `outputs/corpus/corpus_metadata.json`.
+- Пройти по книгам из `outputs/corpus/corpus.json`.
 - Извлечь сущности и связи через локальный или внешний LLM.
 - Сохранить графы в `outputs/graphs/<text_id>/characters.html`.
 
-Запуск по конфигу:
+Запуск с моделью по умолчанию (из `settings.py` → `llm.model`):
 
 ```bash
 mytho graphs
+```
+
+Запуск с конкретной LLM из реестра `config/models.json`:
+
+```bash
+mytho graphs --model gemini25-flash
 ```
 
 Запуск с перезаписью готовых графов:
@@ -178,8 +174,6 @@ mytho graphs
 ```bash
 mytho graphs --force
 ```
-
-LLM-модель задаётся через `config/models.json` и выбирается флагом `--model`. По умолчанию используется модель из `src/settings.py` (`llm.model`).
 
 ## status
 
@@ -220,13 +214,12 @@ FastAPI-сервер и SPA-интерфейс.
 - `src/server/api/points.py` информация о точках эмбеддингов и соседи.
 - `src/server/api/search.py` семантический поиск (синхронный и асинхронный), warmup.
 - `src/server/schemas.py` Pydantic-схемы запросов и ответов.
-- `src/server/services/` сервисный слой (бизнес-логика, загрузка данных).
+- `src/server/services/` сервисный слой (кэширование каталога, ZIP-архив, загрузка проекций и индексов).
 
 ### API эндпоинты
 
 | Метод | Путь | Описание |
 |-------|------|----------|
-| GET | `/api/health` | Проверка работоспособности |
 | GET | `/api/models` | Список embedding-моделей |
 | GET | `/api/corpus/catalog` | Каталог текстов корпуса |
 | GET | `/api/corpus/documents` | Текст документа по ID |
@@ -261,12 +254,6 @@ mytho server
 mytho server --host 0.0.0.0 --port 9000
 ```
 
-Проверка:
-
-```bash
-curl http://127.0.0.1:8000/api/health
-```
-
 Открыть интерфейс: `http://127.0.0.1:8000/`.
 
 ### Публикация в интернет (Caddy)
@@ -299,15 +286,6 @@ sudo systemctl start caddy
 
 Caddy сам получит TLS-сертификат, настроит редирект HTTP → HTTPS и проксирует запросы в uvicorn. В проекте ничего менять не нужно — `mytho server` продолжает слушать localhost.
 
-## config/template
-
-HTML-шаблоны для старого UI.
-
-Возможности:
-- Страницы `home.html`, `corpus.html`, `geography.html`, `embeddings_analysis.html`, `cluster_analysis.html`.
-- Общая навигация `navbar.html`.
-- Логотип `logo.jpg`.
-
 ## server/web
 
 Современный SPA-фронтенд.
@@ -329,7 +307,7 @@ mytho server
 
 Все генерируемые данные хранятся в `outputs/`:
 
-- `outputs/corpus/` — основной текстовый корпус с метаданными и каталогом. Создается через `mytho corpus`.
+- `outputs/corpus/` — основной текстовый корпус с метаданными (`corpus.json`) и описаниями традиций (`traditions.json`). Создается через `mytho corpus`.
 - `outputs/embeddings/` — локальная Chroma DB с векторными коллекциями. Создается через `mytho embeddings`.
 - `outputs/projections/` — результаты анализа: `models.json`, HTML-графики. Создается через `mytho projections`.
 - `outputs/graphs/` — готовые HTML-графы персонажей и связей. Создается через `mytho graphs`.
