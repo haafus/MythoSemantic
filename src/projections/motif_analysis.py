@@ -45,7 +45,7 @@ def generate_motif_summaries(
     data: list[dict],
     output_dir: Path,
 ) -> list[str]:
-    from llm_processing import LLMProcessor
+    from llm_client import LLMProcessor
 
     llm = LLMProcessor(use_json_mode=False)
 
@@ -82,17 +82,17 @@ def generate_motif_summaries(
 
 
 def embed_summaries(summaries: list[str], model_name: str) -> np.ndarray:
-    from sentence_transformers import SentenceTransformer
+    from embeddings.model_manager import ModelManager
 
     logger.info(f"Embedding {len(summaries)} summaries with {model_name}...")
-    model = SentenceTransformer(model_name)
-    embeddings: np.ndarray = model.encode(
+    manager = ModelManager()
+    manager.set_model(model_name)
+    embeddings: np.ndarray = manager.model.encode(
         summaries,
         show_progress_bar=True,
-        batch_size=64,
-        normalize_embeddings=False,
+        normalize_embeddings=True,
     )
-    del model
+    manager.close()
     return embeddings
 
 

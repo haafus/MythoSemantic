@@ -11,9 +11,9 @@ for stub_name in ["networkx", "openai"]:
         sys.modules[stub_name] = types.ModuleType(stub_name)
         _stubs_added.append(stub_name)
 
-_llm_stub = types.ModuleType("llm_processing")
+_llm_stub = types.ModuleType("llm_client")
 _llm_stub.LLMProcessor = type("LLMProcessor", (), {})  # type: ignore[attr-defined]
-sys.modules["llm_processing"] = _llm_stub
+sys.modules["llm_client"] = _llm_stub
 
 
 def _load_module(name: str, filename: str):

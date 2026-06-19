@@ -3,7 +3,7 @@ import json
 import logging
 from concurrent.futures import ThreadPoolExecutor
 
-from llm_processing import LLMProcessor
+from llm_client import LLMProcessor
 
 logger = logging.getLogger(__name__)
 

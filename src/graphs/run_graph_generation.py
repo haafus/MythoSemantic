@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 
 from corpus.corpus_iterator import normalize_catalog_id
-from llm_processing import LLMProcessor
+from llm_client import LLMProcessor
 from settings import settings
 
 from .checkpointing import clear_checkpoint, load_checkpoint, save_checkpoint
