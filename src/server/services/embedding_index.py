@@ -2,17 +2,16 @@ import logging
 import threading
 from collections import OrderedDict
 from dataclasses import dataclass
-from typing import Any
 
 import numpy as np
 
+from embeddings.model_cache import EmbeddingModelCache
 from model_registry import key_to_model
 
 logger = logging.getLogger(__name__)
 
 MAX_PREVIEW_CHARS = 700
 MAX_CACHED_INDEXES = 3
-MAX_CACHED_SEARCH_MODELS = 2
 
 
 @dataclass
@@ -26,9 +25,8 @@ class ModelIndex:
 class EmbeddingIndexService:
     def __init__(self):
         self._indexes: OrderedDict[str, ModelIndex] = OrderedDict()
-        self._search_models: OrderedDict[str, Any] = OrderedDict()
         self._index_lock = threading.RLock()
-        self._model_lock = threading.RLock()
+        self._model_cache = EmbeddingModelCache()
 
     def get_index(self, model_key: str) -> ModelIndex:
         model_name = key_to_model(model_key)
@@ -86,7 +84,7 @@ class EmbeddingIndexService:
     def search(self, model_key: str, query: str, top_k: int = 20) -> list[dict]:
         model_name = key_to_model(model_key)
         index = self.get_index(model_name)
-        query_embedding = self._embed_query(model_name, query)
+        query_embedding = self._model_cache.encode(model_name, [query])
         similarities = index.normalized_matrix @ query_embedding
         return self._top_results(index, similarities, top_k)
 
@@ -119,30 +117,7 @@ class EmbeddingIndexService:
 
     def warmup(self, model_key: str) -> None:
         self.get_index(model_key)
-        self._embed_query(model_key, "warmup")
-
-    def _embed_query(self, model_name: str, query: str) -> np.ndarray:
-        from sentence_transformers import SentenceTransformer
-
-        with self._model_lock:
-            if model_name not in self._search_models:
-                self._search_models[model_name] = SentenceTransformer(model_name)
-
-                while len(self._search_models) > MAX_CACHED_SEARCH_MODELS:
-                    evicted_name, _ = self._search_models.popitem(last=False)
-                    logger.info(f"Evicted search model cache: {evicted_name}")
-            else:
-                self._search_models.move_to_end(model_name)
-
-            model = self._search_models[model_name]
-
-        raw = model.encode(
-            [query],
-            normalize_embeddings=True,
-            convert_to_numpy=True,
-            show_progress_bar=False,
-        )
-        return np.asarray(raw[0], dtype=np.float32)
+        self._model_cache.encode(model_key, ["warmup"])
 
     @staticmethod
     def _normalize_matrix(matrix: np.ndarray) -> np.ndarray:
