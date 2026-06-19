@@ -5,6 +5,7 @@ from settings import settings
 
 from .builder import EmbeddingBuilder
 from .chroma_manager import collection_name_for_model, delete_collection
+from .model_manager import EmbeddingEncoder
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +20,9 @@ def build_embeddings(
     else:
         models_to_run = models or active_embedding_models()
 
-    builder = EmbeddingBuilder(embedding_model=models_to_run[0])
+    encoder = EmbeddingEncoder()
+    encoder.load(models_to_run[0])
+    builder = EmbeddingBuilder(encoder)
 
     logger.info("Starting embedding generation...")
     logger.info(f"   Source: {settings.corpus_dir}")
@@ -44,7 +47,7 @@ def build_embeddings(
                 except Exception:
                     pass
 
-            builder.load_model(model)
+            encoder.load(model)
             logger.info(f"   Model: {model}")
             logger.info(f"   Model batch size: {builder.batch_size}")
             builder.save_all_corpus_to_chroma()
@@ -53,6 +56,6 @@ def build_embeddings(
         logger.error(f"Embedding generation error: {e}")
         raise
     finally:
-        builder.close()
+        encoder.unload()
 
     logger.info("All embeddings saved to Chroma.")

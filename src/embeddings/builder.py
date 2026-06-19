@@ -15,26 +15,17 @@ logger = logging.getLogger(__name__)
 
 
 class EmbeddingBuilder:
-    def __init__(self, embedding_model: str = "BAAI/bge-m3"):
+    def __init__(self, encoder: EmbeddingEncoder):
         from settings import settings
 
         emb = settings.embedding
         self.corpus_dir = Path(settings.corpus_dir)
         self.batch_size = emb.batch_size
-
-        self._encoder = EmbeddingEncoder()
+        self._encoder = encoder
 
         chroma_dir = Path(settings.embeddings_dir)
         chroma_dir.mkdir(parents=True, exist_ok=True)
         self.chroma_client = chromadb.PersistentClient(path=str(chroma_dir))
-
-        self._chunking_strategies = create_chunking_strategies()
-        self.set_chunking_strategy(emb.default_chunking)
-
-        self._encoder.load(embedding_model)
-
-    def load_model(self, model_name: str) -> None:
-        self._encoder.load(model_name)
 
     def set_chunking_strategy(self, strategy_name: str) -> None:
         if strategy_name not in self._chunking_strategies:
@@ -146,5 +137,4 @@ class EmbeddingBuilder:
             logger.info(f"Encode speed: {speed:,.1f} chunks/sec ({added_total} chunks in {encode_seconds:.1f}s)")
 
     def close(self) -> None:
-        if hasattr(self, "_encoder"):
-            self._encoder.unload()
+        pass
