@@ -28,7 +28,10 @@ class TestSPAFallback:
 
 class TestModelsEndpoint:
     def test_list_models(self):
-        response = client.get("/api/models")
+        from unittest.mock import patch
+
+        with patch("server.services.models.get_available_models", return_value=[]):
+            response = client.get("/api/models")
         assert response.status_code == 200
         data = response.json()
         assert "models" in data

@@ -4,14 +4,13 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from uuid import uuid4
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException
 
-from server.schemas import NeighborsResponse, PointInfo, SavedPlotResponse, SearchRequest, SearchResponse, WarmupRequest
+from server.schemas import SearchRequest, SearchResponse, WarmupRequest
 from server.services.embedding_index import embedding_index_service
-from server.services.projections import get_projection_data, get_saved_html_plot
 from settings import settings
 
-router = APIRouter(prefix="/api/similarity", tags=["similarity"])
+router = APIRouter(prefix="/api/similarity", tags=["search"])
 logger = logging.getLogger(__name__)
 
 _search_executor = ThreadPoolExecutor(max_workers=settings.server.search_max_workers, thread_name_prefix="semantic-search")
@@ -20,48 +19,6 @@ _search_jobs: dict[str, dict] = {}
 _search_jobs_lock = threading.Lock()
 _warmup_status: dict[str, dict] = {}
 _warmup_lock = threading.Lock()
-
-
-@router.get("/projections/{model_key}/{method}")
-def projection(model_key: str, method: str) -> dict:
-    data = get_projection_data(model_key, method)
-    if not data:
-        saved = get_saved_html_plot(model_key, method)
-        raise HTTPException(
-            status_code=404,
-            detail={
-                "message": "Projection JSON not found",
-                "saved_html_plot": saved,
-            },
-        )
-    return data
-
-
-@router.get("/saved-html/{model_key}/{method}", response_model=SavedPlotResponse)
-def saved_html_plot(model_key: str, method: str) -> dict:
-    return get_saved_html_plot(model_key, method)
-
-
-@router.get("/points/{model_key}/{point_id}", response_model=PointInfo)
-def point_info(model_key: str, point_id: str, chunk_index: int | None = Query(None)):
-    try:
-        return embedding_index_service.get_point(model_key, point_id, chunk_index)
-    except KeyError as exc:
-        raise HTTPException(status_code=404, detail="Point not found") from exc
-
-
-@router.get("/points/{model_key}/{point_id}/neighbors", response_model=NeighborsResponse)
-def point_neighbors(
-    model_key: str,
-    point_id: str,
-    n: int = Query(10, ge=1, le=100),
-    chunk_index: int | None = Query(None),
-):
-    try:
-        neighbors = embedding_index_service.get_neighbors(model_key, point_id, n, chunk_index)
-    except KeyError as exc:
-        raise HTTPException(status_code=404, detail="Point not found") from exc
-    return {"point_id": point_id, "neighbors": neighbors}
 
 
 def _cleanup_search_jobs_locked() -> None:
@@ -103,6 +60,24 @@ def _run_search_job(job_id: str, model: str, query: str, top_k: int) -> None:
         )
 
 
+@router.post("/search", response_model=SearchResponse)
+def search(request: SearchRequest) -> dict:
+    try:
+        results = embedding_index_service.search(request.model, request.query, request.top_k)
+    except Exception as exc:
+        logger.exception("Semantic search failed")
+        raise HTTPException(
+            status_code=503,
+            detail="Semantic search unavailable",
+        ) from exc
+    return {
+        "query": request.query,
+        "model": request.model,
+        "results": results,
+        "total": len(results),
+    }
+
+
 @router.post("/search/jobs")
 def start_search_job(request: SearchRequest) -> dict:
     job_id = uuid4().hex
@@ -123,6 +98,19 @@ def start_search_job(request: SearchRequest) -> dict:
 
     _search_executor.submit(_run_search_job, job_id, request.model, request.query, request.top_k)
     return job
+
+
+@router.get("/search/jobs/{job_id}")
+def search_job(job_id: str) -> dict:
+    with _search_jobs_lock:
+        _cleanup_search_jobs_locked()
+        job = _search_jobs.get(job_id)
+        if job is None:
+            raise HTTPException(
+                status_code=404,
+                detail="Search job not found. The server may have restarted; start a new search.",
+            )
+        return dict(job)
 
 
 def _run_warmup(model: str) -> None:
@@ -148,34 +136,3 @@ def warmup_search(request: WarmupRequest) -> dict:
         _warmup_status[request.model] = status
     _warmup_executor.submit(_run_warmup, request.model)
     return status
-
-
-@router.get("/search/jobs/{job_id}")
-def search_job(job_id: str) -> dict:
-    with _search_jobs_lock:
-        _cleanup_search_jobs_locked()
-        job = _search_jobs.get(job_id)
-        if job is None:
-            raise HTTPException(
-                status_code=404,
-                detail="Search job not found. The server may have restarted; start a new search.",
-            )
-        return dict(job)
-
-
-@router.post("/search", response_model=SearchResponse)
-def search(request: SearchRequest) -> dict:
-    try:
-        results = embedding_index_service.search(request.model, request.query, request.top_k)
-    except Exception as exc:
-        logger.exception("Semantic search failed")
-        raise HTTPException(
-            status_code=503,
-            detail="Semantic search unavailable",
-        ) from exc
-    return {
-        "query": request.query,
-        "model": request.model,
-        "results": results,
-        "total": len(results),
-    }

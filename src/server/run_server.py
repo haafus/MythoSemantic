@@ -4,7 +4,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, ORJSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from server.api import corpus, geography, models, similarity
+from server.api import corpus, geography, models, points, projections, search
 from settings import settings
 
 
@@ -20,7 +20,9 @@ def create_app() -> FastAPI:
     app.include_router(models.router)
     app.include_router(corpus.router)
     app.include_router(geography.router)
-    app.include_router(similarity.router)
+    app.include_router(projections.router)
+    app.include_router(points.router)
+    app.include_router(search.router)
 
     assets_dir = settings.web_root / "assets"
     if assets_dir.exists():
@@ -54,6 +56,8 @@ def create_app() -> FastAPI:
 
     @app.get("/{full_path:path}")
     def spa_fallback(full_path: str) -> FileResponse:
+        if full_path in ("docs", "redoc", "openapi.json"):
+            raise HTTPException(status_code=404, detail="Not found")
         if not (settings.web_root / "index.html").exists():
             raise HTTPException(status_code=404, detail="Not found")
         return _index_response()
