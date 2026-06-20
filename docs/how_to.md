@@ -87,7 +87,7 @@ mytho corpus --force
 - `src/embeddings/build_embeddings.py` оркестрирует генерацию для нескольких моделей (skip/resume по метаданным коллекции).
 - `src/embeddings/builder.py` читает корпус, режет тексты на чанки, считает эмбеддинги и пишет в Chroma.
 - `src/embeddings/chunking.py` содержит стратегии chunking (character, sentence, paragraph).
-- `src/embeddings/chroma_manager.py` хранилище ChromaDB: `ChromaStore` (создание/удаление коллекций, список моделей) и `ChromaCollection` (upsert, загрузка данных, existing_ids).
+- `src/embeddings/chroma_manager.py` хранилище ChromaDB: module-level функции (создание/удаление коллекций, список моделей) и `ChromaCollection` (upsert, загрузка данных, existing_ids).
 - `src/embeddings/model_manager.py` загрузка/выгрузка SentenceTransformer моделей (`EmbeddingEncoder`).
 - `src/model_registry.py` резолвит алиасы моделей из `config/models.json`.
 

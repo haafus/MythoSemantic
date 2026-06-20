@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from embeddings.chroma_manager import ChromaStore
+from embeddings import chroma_manager
 from model_registry import model_to_key
 from server.schemas import ModelListResponse
 
@@ -11,6 +11,6 @@ router = APIRouter(prefix="/api/models", tags=["models"])
 def list_models() -> dict:
     models = [
         {"name": m, "key": model_to_key(m), "safe_dir": model_to_key(m)}
-        for m in ChromaStore().get_available_models()
+        for m in chroma_manager.get_available_models()
     ]
     return {"models": models}

@@ -34,9 +34,9 @@ def analyze_embeddings(
     motif_analysis: bool = False,
     force: bool = False,
 ) -> EmbeddingAnalyzer | None:
-    from embeddings.chroma_manager import ChromaStore
+    from embeddings import chroma_manager
 
-    available_models = ChromaStore().get_available_models()
+    available_models = chroma_manager.get_available_models()
 
     if not available_models:
         logger.error("ERROR: No available models in the Chroma database!")

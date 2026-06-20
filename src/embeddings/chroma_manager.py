@@ -7,6 +7,18 @@ import numpy as np
 
 from settings import settings
 
+_MAX_COLLECTION_NAME = 63
+_COLLECTION_HASH_LEN = 8
+
+_client = None
+
+
+def _get_client():
+    global _client
+    if _client is None:
+        _client = chromadb.PersistentClient(path=str(settings.embeddings_dir))
+    return _client
+
 
 class ChromaCollection:
     def __init__(self, collection: chromadb.Collection):
@@ -25,6 +37,9 @@ class ChromaCollection:
 
     def existing_ids(self) -> set[str]:
         return set(self._collection.get(include=[])["ids"])
+
+    def get(self, **kwargs) -> dict:
+        return self._collection.get(**kwargs)
 
     def upsert(
         self,
@@ -54,63 +69,60 @@ class ChromaCollection:
         return records, embeddings
 
 
-class ChromaStore:
-    _MAX_COLLECTION_NAME = 63
-    _COLLECTION_HASH_LEN = 8
+def _collection_name(model_name: str) -> str:
+    raw_name = str(model_name or "unknown").strip()
+    digest = hashlib.sha1(raw_name.encode("utf-8")).hexdigest()[:_COLLECTION_HASH_LEN]
 
-    def __init__(self):
-        self._client = chromadb.PersistentClient(path=str(settings.embeddings_dir))
+    safe_name = re.sub(r"[^0-9A-Za-z_-]+", "_", raw_name).strip("_-").lower()
+    safe_name = re.sub(r"_+", "_", safe_name)
+    if not safe_name:
+        safe_name = "model"
 
-    @staticmethod
-    def _collection_name(model_name: str) -> str:
-        raw_name = str(model_name or "unknown").strip()
-        digest = hashlib.sha1(raw_name.encode("utf-8")).hexdigest()[:ChromaStore._COLLECTION_HASH_LEN]
-
-        safe_name = re.sub(r"[^0-9A-Za-z_-]+", "_", raw_name).strip("_-").lower()
-        safe_name = re.sub(r"_+", "_", safe_name)
-        if not safe_name:
-            safe_name = "model"
-
-        suffix = f"_{digest}"
-        max_base_len = ChromaStore._MAX_COLLECTION_NAME - len(suffix)
+    suffix = f"_{digest}"
+    max_base_len = _MAX_COLLECTION_NAME - len(suffix)
+    safe_name = safe_name[:max_base_len].strip("_-")
+    if len(safe_name) < 3:
+        safe_name = f"{safe_name}_model".strip("_-")
         safe_name = safe_name[:max_base_len].strip("_-")
-        if len(safe_name) < 3:
-            safe_name = f"{safe_name}_model".strip("_-")
-            safe_name = safe_name[:max_base_len].strip("_-")
-        if len(safe_name) < 3:
-            safe_name = "model"
+    if len(safe_name) < 3:
+        safe_name = "model"
 
-        return f"{safe_name}{suffix}"
+    return f"{safe_name}{suffix}"
 
-    def get_or_create_collection(self, model_name: str, **kwargs) -> ChromaCollection:
-        return ChromaCollection(
-            self._client.get_or_create_collection(name=self._collection_name(model_name), **kwargs)
-        )
 
-    def get_collection(self, model_name: str) -> ChromaCollection:
-        return ChromaCollection(
-            self._client.get_collection(name=self._collection_name(model_name))
-        )
+def get_or_create_collection(model_name: str, **kwargs) -> ChromaCollection:
+    return ChromaCollection(
+        _get_client().get_or_create_collection(name=_collection_name(model_name), **kwargs)
+    )
 
-    def list_collections(self) -> list[ChromaCollection]:
-        return [ChromaCollection(col) for col in self._client.list_collections()]
 
-    def get_available_models(self) -> list[str]:
-        return sorted(
-            col.metadata["model"] for col in self._client.list_collections()
-        )
+def get_collection(model_name: str) -> ChromaCollection:
+    return ChromaCollection(
+        _get_client().get_collection(name=_collection_name(model_name))
+    )
 
-    def delete_collection(self, model_name: str) -> bool:
-        try:
-            self._client.delete_collection(name=self._collection_name(model_name))
-            return True
-        except Exception as error:
-            msg = str(error).lower()
-            if "does not exist" in msg or "doesn't exist" in msg or "not found" in msg:
-                return False
-            if "readonly database" in msg or "read-only database" in msg:
-                raise RuntimeError(
-                    "Chroma database is read-only. Move chroma_path to a writable directory "
-                    "or fix permissions for the Chroma DB files."
-                ) from error
-            raise
+
+def list_collections() -> list[ChromaCollection]:
+    return [ChromaCollection(col) for col in _get_client().list_collections()]
+
+
+def get_available_models() -> list[str]:
+    return sorted(
+        col.metadata["model"] for col in _get_client().list_collections()
+    )
+
+
+def delete_collection(model_name: str) -> bool:
+    try:
+        _get_client().delete_collection(name=_collection_name(model_name))
+        return True
+    except Exception as error:
+        msg = str(error).lower()
+        if "does not exist" in msg or "doesn't exist" in msg or "not found" in msg:
+            return False
+        if "readonly database" in msg or "read-only database" in msg:
+            raise RuntimeError(
+                "Chroma database is read-only. Move chroma_path to a writable directory "
+                "or fix permissions for the Chroma DB files."
+            ) from error
+        raise

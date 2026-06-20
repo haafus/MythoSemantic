@@ -7,7 +7,7 @@ from typing import Any
 import numpy as np
 from tqdm import tqdm
 
-from .chroma_manager import ChromaStore
+from . import chroma_manager
 from .chunking import create_chunking_strategies
 from corpus.iterator import CorpusFileInfo, iter_files
 from .model_manager import EmbeddingEncoder
@@ -42,14 +42,13 @@ def _build_chroma_entries(
 
 
 class EmbeddingBuilder:
-    def __init__(self, encoder: EmbeddingEncoder, store: ChromaStore):
+    def __init__(self, encoder: EmbeddingEncoder):
         from settings import settings
 
         emb = settings.embedding
         self.corpus_dir = Path(settings.corpus_dir)
         self.batch_size = emb.batch_size
         self._encoder = encoder
-        self._store = store
 
         self._chunking_strategies = create_chunking_strategies()
         self.set_chunking_strategy(emb.default_chunking)
@@ -74,7 +73,7 @@ class EmbeddingBuilder:
             logger.warning("No files found in corpus/. Check the folder structure.")
             return
 
-        collection = self._store.get_or_create_collection(
+        collection = chroma_manager.get_or_create_collection(
             model_name,
             metadata={"model": model_name, "chunking": self.current_chunking.name, "hnsw:space": "cosine"},
         )

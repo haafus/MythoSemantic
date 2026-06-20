@@ -3,8 +3,8 @@ import logging
 from model_registry import active_embedding_models, resolve_embedding_model
 from settings import settings
 
+from . import chroma_manager
 from .builder import EmbeddingBuilder
-from .chroma_manager import ChromaStore
 from .model_manager import EmbeddingEncoder
 
 logger = logging.getLogger(__name__)
@@ -22,8 +22,7 @@ def build_embeddings(
 
     encoder = EmbeddingEncoder()
     encoder.load(models_to_run[0])
-    store = ChromaStore()
-    builder = EmbeddingBuilder(encoder, store)
+    builder = EmbeddingBuilder(encoder)
 
     logger.info("Starting embedding generation...")
     logger.info(f"   Source: {settings.corpus_dir}")
@@ -32,10 +31,10 @@ def build_embeddings(
     try:
         for model in models_to_run:
             if force:
-                store.delete_collection(model)
+                chroma_manager.delete_collection(model)
             else:
                 try:
-                    coll = store.get_collection(model)
+                    coll = chroma_manager.get_collection(model)
                     count = coll.count()
                     expected = (coll.metadata or {}).get("total_chunks")
                     if expected and count >= expected:
