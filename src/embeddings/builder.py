@@ -75,7 +75,7 @@ class EmbeddingBuilder:
 
         collection = chroma_manager.get_or_create_collection(
             model_name,
-            metadata={"model": model_name, "chunking": self.current_chunking.name, "hnsw:space": "cosine"},
+            metadata={"chunking": self.current_chunking.name, "hnsw:space": "cosine"},
         )
 
         existing_ids = collection.existing_ids()
@@ -150,7 +150,6 @@ class EmbeddingBuilder:
                     logger.exception("Error processing %s", file_info.filename)
 
         collection.modify(metadata={
-            "model": model_name,
             "chunking": self.current_chunking.name,
             "total_chunks": total_chunks,
         })

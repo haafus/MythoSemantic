@@ -107,10 +107,8 @@ def embeddings_status(settings) -> dict[str, Any]:
         from embeddings import chroma_manager
 
         for col in chroma_manager.list_collections():
-            model_name = (col.metadata or {}).get("model", col.name)
             result["collections"].append({
                 "name": col.name,
-                "model": model_name,
                 "count": col.count(),
             })
     except Exception as e:
@@ -120,15 +118,15 @@ def embeddings_status(settings) -> dict[str, Any]:
 
 
 def embeddings_orphan_collections(settings) -> list[dict[str, Any]]:
-    from model_registry import list_embedding_aliases
+    from model_registry import list_embedding_aliases, model_to_key
 
     info = embeddings_status(settings)
     if not info["exists"]:
         return []
 
-    known_models = set(list_embedding_aliases().values())
+    known_keys = {model_to_key(name) for name in list_embedding_aliases().values()}
 
-    return [c for c in info["collections"] if c["model"] not in known_models]
+    return [c for c in info["collections"] if c["name"] not in known_keys]
 
 
 def embeddings_orphan_chunks(settings, *, skip_collections: set[str] | None = None) -> list[dict[str, Any]]:
@@ -225,8 +223,7 @@ def projections_orphans(settings) -> list[dict[str, Any]]:
     if "error" in emb_info:
         return []
 
-    from model_registry import model_to_key
-    known_dirs = {model_to_key(c["model"]) for c in emb_info["collections"]}
+    known_dirs = {c["name"] for c in emb_info["collections"]}
 
     return [m for m in info["models"] if m["name"] not in known_dirs]
 

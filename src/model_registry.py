@@ -52,8 +52,13 @@ def list_embedding_aliases() -> dict[str, str]:
 
 
 def model_to_key(model_name: str) -> str:
-    return (model_name or "").replace("/", "_")
+    return (model_name or "").replace("/", "_").replace(".", "_")[:63]
 
 
-def key_to_model(model_key: str) -> str:
-    return model_key.replace("_", "/")
+def model_name_for_key(key: str) -> str:
+    emb = _load_registry().get("embedding", {})
+    for section in ("models", "inactive"):
+        for name in emb.get(section, {}).values():
+            if model_to_key(name) == key:
+                return name
+    return key

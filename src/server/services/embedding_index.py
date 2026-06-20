@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from model_registry import key_to_model
+from model_registry import model_name_for_key
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class EmbeddingIndexService:
             return self._index
 
     def get_point(self, model_key: str, point_id: str, chunk_index: int | None = None) -> dict:
-        index = self.get_index(key_to_model(model_key))
+        index = self.get_index(model_name_for_key(model_key))
         item_index = index.id_to_index.get(self._point_key(point_id, chunk_index))
         if item_index is None:
             item_index = index.id_to_index.get(str(point_id))
@@ -58,7 +58,7 @@ class EmbeddingIndexService:
         }
 
     def get_neighbors(self, model_key: str, point_id: str, n: int = 10, chunk_index: int | None = None) -> list[dict]:
-        index = self.get_index(key_to_model(model_key))
+        index = self.get_index(model_name_for_key(model_key))
         item_index = index.id_to_index.get(self._point_key(point_id, chunk_index))
         if item_index is None:
             item_index = index.id_to_index.get(str(point_id))
@@ -71,14 +71,14 @@ class EmbeddingIndexService:
         return self._top_results(index, similarities, n)
 
     def search(self, model_key: str, query: str, top_k: int = 20) -> list[dict]:
-        model_name = key_to_model(model_key)
+        model_name = model_name_for_key(model_key)
         index = self.get_index(model_name)
         query_embedding = self._encode_query(model_name, query)
         similarities = index.normalized_matrix @ query_embedding
         return self._top_results(index, similarities, top_k)
 
     def warmup(self, model_key: str) -> None:
-        model_name = key_to_model(model_key)
+        model_name = model_name_for_key(model_key)
         self.get_index(model_name)
         self._encode_query(model_name, "warmup")
 
