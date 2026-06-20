@@ -2,7 +2,7 @@ export const app = document.getElementById("app");
 
 export const state = {
     models: [],
-    selectedModel: localStorage.getItem("selectedModel") || localStorage.getItem("mythoscope.model") || "",
+    selectedModel: localStorage.getItem("selectedModel") || "",
     corpusDocuments: [],
     selectedCorpusDoc: null,
     corpusOpenTraditions: new Set(),
@@ -157,7 +157,6 @@ function modelLabel(model) {
 export function persistSelectedModel(key) {
     state.selectedModel = key || "";
     localStorage.setItem("selectedModel", state.selectedModel);
-    localStorage.setItem("mythoscope.model", state.selectedModel);
 }
 
 export async function ensureModels() {
