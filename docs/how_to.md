@@ -155,7 +155,10 @@ mytho projections --model bge-m3
 Возможности:
 - Пройти по книгам из `outputs/corpus/corpus.json`.
 - Извлечь сущности и связи через локальный или внешний LLM.
-- Сохранить графы в `outputs/graphs/<text_id>/characters.json`.
+- Сохранить три графа на книгу в `outputs/graphs/<text_id>/`:
+  - `characters.json` — персонажи и отношения между ними.
+  - `realms.json` — локации и связи смежности (поле "Adjacent to").
+  - `ages.json` — эпохи, связанные через общих ключевых персонажей (KeyActors).
 
 Запуск с моделью по умолчанию (из `settings.py` → `llm.model`):
 
@@ -311,7 +314,7 @@ mytho server
 - `outputs/corpus/` — основной текстовый корпус с метаданными (`corpus.json`) и описаниями традиций (`traditions.json`). Создается через `mytho corpus`.
 - `outputs/embeddings/` — локальная Chroma DB с векторными коллекциями. Создается через `mytho embeddings`.
 - `outputs/projections/` — результаты анализа: JSON-данные проекций (UMAP, heatmap, distribution). Создается через `mytho projections`.
-- `outputs/graphs/` — готовые HTML-графы персонажей и связей. Создается через `mytho graphs`.
+- `outputs/graphs/` — JSON-графы (characters, realms, ages) для каждого текста. Создается через `mytho graphs`.
 - `outputs/logs/` — логи всех пайплайнов.
 
 ## Типовой пайплайн
