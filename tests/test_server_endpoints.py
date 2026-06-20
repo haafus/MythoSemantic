@@ -7,7 +7,7 @@ client = TestClient(create_app())
 
 class TestSPA:
     def test_spa_serves_index(self):
-        response = client.get("/nonexistent/page")
+        response = client.get("/")
         assert response.status_code == 200
 
 

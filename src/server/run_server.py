@@ -30,8 +30,8 @@ def create_app() -> FastAPI:
     if settings.corpus_dir.exists():
         app.mount("/corpus", StaticFiles(directory=str(settings.corpus_dir)), name="corpus")
 
-    @app.get("/{full_path:path}")
-    def spa(full_path: str) -> FileResponse:
+    @app.get("/")
+    def spa() -> FileResponse:
         return FileResponse(settings.web_root / "index.html")
 
     return app
