@@ -136,14 +136,14 @@ class TestTraditionsResponse:
 
 class TestModelSummary:
     def test_fields(self):
-        m = ModelSummary(name="BAAI/bge-m3", key="BAAI_bge-m3", safe_dir="BAAI_bge-m3")
+        m = ModelSummary(name="BAAI/bge-m3", key="BAAI_bge-m3")
         assert m.name == "BAAI/bge-m3"
 
 
 class TestModelListResponse:
     def test_structure(self):
         resp = ModelListResponse(
-            models=[ModelSummary(name="m1", key="k1", safe_dir="k1")]
+            models=[ModelSummary(name="m1", key="k1")]
         )
         assert len(resp.models) == 1
 

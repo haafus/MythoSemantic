@@ -63,7 +63,6 @@ def get_projection_data(model_key: str, method: str) -> dict | None:
 
 
 def get_saved_html_plot(model_key: str, method: str, output_dir: Path | None = None) -> dict:
-    safe_dir = model_key
     if output_dir is None:
         output_dir = settings.projections_dir / model_key
     filename = SAVED_HTML_METHOD_FILES.get(method, f"{method}.html")
@@ -77,7 +76,7 @@ def get_saved_html_plot(model_key: str, method: str, output_dir: Path | None = N
 
     return {
         "exists": True,
-        "url": f"/projections/{safe_dir}/{filename}",
+        "url": f"/projections/{model_key}/{filename}",
         "path": str(html_path),
     }
 
