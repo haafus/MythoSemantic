@@ -1,5 +1,5 @@
 import uvicorn
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, ORJSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -32,10 +32,7 @@ def create_app() -> FastAPI:
 
     @app.get("/{full_path:path}")
     def spa(full_path: str) -> FileResponse:
-        index_html = settings.web_root / "index.html"
-        if not index_html.exists():
-            raise HTTPException(status_code=404, detail="Not found")
-        return FileResponse(index_html)
+        return FileResponse(settings.web_root / "index.html")
 
     return app
 
