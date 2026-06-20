@@ -76,7 +76,7 @@ class EmbeddingBuilder:
 
         collection = self._store.get_or_create_collection(
             model_name,
-            metadata={"model": model_name, "chunking": self.current_chunking.name},
+            metadata={"model": model_name, "chunking": self.current_chunking.name, "hnsw:space": "cosine"},
         )
 
         existing_ids = collection.existing_ids()
