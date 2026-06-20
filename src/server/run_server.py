@@ -31,7 +31,7 @@ def create_app() -> FastAPI:
         app.mount("/corpus", StaticFiles(directory=str(settings.corpus_dir)), name="corpus")
 
     @app.get("/{full_path:path}")
-    def spa_fallback(full_path: str) -> FileResponse:
+    def spa(full_path: str) -> FileResponse:
         if full_path in ("docs", "redoc", "openapi.json"):
             raise HTTPException(status_code=404, detail="Not found")
         index_html = settings.web_root / "index.html"
