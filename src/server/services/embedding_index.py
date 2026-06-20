@@ -25,9 +25,7 @@ class EmbeddingIndexService:
         self._index_lock = threading.RLock()
         self._encoder = None
 
-    def get_index(self, model_key: str) -> ModelIndex:
-        model_name = key_to_model(model_key)
-
+    def get_index(self, model_name: str) -> ModelIndex:
         with self._index_lock:
             if self._index is not None and self._index.model_name == model_name:
                 return self._index
@@ -37,7 +35,7 @@ class EmbeddingIndexService:
             return self._index
 
     def get_point(self, model_key: str, point_id: str, chunk_index: int | None = None) -> dict:
-        index = self.get_index(model_key)
+        index = self.get_index(key_to_model(model_key))
         item_index = index.id_to_index.get(self._point_key(point_id, chunk_index))
         if item_index is None:
             item_index = index.id_to_index.get(str(point_id))
@@ -60,7 +58,7 @@ class EmbeddingIndexService:
         }
 
     def get_neighbors(self, model_key: str, point_id: str, n: int = 10, chunk_index: int | None = None) -> list[dict]:
-        index = self.get_index(model_key)
+        index = self.get_index(key_to_model(model_key))
         item_index = index.id_to_index.get(self._point_key(point_id, chunk_index))
         if item_index is None:
             item_index = index.id_to_index.get(str(point_id))
@@ -78,6 +76,11 @@ class EmbeddingIndexService:
         query_embedding = self._encode_query(model_name, query)
         similarities = index.normalized_matrix @ query_embedding
         return self._top_results(index, similarities, top_k)
+
+    def warmup(self, model_key: str) -> None:
+        model_name = key_to_model(model_key)
+        self.get_index(model_name)
+        self._encode_query(model_name, "warmup")
 
     def _load_index(self, model_name: str) -> ModelIndex:
         from embeddings import chroma_manager
@@ -105,10 +108,6 @@ class EmbeddingIndexService:
         if chunk_index is None:
             return str(point_id)
         return f"{point_id}::{chunk_index}"
-
-    def warmup(self, model_key: str) -> None:
-        self.get_index(model_key)
-        self._encode_query(key_to_model(model_key), "warmup")
 
     def _encode_query(self, model_name: str, query: str) -> np.ndarray:
         if self._encoder is None:
