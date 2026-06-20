@@ -1,6 +1,5 @@
 import json
 import logging
-import textwrap
 from pathlib import Path
 from typing import Any
 
@@ -143,80 +142,17 @@ def _plot_umap_scatter(
     title_prefix: str,
     filename: str,
     axis_prefix: str,
-    save_html: bool = True,
     output_dir: Path | None = None,
     model_name: str | None = None,
-) -> go.Figure | None:
+) -> None:
     if output_dir is None:
         output_dir = settings.projections_dir
 
     embedding_2d = _reduce_dimensions_safe(embeddings, n_components=2)
     if embedding_2d is None:
-        return None
+        return
 
-    fig = go.Figure()
-    color_map = _get_color_map(data)
-
-    for tradition, color in color_map.items():
-        indices = [i for i, item in enumerate(data) if item.get("tradition", "unknown") == tradition]
-        if not indices:
-            continue
-
-        customdata = []
-        for i in indices:
-            item = data[i]
-            text_preview = item.get("text", "")[:MAX_TEXT_PREVIEW_LEN]
-            if len(item.get("text", "")) > MAX_TEXT_PREVIEW_LEN:
-                text_preview += "..."
-            text_preview = "<br>".join(textwrap.wrap(text_preview, width=60))
-            customdata.append([item["text_id"], tradition, item["chunk_index"], text_preview])
-
-        fig.add_trace(
-            go.Scatter(
-                x=embedding_2d[indices, 0],
-                y=embedding_2d[indices, 1],
-                mode="markers",
-                name=tradition,
-                marker=dict(size=8, opacity=0.7, color=color, line=dict(width=1, color="white")),
-                customdata=customdata,
-                hovertemplate="<b>%{customdata[1]}</b><br>"
-                "ID: %{customdata[0]}<br>"
-                "Chunk: %{customdata[2]}<br>"
-                "Text: %{customdata[3]}<extra></extra>",
-            )
-        )
-
-    title = title_prefix
-    if model_name:
-        title += f" - {model_name}"
-
-    fig.update_layout(
-        title=dict(text=title, font=dict(size=16, family="Arial, sans-serif"), x=0.5, xanchor="center"),
-        showlegend=True,
-        legend=dict(
-            orientation="h",
-            yanchor="top",
-            y=-0.15,
-            xanchor="center",
-            x=0.5,
-            bgcolor="rgba(255,255,255,0.9)",
-            bordercolor="rgba(0,0,0,0.2)",
-            borderwidth=1,
-            font=dict(size=11),
-        ),
-        hovermode="closest",
-        margin=dict(l=50, r=50, t=80, b=100),
-        plot_bgcolor="rgba(240,240,240,0.5)",
-        paper_bgcolor="white",
-        xaxis=_cartesian_axis(f"{axis_prefix} component 1"),
-        yaxis=_cartesian_axis(f"{axis_prefix} component 2"),
-    )
-
-    if save_html and output_dir:
-        html_path = output_dir / filename
-        fig.write_html(str(html_path), include_plotlyjs="cdn", full_html=True)
-        logger.info(f"Saved: {html_path}")
-
+    if output_dir:
         points = []
         for i, item in enumerate(data):
             text_preview = item.get("text", "")[:MAX_TEXT_PREVIEW_LEN]
@@ -230,26 +166,23 @@ def _plot_umap_scatter(
                 "x": round(float(embedding_2d[i, 0]), 6),
                 "y": round(float(embedding_2d[i, 1]), 6),
             })
-        json_path = output_dir / filename.replace(".html", ".json")
+        json_path = output_dir / filename
         json_path.write_text(json.dumps({"model": model_name or "", "points": points}), encoding="utf-8")
         logger.info(f"Saved: {json_path}")
-
-    return fig
 
 
 def plot_interactive_2d(
     data: list[dict],
     embeddings: np.ndarray,
-    save_html: bool = True,
     output_dir: Path | None = None,
     model_name: str | None = None,
-) -> go.Figure | None:
-    return _plot_umap_scatter(
+) -> None:
+    _plot_umap_scatter(
         data, embeddings,
         title_prefix="UMAP visualization by tradition",
-        filename="umap_2d_traditions.html",
+        filename="umap_2d_traditions.json",
         axis_prefix="UMAP",
-        save_html=save_html, output_dir=output_dir,
+        output_dir=output_dir,
         model_name=model_name,
     )
 
@@ -257,17 +190,16 @@ def plot_interactive_2d(
 def plot_residual_umap(
     data: list[dict],
     embeddings: np.ndarray,
-    save_html: bool = True,
     output_dir: Path | None = None,
     model_name: str | None = None,
-) -> go.Figure | None:
+) -> None:
     residuals = _compute_tradition_residuals(data, embeddings)
-    return _plot_umap_scatter(
+    _plot_umap_scatter(
         data, residuals,
         title_prefix="Residual UMAP (tradition centroid removed)",
-        filename="residual_umap_2d.html",
+        filename="residual_umap_2d.json",
         axis_prefix="Residual UMAP",
-        save_html=save_html, output_dir=output_dir,
+        output_dir=output_dir,
         model_name=model_name,
     )
 
@@ -275,18 +207,17 @@ def plot_residual_umap(
 def plot_residual_normalized_umap(
     data: list[dict],
     embeddings: np.ndarray,
-    save_html: bool = True,
     output_dir: Path | None = None,
     model_name: str | None = None,
-) -> go.Figure | None:
+) -> None:
     residuals = _compute_tradition_residuals(data, embeddings)
     residuals = Normalizer(norm="l2").fit_transform(residuals)
-    return _plot_umap_scatter(
+    _plot_umap_scatter(
         data, residuals,
         title_prefix="Residual Normalized UMAP (tradition centroid removed, L2-normalized)",
-        filename="residual_normalized_umap_2d.html",
+        filename="residual_normalized_umap_2d.json",
         axis_prefix="Residual Normalized UMAP",
-        save_html=save_html, output_dir=output_dir,
+        output_dir=output_dir,
         model_name=model_name,
     )
 
@@ -294,17 +225,16 @@ def plot_residual_normalized_umap(
 def plot_rlace_umap(
     data: list[dict],
     embeddings: np.ndarray,
-    save_html: bool = True,
     output_dir: Path | None = None,
     model_name: str | None = None,
-) -> go.Figure | None:
+) -> None:
     erased = _concept_erasure(data, embeddings)
-    return _plot_umap_scatter(
+    _plot_umap_scatter(
         data, erased,
         title_prefix="RLACE UMAP (tradition signal erased via INLP)",
-        filename="rlace_umap_2d.html",
+        filename="rlace_umap_2d.json",
         axis_prefix="RLACE UMAP",
-        save_html=save_html, output_dir=output_dir,
+        output_dir=output_dir,
         model_name=model_name,
     )
 
@@ -442,58 +372,3 @@ def plot_tradition_distribution(
     return fig
 
 
-def add_click_handler_to_html(html_path: str) -> None:
-    try:
-        with open(html_path, encoding="utf-8") as f:
-            content = f.read()
-
-        if "pointClickHandler" in content:
-            return
-
-        click_handler_js = """
-        <script>
-        (function() {
-            function sendPointClick(pointId) {
-                if (window.parent !== window) {
-                    window.parent.postMessage({
-                        type: 'pointClicked',
-                        pointId: pointId
-                    }, '*');
-                }
-            }
-
-            function addClickHandler() {
-                setTimeout(function() {
-                    var plotDiv = document.querySelector('.plotly-graph-div') || document.getElementById('plotly-graph');
-                    if (plotDiv && plotDiv.on) {
-                        plotDiv.on('plotly_click', function(data) {
-                            if (data.points && data.points[0] && data.points[0].customdata) {
-                                var pointId = data.points[0].customdata[0];
-                                if (pointId) {
-                                    sendPointClick(pointId);
-                                }
-                            }
-                        });
-                    } else {
-                        setTimeout(addClickHandler, 500);
-                    }
-                }, 1000);
-            }
-
-            addClickHandler();
-        })();
-        </script>
-        </body>
-        """
-
-        if "</body>" in content:
-            content = content.replace("</body>", click_handler_js)
-        else:
-            content += click_handler_js
-
-        with open(html_path, "w", encoding="utf-8") as f:
-            f.write(content)
-
-        logger.info(f"Added click handler to {html_path}")
-    except Exception as e:
-        logger.warning(f"Failed to add click handler to {html_path}: {e}")
