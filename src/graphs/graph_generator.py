@@ -8,18 +8,6 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 
 
-def create_webpage(nodes_for_js, edges_for_js, output_html_path: Path):
-    nodes_json = json.dumps(nodes_for_js, ensure_ascii=False, indent=2)
-    edges_json = json.dumps(edges_for_js, ensure_ascii=False, indent=2)
-
-    template_path = Path(__file__).parent / "characters_graph.html"
-    html_template = template_path.read_text(encoding="utf-8")
-    html_content = html_template.replace("{nodes_json}", nodes_json).replace("{edges_json}", edges_json)
-
-    with open(output_html_path, "w", encoding="utf-8") as f:
-        f.write(html_content)
-
-
 def generate_and_save_graph(personas_data: list, relations_data: list, output_dir: Path):
     personas = pd.DataFrame(personas_data)
     relations = pd.DataFrame(relations_data)
@@ -110,5 +98,8 @@ def generate_and_save_graph(personas_data: list, relations_data: list, output_di
         {"source": str(u), "target": str(v), "relation": d.get("relation", "")} for u, v, d in G.edges(data=True)
     ]
 
-    create_webpage(nodes_for_js, edges_for_js, output_dir / "characters.html")
-    logger.info(f"Character graph saved successfully: {output_dir / 'characters.html'}")
+    graph_data = {"nodes": nodes_for_js, "edges": edges_for_js}
+    output_path = output_dir / "characters.json"
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(graph_data, f, ensure_ascii=False, indent=2)
+    logger.info(f"Character graph saved: {output_path}")

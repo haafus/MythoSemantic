@@ -16,6 +16,7 @@ export const state = {
     searchPageRequestId: 0,
     warmedSearchModels: new Set(),
     keydownHandler: null,
+    graphCy: null,
 };
 
 export const SIMILARITY_METHODS = [
@@ -54,6 +55,7 @@ function routeClass(path) {
     if (path === "/geography") return "route-geography";
     if (path === "/embeddings_analysis") return "route-embeddings";
     if (path === "/searchSimilarities") return "route-search";
+    if (["/ages", "/realms", "/beings"].includes(path)) return "route-graphs";
     return "route-corpus";
 }
 
@@ -78,6 +80,10 @@ export function cleanupRoute() {
     if (state.geographyMap) {
         state.geographyMap.remove();
         state.geographyMap = null;
+    }
+    if (state.graphCy) {
+        state.graphCy.destroy();
+        state.graphCy = null;
     }
     if (window.Plotly) {
         document.querySelectorAll("#scatter-plot").forEach((plot) => {

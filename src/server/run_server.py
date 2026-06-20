@@ -4,7 +4,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, ORJSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from server.api import corpus, geography, models, points, projections, search
+from server.api import corpus, geography, graphs, models, points, projections, search
 from settings import settings
 
 
@@ -20,6 +20,7 @@ def create_app() -> FastAPI:
     app.include_router(models.router)
     app.include_router(corpus.router)
     app.include_router(geography.router)
+    app.include_router(graphs.router)
     app.include_router(projections.router)
     app.include_router(points.router)
     app.include_router(search.router)

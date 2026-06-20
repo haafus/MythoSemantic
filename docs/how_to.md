@@ -149,13 +149,13 @@ mytho projections --model bge-m3
 - `src/graphs/extraction.py` извлекает сущности через LLM и дедуплицирует их.
 - `src/graphs/chunking.py` разбивает тексты на чанки с перекрытием.
 - `src/graphs/checkpointing.py` сохранение/загрузка промежуточных результатов.
-- `src/graphs/graph_generator.py` строит HTML-граф через NetworkX и Cytoscape.
+- `src/graphs/graph_generator.py` строит граф через NetworkX и сохраняет JSON.
 - `src/llm_client.py` вызывает OpenAI-compatible API (`LLMProcessor`).
 
 Возможности:
 - Пройти по книгам из `outputs/corpus/corpus.json`.
 - Извлечь сущности и связи через локальный или внешний LLM.
-- Сохранить графы в `outputs/graphs/<text_id>/characters.html`.
+- Сохранить графы в `outputs/graphs/<text_id>/characters.json`.
 
 Запуск с моделью по умолчанию (из `settings.py` → `llm.model`):
 
@@ -210,6 +210,7 @@ FastAPI-сервер и SPA-интерфейс.
 - `src/server/api/models.py` список доступных embedding-моделей.
 - `src/server/api/corpus.py` каталог текстов, чтение документов, скачивание архива.
 - `src/server/api/geography.py` традиции с географией.
+- `src/server/api/graphs.py` данные графов (персонажи, связи).
 - `src/server/api/projections.py` JSON-данные проекций.
 - `src/server/api/points.py` информация о точках эмбеддингов и соседи.
 - `src/server/api/search.py` семантический поиск (синхронный и асинхронный), warmup.
@@ -225,6 +226,8 @@ FastAPI-сервер и SPA-интерфейс.
 | GET | `/api/corpus/documents` | Текст документа по ID |
 | GET | `/api/corpus/archive` | ZIP-архив корпуса |
 | GET | `/api/geography/traditions` | Традиции с координатами |
+| GET | `/api/graphs/` | Список книг с доступными графами |
+| GET | `/api/graphs/{book_id}/{graph_type}` | JSON-данные графа (nodes + edges) |
 | GET | `/api/similarity/projections/{model}/{method}` | JSON-данные проекции |
 | GET | `/api/similarity/points/{model}/{point_id}` | Информация о точке |
 | GET | `/api/similarity/points/{model}/{point_id}/neighbors` | Ближайшие соседи точки |

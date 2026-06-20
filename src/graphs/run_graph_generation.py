@@ -53,9 +53,9 @@ def generate_graphs(llm: str | None = None, force: bool = False, max_texts: int 
         book_out_dir = settings.graphs_dir / text_id
         book_out_dir.mkdir(parents=True, exist_ok=True)
 
-        expected_html_path = book_out_dir / "characters.html"
+        expected_path = book_out_dir / "characters.json"
 
-        if expected_html_path.exists():
+        if expected_path.exists():
             if not force:
                 logger.info(f"--- Skipping: {book_id} (already exists) ---")
                 continue
