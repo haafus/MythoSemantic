@@ -31,7 +31,7 @@ def create_app() -> FastAPI:
         app.mount("/corpus", StaticFiles(directory=str(settings.corpus_dir)), name="corpus")
 
     @app.get("/")
-    def spa() -> FileResponse:
+    def index() -> FileResponse:
         return FileResponse(settings.web_root / "index.html")
 
     return app
