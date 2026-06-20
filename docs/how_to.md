@@ -115,11 +115,11 @@ mytho embeddings --model bge-m3 --force
 
 ## projections
 
-Модуль анализа эмбеддингов из Chroma DB и генерации HTML/CSV/JSON-артефактов в `outputs/projections/`.
+Модуль анализа эмбеддингов из Chroma DB и генерации JSON-артефактов в `outputs/projections/`.
 
 Основные файлы:
 - `src/projections/analyzer.py` загружает данные из Chroma и собирает статистику.
-- `src/projections/visualization.py` строит UMAP-проекцию, heatmap и distribution chart.
+- `src/projections/visualization.py` вычисляет UMAP-проекции, heatmap расстояний и distribution, сохраняет как JSON.
 - `src/projections/run_analysis.py` оркестрирует анализ для нескольких моделей.
 
 Возможности:
@@ -206,11 +206,11 @@ mytho clean --apply
 FastAPI-сервер и SPA-интерфейс.
 
 Основные файлы:
-- `src/server/run_server.py` создание приложения, middleware, статика, SPA fallback.
+- `src/server/run_server.py` создание приложения, middleware, статика.
 - `src/server/api/models.py` список доступных embedding-моделей.
 - `src/server/api/corpus.py` каталог текстов, чтение документов, скачивание архива.
 - `src/server/api/geography.py` традиции с географией.
-- `src/server/api/projections.py` данные проекций и сохранённые HTML-графики.
+- `src/server/api/projections.py` JSON-данные проекций.
 - `src/server/api/points.py` информация о точках эмбеддингов и соседи.
 - `src/server/api/search.py` семантический поиск (синхронный и асинхронный), warmup.
 - `src/server/schemas.py` Pydantic-схемы запросов и ответов.
@@ -226,7 +226,6 @@ FastAPI-сервер и SPA-интерфейс.
 | GET | `/api/corpus/archive` | ZIP-архив корпуса |
 | GET | `/api/geography/traditions` | Традиции с координатами |
 | GET | `/api/similarity/projections/{model}/{method}` | JSON-данные проекции |
-| GET | `/api/similarity/saved-html/{model}/{method}` | URL сохранённого HTML-графика |
 | GET | `/api/similarity/points/{model}/{point_id}` | Информация о точке |
 | GET | `/api/similarity/points/{model}/{point_id}/neighbors` | Ближайшие соседи точки |
 | POST | `/api/similarity/search` | Синхронный семантический поиск |
@@ -308,7 +307,7 @@ mytho server
 
 - `outputs/corpus/` — основной текстовый корпус с метаданными (`corpus.json`) и описаниями традиций (`traditions.json`). Создается через `mytho corpus`.
 - `outputs/embeddings/` — локальная Chroma DB с векторными коллекциями. Создается через `mytho embeddings`.
-- `outputs/projections/` — результаты анализа: `models.json`, HTML-графики. Создается через `mytho projections`.
+- `outputs/projections/` — результаты анализа: JSON-данные проекций (UMAP, heatmap, distribution). Создается через `mytho projections`.
 - `outputs/graphs/` — готовые HTML-графы персонажей и связей. Создается через `mytho graphs`.
 - `outputs/logs/` — логи всех пайплайнов.
 
