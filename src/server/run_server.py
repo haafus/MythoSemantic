@@ -32,8 +32,6 @@ def create_app() -> FastAPI:
 
     @app.get("/{full_path:path}")
     def spa(full_path: str) -> FileResponse:
-        if full_path in ("docs", "redoc", "openapi.json"):
-            raise HTTPException(status_code=404, detail="Not found")
         index_html = settings.web_root / "index.html"
         if not index_html.exists():
             raise HTTPException(status_code=404, detail="Not found")
