@@ -1,3 +1,7 @@
+// Plotly chart implementation (~3.5 MB).
+// CDN: <script src="https://cdn.plot.ly/plotly-3.0.1.min.js" charset="utf-8"></script>
+// To activate: cp chart-plotly.js chart.js  (and update CDN in index.html)
+
 import { escapeHtml, normalizePreviewText } from "./core.js";
 
 let activeChart = null;
