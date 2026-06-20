@@ -5,17 +5,14 @@ class TestModelToKey:
     def test_slash_replaced(self):
         assert model_to_key("BAAI/bge-m3") == "BAAI_bge-m3"
 
-    def test_dot_replaced(self):
-        assert model_to_key("Qwen/Qwen3-Embedding-0.6B") == "Qwen_Qwen3-Embedding-0_6B"
+    def test_dot_preserved(self):
+        assert model_to_key("Qwen/Qwen3-Embedding-0.6B") == "Qwen_Qwen3-Embedding-0.6B"
 
     def test_no_special_chars(self):
         assert model_to_key("simple-model") == "simple-model"
 
     def test_empty(self):
         assert model_to_key("") == ""
-
-    def test_max_length(self):
-        assert len(model_to_key("a" * 100)) == 63
 
 
 class TestModelNameForKey:

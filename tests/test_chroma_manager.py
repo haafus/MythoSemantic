@@ -16,9 +16,5 @@ class TestModelToKeyAsCollectionName:
     def test_no_slash(self):
         assert "/" not in model_to_key("BAAI/bge-m3")
 
-    def test_no_dot(self):
-        assert "." not in model_to_key("Qwen/Qwen3-Embedding-0.6B")
-
-    def test_max_length(self):
-        name = model_to_key("very-long-model-name/" + "a" * 100)
-        assert len(name) <= 63
+    def test_dot_preserved(self):
+        assert model_to_key("Qwen/Qwen3-Embedding-0.6B") == "Qwen_Qwen3-Embedding-0.6B"
