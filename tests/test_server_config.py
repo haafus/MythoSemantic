@@ -13,9 +13,6 @@ class TestServerSettingsDefaults:
     def test_gzip_minimum_size(self):
         assert settings.server.gzip_minimum_size == 1024
 
-    def test_cache_max_age(self):
-        assert settings.server.cache_max_age == 86400
-
     def test_search_defaults(self):
         assert settings.server.search_job_ttl_seconds == 1800
         assert settings.server.search_max_workers == 1

@@ -1,5 +1,5 @@
 import uvicorn
-from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, ORJSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -29,20 +29,6 @@ def create_app() -> FastAPI:
         app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
     if settings.corpus_dir.exists():
         app.mount("/corpus", StaticFiles(directory=str(settings.corpus_dir)), name="corpus")
-
-    @app.middleware("http")
-    async def add_cache_headers(request: Request, call_next) -> Response:
-        response = await call_next(request)
-        path = request.url.path
-
-        if path.startswith("/api/") or path.startswith("/assets/"):
-            response.headers["Cache-Control"] = "no-store"
-        elif path.startswith("/corpus/"):
-            response.headers["Cache-Control"] = f"public, max-age={srv.cache_max_age}"
-        else:
-            response.headers["Cache-Control"] = "no-cache"
-
-        return response
 
     @app.get("/")
     def index() -> FileResponse:
