@@ -84,17 +84,15 @@ class TestUpdateTraditions:
     def _setup(self, tmp_path, monkeypatch, *, books=None, traditions=None):
         from settings import settings
 
+        config_dir = tmp_path / "config"
+        config_dir.mkdir()
         corpus_dir = tmp_path / "corpus"
         corpus_dir.mkdir()
 
-        dl_file = tmp_path / "corpus.json"
-        dl_file.write_text(json.dumps(books or []))
+        (config_dir / "corpus.json").write_text(json.dumps(books or []))
+        (config_dir / "traditions.json").write_text(json.dumps(traditions or {}))
 
-        trad_file = tmp_path / "traditions.json"
-        trad_file.write_text(json.dumps(traditions or {}))
-
-        monkeypatch.setattr(settings, "corpus_config_file", dl_file)
-        monkeypatch.setattr(settings, "traditions_config_file", trad_file)
+        monkeypatch.setattr(settings, "config_dir", config_dir)
         monkeypatch.setattr(settings, "corpus_dir", corpus_dir)
         return corpus_dir
 
@@ -135,10 +133,10 @@ class TestUpdateTraditions:
     def test_no_sources(self, tmp_path, monkeypatch):
         from settings import settings
 
+        config_dir = tmp_path / "empty_config"
         corpus_dir = tmp_path / "corpus"
         corpus_dir.mkdir()
-        monkeypatch.setattr(settings, "corpus_config_file", tmp_path / "nonexistent.json")
-        monkeypatch.setattr(settings, "traditions_config_file", tmp_path / "nonexistent2.json")
+        monkeypatch.setattr(settings, "config_dir", config_dir)
         monkeypatch.setattr(settings, "corpus_dir", corpus_dir)
 
         _update_traditions(force=False)

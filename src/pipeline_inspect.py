@@ -37,7 +37,7 @@ def format_size(nbytes: int) -> str:
 # ---------------------------------------------------------------------------
 
 def corpus_status(settings) -> dict[str, Any]:
-    config_path = settings.corpus_config_file
+    config_path = settings.config_dir / "corpus.json"
     config_count = 0
     if config_path.exists():
         try:
@@ -46,7 +46,7 @@ def corpus_status(settings) -> dict[str, Any]:
         except Exception:
             pass
 
-    meta_path = settings.corpus_metadata_path
+    meta_path = settings.corpus_dir / "corpus.json"
     meta_entries: list[dict] = []
     if meta_path.exists():
         try:
@@ -75,7 +75,7 @@ def corpus_status(settings) -> dict[str, Any]:
 
 
 def corpus_orphans(settings) -> list[tuple[Path, int]]:
-    if not settings.corpus_metadata_path.exists():
+    if not settings.corpus_dir / "corpus.json".exists():
         return []
 
     info = corpus_status(settings)
@@ -141,7 +141,7 @@ def embeddings_orphan_chunks(settings, *, skip_collections: set[str] | None = No
     if skip_collections is None:
         skip_collections = {c["name"] for c in embeddings_orphan_collections(settings)}
 
-    meta_path = settings.corpus_metadata_path
+    meta_path = settings.corpus_dir / "corpus.json"
     if not meta_path.exists():
         return []
 
@@ -263,7 +263,7 @@ def graphs_orphans(settings) -> list[tuple[Path, int]]:
     if not graphs_dir.exists():
         return []
 
-    meta_path = settings.corpus_metadata_path
+    meta_path = settings.corpus_dir / "corpus.json"
     if not meta_path.exists():
         return []
 

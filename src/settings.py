@@ -65,9 +65,6 @@ class Settings(BaseSettings):
     projections_dir: Path = Path("outputs/projections")
     graphs_dir: Path = Path("outputs/graphs")
     logs_dir: Path = Path("outputs/logs")
-    corpus_config_file: Path = Path("config/corpus.json")
-    traditions_config_file: Path = Path("config/traditions.json")
-    corpus_metadata_path: Path = Path("outputs/corpus/corpus.json")
     web_root: Path = Path("src/server/web")
 
     log_level: str = "INFO"

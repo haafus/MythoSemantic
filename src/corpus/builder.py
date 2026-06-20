@@ -113,7 +113,7 @@ def _download_and_process(item: dict) -> dict | None:
 
 
 def _update_traditions(force: bool) -> None:
-    config_path = Path(settings.traditions_config_file)
+    config_path = settings.config_dir / "traditions.json"
     output_path = settings.corpus_dir / "traditions.json"
 
     static: dict = {}
@@ -125,8 +125,9 @@ def _update_traditions(force: bool) -> None:
             logger.exception("Error reading %s", config_path)
 
     corpus_traditions: set[str] = set()
-    if Path(settings.corpus_config_file).exists():
-        with open(settings.corpus_config_file, encoding="utf-8") as f:
+    corpus_config = settings.config_dir / "corpus.json"
+    if corpus_config.exists():
+        with open(corpus_config, encoding="utf-8") as f:
             for item in json.load(f):
                 if "tradition" in item:
                     corpus_traditions.add(item["tradition"])
@@ -142,7 +143,7 @@ def _update_traditions(force: bool) -> None:
 
 
 def _load_existing_metadata() -> dict[str, dict]:
-    path = settings.corpus_metadata_path
+    path = settings.corpus_dir / "corpus.json"
     if not path.exists():
         return {}
     try:
@@ -193,7 +194,7 @@ def build_corpus(force: bool = False, max_texts: int | None = None):
         metadata.extend(new_metadata)
         logger.info(f"Downloaded: {len(new_metadata)}, failed: {len(to_download) - len(new_metadata)}")
 
-    with open(settings.corpus_metadata_path, "w", encoding="utf-8") as f:
+    with open(settings.corpus_dir / "corpus.json", "w", encoding="utf-8") as f:
         json.dump(metadata, f, ensure_ascii=False, indent=2)
 
     logger.info("Corpus build complete. Total: %d texts", len(metadata))

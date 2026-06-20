@@ -22,7 +22,7 @@ def generate_graphs(llm: str | None = None, force: bool = False, max_texts: int 
         logger.exception("Failed to load prompts from %s", prompts_path)
         return
 
-    metadata_path = settings.corpus_metadata_path
+    metadata_path = settings.corpus_dir / "corpus.json"
     if not metadata_path.exists():
         logger.error(f"Metadata file not found: {metadata_path}")
         return

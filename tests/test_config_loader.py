@@ -36,5 +36,5 @@ class TestPathsFromSettings:
     def test_corpus_dir(self):
         assert settings.corpus_dir is not None
 
-    def test_metadata_path(self):
-        assert settings.corpus_metadata_path is not None
+    def test_config_dir(self):
+        assert settings.config_dir is not None

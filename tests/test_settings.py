@@ -11,14 +11,6 @@ def test_default_paths():
     assert s.logs_dir == Path("outputs/logs")
 
 
-def test_default_metadata_path():
-    from settings import Settings
-
-    s = Settings()
-    assert s.corpus_metadata_path == Path("outputs/corpus/corpus.json")
-
-
-
 def test_env_override(monkeypatch):
     monkeypatch.setenv("MYTHO_CORPUS_DIR", "/tmp/my_corpus")
     monkeypatch.setenv("MYTHO_LOG_LEVEL", "DEBUG")
@@ -28,7 +20,6 @@ def test_env_override(monkeypatch):
     s = Settings()
     assert s.corpus_dir == Path("/tmp/my_corpus")
     assert s.log_level == "DEBUG"
-    assert s.corpus_metadata_path == Path("outputs/corpus/corpus.json")
 
 
 def test_env_override_embeddings_dir(monkeypatch):

@@ -1,6 +1,5 @@
 import json
 import logging
-from pathlib import Path
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -46,11 +45,12 @@ def _get_user_agent():
 
 
 def load_download_list() -> list[dict]:
-    if not Path(settings.corpus_config_file).exists():
-        logger.error(f"Download list file not found: {settings.corpus_config_file}")
+    config_file = settings.config_dir / "corpus.json"
+    if not config_file.exists():
+        logger.error(f"Download list file not found: {config_file}")
         return []
 
-    with open(settings.corpus_config_file, encoding="utf-8") as f:
+    with open(config_file, encoding="utf-8") as f:
         items = json.load(f)
 
     seen_urls: set[str] = set()
