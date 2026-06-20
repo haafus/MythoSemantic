@@ -41,7 +41,8 @@ function render() {
     if (path === "/embeddings_analysis") return renderEmbeddingsAnalysis();
     if (path === "/searchSimilarities") return renderSearchSimilarities(parsed.params);
     if (path === "/beings") return renderGraphPage("beings", "characters");
-    if (["/ages", "/realms"].includes(path)) return renderFutureDomain(path.slice(1));
+    if (path === "/realms") return renderGraphPage("realms", "realms");
+    if (path === "/ages") return renderGraphPage("ages", "ages");
 
     window.location.hash = "#/corpus";
 }
@@ -1600,18 +1601,17 @@ function showPointDetails(pointId, modelName, chunkIndex = null) {
     }
 }
 
-function renderFutureDomain(name) {
-    document.title = `MythoScope - ${name}`;
-    app.innerHTML = `
-        <main class="placeholder-page">
-            <h2>${escapeHtml(name.charAt(0).toUpperCase() + name.slice(1))}</h2>
-        </main>
-    `;
-}
-
 const GRAPH_CATEGORY_COLORS = {
     Character: "#dcd0ff",
-    Group: "#cccccc",
+    Location: "#c8e6c9",
+    Epoch: "#fff3cd",
+    Other: "#cccccc",
+};
+
+const GRAPH_INFO_FIELDS = {
+    characters: ["Name", "Category", "Description", "Roles", "Epithets", "Attributes", "Actions", "Degree", "BetweennessCentrality"],
+    realms: ["Name", "Category", "Description", "Function", "Adjacent To", "Degree", "BetweennessCentrality"],
+    ages: ["Name", "Category", "Description", "Keyactors", "Keyevents", "Degree", "BetweennessCentrality"],
 };
 
 async function renderGraphPage(pageName, graphType) {
@@ -1684,7 +1684,7 @@ async function loadGraphData(bookId, graphType) {
     try {
         const data = await api(`/api/graphs/${encodeURIComponent(bookId)}/${encodeURIComponent(graphType)}`);
         if (placeholder) placeholder.style.display = "none";
-        renderCytoscapeGraph(canvas, data);
+        renderCytoscapeGraph(canvas, data, graphType);
     } catch (error) {
         if (placeholder) {
             placeholder.textContent = `Error: ${error.message}`;
@@ -1693,7 +1693,7 @@ async function loadGraphData(bookId, graphType) {
     }
 }
 
-function renderCytoscapeGraph(container, data) {
+function renderCytoscapeGraph(container, data, graphType) {
     if (typeof cytoscape === "undefined") {
         const placeholder = document.getElementById("graphPlaceholder");
         if (placeholder) {
@@ -1804,7 +1804,7 @@ function renderCytoscapeGraph(container, data) {
 
     cy.on("tap", "node", (evt) => {
         const d = evt.target.data();
-        const fields = ["Name", "Category", "Description", "Roles", "Epithets", "Attributes", "Actions", "Degree", "BetweennessCentrality"];
+        const fields = GRAPH_INFO_FIELDS[graphType] || GRAPH_INFO_FIELDS.characters;
         let html = `<h4>${escapeHtml(d.display_name || d.Name || d.id)}</h4><table>`;
         fields.forEach((f) => {
             if (d[f] !== undefined && d[f] !== null && d[f] !== "") {

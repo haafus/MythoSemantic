@@ -9,7 +9,7 @@ from settings import settings
 from .checkpointing import clear_checkpoint, load_checkpoint, save_checkpoint
 from .chunking import chunk_text
 from .extraction import deduplicate_entities, deduplicate_relations, extract_from_chunk
-from .graph_generator import generate_and_save_graph
+from .graph_generator import generate_ages_graph, generate_characters_graph, generate_realms_graph
 
 logger = logging.getLogger(__name__)
 
@@ -123,7 +123,9 @@ def generate_graphs(llm: str | None = None, force: bool = False, max_texts: int 
             with open(book_out_dir / "times.json", "w", encoding="utf-8") as f:
                 json.dump(all_times, f, ensure_ascii=False, indent=2)
 
-            generate_and_save_graph(all_characters, all_relations, book_out_dir)
+            generate_characters_graph(all_characters, all_relations, book_out_dir)
+            generate_realms_graph(all_locations, book_out_dir)
+            generate_ages_graph(all_times, book_out_dir)
             clear_checkpoint(book_out_dir)
 
         except Exception:

@@ -4,7 +4,7 @@ from pathlib import Path
 from corpus.utils import normalize_catalog_id
 from settings import settings
 
-GRAPH_TYPES = {"characters"}
+GRAPH_TYPES = {"characters", "realms", "ages"}
 
 
 def list_books_with_graphs() -> list[dict]:

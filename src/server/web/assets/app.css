@@ -1436,16 +1436,6 @@ body.route-search {
     background: #faf9f5;
 }
 
-.placeholder-page {
-    width: min(1200px, calc(100% - 40px));
-    margin: 24px auto;
-    background: #fff;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 40px;
-    color: #495057;
-}
-
 .graph-page.container {
     width: min(100% - 24px, 1600px);
     padding-top: 24px;
