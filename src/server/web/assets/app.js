@@ -161,6 +161,7 @@ function renderCorpusLibrary() {
         return;
     }
 
+    const docIndex = new Map(documents.map((doc, i) => [doc, i]));
     const grouped = groupDocuments(documents);
     if (!state.corpusOpenTraditionsInitialized) {
         grouped.forEach((traditions, major) => {
@@ -192,7 +193,7 @@ function renderCorpusLibrary() {
                         <span class="tradition-toggle">${isOpen ? "-" : "+"}</span>
                     </button>
                     <ul class="document-list">
-                        ${docs.map((doc) => createCorpusDocumentButton(doc, documents.indexOf(doc))).join("")}
+                        ${docs.map((doc) => createCorpusDocumentButton(doc, docIndex.get(doc))).join("")}
                     </ul>
                 </div>
             `;
@@ -1027,19 +1028,7 @@ async function displayPointInfo(pointId, chunkIndex = null) {
     infoContent.classList.remove("empty");
 
     try {
-        const pointQuery = chunkIndex !== null && chunkIndex !== undefined && chunkIndex !== ""
-            ? `?chunk_index=${encodeURIComponent(chunkIndex)}`
-            : "";
-        const neighborsQuery = new URLSearchParams({n: "5"});
-        if (chunkIndex !== null && chunkIndex !== undefined && chunkIndex !== "") {
-            neighborsQuery.set("chunk_index", String(chunkIndex));
-        }
-
-        const [point, neighborsData] = await Promise.all([
-            api(`/api/similarity/points/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(pointId)}${pointQuery}`),
-            api(`/api/similarity/points/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(pointId)}/neighbors?${neighborsQuery.toString()}`),
-        ]);
-
+        const [point, neighborsData] = await fetchPointAndNeighbors(pointId, chunkIndex);
         const neighbors = Array.isArray(neighborsData.neighbors) ? neighborsData.neighbors : [];
         let html = `
             <div class="badge">${escapeHtml(point.tradition)}</div>
@@ -1171,6 +1160,36 @@ async function openBookReader(doc) {
     } catch {
         modalBody.textContent = "Load error.";
     }
+}
+
+function scoreClass(similarityScore) {
+    const percent = Math.round(Number(similarityScore || 0) * 100);
+    let cls = "score-low";
+    if (percent >= 60) cls = "score-high";
+    else if (percent >= 40) cls = "score-medium";
+    return {percent, cls};
+}
+
+function buildPointQueries(chunkIndex) {
+    const hasChunk = chunkIndex !== null && chunkIndex !== undefined && chunkIndex !== "";
+    const pointQuery = hasChunk ? `?chunk_index=${encodeURIComponent(chunkIndex)}` : "";
+    const neighborsQuery = new URLSearchParams({n: "5"});
+    if (hasChunk) neighborsQuery.set("chunk_index", String(chunkIndex));
+    return {pointQuery, neighborsQuery};
+}
+
+function fetchPointAndNeighbors(pointId, chunkIndex) {
+    const {pointQuery, neighborsQuery} = buildPointQueries(chunkIndex);
+    return Promise.all([
+        api(`/api/similarity/points/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(pointId)}${pointQuery}`),
+        api(`/api/similarity/points/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(pointId)}/neighbors?${neighborsQuery.toString()}`),
+    ]);
+}
+
+function bindSearchResultClicks(container, handler) {
+    container.querySelectorAll(".search-result-item").forEach((item) => {
+        item.addEventListener("click", () => handler(item.dataset.pointId, item.dataset.chunkIndex));
+    });
 }
 
 const SEARCH_JOB_POLL_MS = 1000;
@@ -1333,25 +1352,16 @@ function displayAnalysisSearchResults(data) {
         </div>
     `);
 
-    const resultsContainer = document.getElementById("searchResults");
-    resultsContainer.querySelectorAll(".search-result-item").forEach((item) => {
-        item.addEventListener("click", () => {
-            displaySearchModalPointInfo(item.dataset.pointId, item.dataset.chunkIndex);
-        });
-    });
+    bindSearchResultClicks(document.getElementById("searchResults"), displaySearchModalPointInfo);
 }
 
 function renderSearchResultItem(result, data) {
-    const similarityPercent = Math.round(Number(result.similarity_score || 0) * 100);
-    let scoreClass = "score-low";
-    if (similarityPercent >= 60) scoreClass = "score-high";
-    else if (similarityPercent >= 40) scoreClass = "score-medium";
-
+    const {percent, cls} = scoreClass(result.similarity_score);
     return `
         <button class="search-result-item" type="button" data-point-id="${escapeAttribute(result.id)}" data-chunk-index="${escapeAttribute(result.chunk_index)}">
             <span class="search-result-topline">
                 <span class="result-tradition">${escapeHtml(result.tradition)}</span>
-                <span class="result-score ${scoreClass}">${similarityPercent}% similarity</span>
+                <span class="result-score ${cls}">${percent}% similarity</span>
             </span>
             <span class="search-result-meta">${escapeHtml(searchResultMetaLine(result))}</span>
             <span class="result-text chunk-text">${chunkTextHtml(result, data.query)}</span>
@@ -1366,18 +1376,7 @@ async function displaySearchModalPointInfo(pointId, chunkIndex = null) {
     setSearchResults('<div class="search-loading">Loading nearest chunks...</div>');
 
     try {
-        const pointQuery = chunkIndex !== null && chunkIndex !== undefined && chunkIndex !== ""
-            ? `?chunk_index=${encodeURIComponent(chunkIndex)}`
-            : "";
-        const neighborsQuery = new URLSearchParams({n: "5"});
-        if (chunkIndex !== null && chunkIndex !== undefined && chunkIndex !== "") {
-            neighborsQuery.set("chunk_index", String(chunkIndex));
-        }
-
-        const [point, neighborsData] = await Promise.all([
-            api(`/api/similarity/points/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(pointId)}${pointQuery}`),
-            api(`/api/similarity/points/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(pointId)}/neighbors?${neighborsQuery.toString()}`),
-        ]);
+        const [point, neighborsData] = await fetchPointAndNeighbors(pointId, chunkIndex);
         const neighbors = Array.isArray(neighborsData.neighbors) ? neighborsData.neighbors : [];
 
         setSearchResults(`
@@ -1400,13 +1399,7 @@ async function displaySearchModalPointInfo(pointId, chunkIndex = null) {
 
         const back = document.getElementById("backToSearchResults");
         if (back) back.addEventListener("click", () => displayAnalysisSearchResults(state.lastAnalysisSearchData || {results: []}));
-
-        const resultsContainer = document.getElementById("searchResults");
-        resultsContainer.querySelectorAll(".search-result-item").forEach((item) => {
-            item.addEventListener("click", () => {
-                displaySearchModalPointInfo(item.dataset.pointId, item.dataset.chunkIndex);
-            });
-        });
+        bindSearchResultClicks(document.getElementById("searchResults"), displaySearchModalPointInfo);
     } catch (error) {
         setSearchResults(`<div class="search-empty">Load error: ${escapeHtml(error.message)}</div>`);
     }
@@ -1538,28 +1531,12 @@ function displaySearchResults(data) {
                 Model: ${escapeHtml(String(data.model || "").replace(/_/g, "/"))}
             </span>
         </div>
-        ${results.map((result) => {
-            const similarityPercent = Math.round(Number(result.similarity_score || 0) * 100);
-            let scoreClass = "score-low";
-            if (similarityPercent >= 60) scoreClass = "score-high";
-            else if (similarityPercent >= 40) scoreClass = "score-medium";
-
-            return `
-                <div class="result-item" data-point-id="${escapeAttribute(result.id)}" data-model="${escapeAttribute(data.model)}" data-chunk-index="${escapeAttribute(result.chunk_index)}">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-                        <span class="result-tradition">${escapeHtml(result.tradition)}</span>
-                        <span class="result-score ${scoreClass}">${similarityPercent}% similarity</span>
-                    </div>
-                    <div class="search-result-meta">${escapeHtml(searchResultMetaLine(result))}</div>
-                    <div class="result-text chunk-text">${chunkTextHtml(result, data.query)}</div>
-                </div>
-            `;
-        }).join("")}
+        <div class="search-result-list">
+            ${results.map((result) => renderSearchResultItem(result, data)).join("")}
+        </div>
     `;
 
-    resultsArea.querySelectorAll(".result-item").forEach((item) => {
-        item.addEventListener("click", () => showPointDetails(item.dataset.pointId, item.dataset.model, item.dataset.chunkIndex));
-    });
+    bindSearchResultClicks(resultsArea, (pointId, chunkIndex) => showPointDetails(pointId, data.model, chunkIndex));
 }
 
 function highlightText(text, query) {
@@ -1587,7 +1564,7 @@ function showPointDetails(pointId, modelName, chunkIndex = null) {
             id: pointId,
             model: modelName,
             chunkIndex,
-        }, "*");
+        }, window.location.origin);
 
         const notification = document.createElement("div");
         notification.textContent = "Details opened in the main window";
@@ -1779,18 +1756,20 @@ function renderCytoscapeGraph(container, data, graphType) {
     tooltipDiv.className = "graph-edge-tooltip";
     container.appendChild(tooltipDiv);
 
+    let cachedRect = container.getBoundingClientRect();
     cy.on("mouseover", "edge", (evt) => {
+        cachedRect = container.getBoundingClientRect();
         const edge = evt.target;
         const sName = cy.getElementById(edge.data("source")).data("display_name") || edge.data("source");
         const tName = cy.getElementById(edge.data("target")).data("display_name") || edge.data("target");
         tooltipDiv.innerHTML = `${escapeHtml(sName)} &rarr; ${escapeHtml(tName)}<br><strong>${escapeHtml(edge.data("relation") || "")}</strong>`;
-        tooltipDiv.style.left = (evt.originalEvent.clientX - container.getBoundingClientRect().left + 10) + "px";
-        tooltipDiv.style.top = (evt.originalEvent.clientY - container.getBoundingClientRect().top + 10) + "px";
+        tooltipDiv.style.left = (evt.originalEvent.clientX - cachedRect.left + 10) + "px";
+        tooltipDiv.style.top = (evt.originalEvent.clientY - cachedRect.top + 10) + "px";
         tooltipDiv.style.display = "block";
     });
     cy.on("mousemove", "edge", (evt) => {
-        tooltipDiv.style.left = (evt.originalEvent.clientX - container.getBoundingClientRect().left + 10) + "px";
-        tooltipDiv.style.top = (evt.originalEvent.clientY - container.getBoundingClientRect().top + 10) + "px";
+        tooltipDiv.style.left = (evt.originalEvent.clientX - cachedRect.left + 10) + "px";
+        tooltipDiv.style.top = (evt.originalEvent.clientY - cachedRect.top + 10) + "px";
     });
     cy.on("mouseout", "edge", () => {
         tooltipDiv.style.display = "none";
@@ -1818,17 +1797,8 @@ function renderCytoscapeGraph(container, data, graphType) {
     });
 }
 
-const fadeStyle = document.createElement("style");
-fadeStyle.textContent = `
-    @keyframes fadeOut {
-        0% { opacity: 1; }
-        70% { opacity: 1; }
-        100% { opacity: 0; visibility: hidden; }
-    }
-`;
-document.head.appendChild(fadeStyle);
-
 window.addEventListener("message", (event) => {
+    if (event.origin !== window.location.origin) return;
     const data = event.data || {};
     if (data.type !== "openPointDetails") return;
 

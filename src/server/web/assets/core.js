@@ -97,13 +97,9 @@ export function cleanupRoute() {
 }
 
 export async function api(path, options = {}) {
-    const response = await fetch(path, {
-        headers: {
-            "Content-Type": "application/json",
-            ...(options.headers || {}),
-        },
-        ...options,
-    });
+    const headers = {...(options.headers || {})};
+    if (options.body) headers["Content-Type"] = headers["Content-Type"] || "application/json";
+    const response = await fetch(path, {...options, headers});
 
     if (!response.ok) {
         const text = await response.text();
@@ -123,23 +119,20 @@ export async function api(path, options = {}) {
 }
 
 export function escapeHtml(value) {
-    const div = document.createElement("div");
-    div.textContent = String(value ?? "");
-    return div.innerHTML;
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
 }
 
 export function normalizePreviewText(value) {
-    return String(value ?? "")
-        .replace(/-\s*&lt;br\s*\/?&gt;/gi, "-")
-        .replace(/-\s*<br\s*\/?>/gi, "-")
-        .replace(/&lt;br\s*\/?&gt;/gi, " ")
-        .replace(/<br\s*\/?>/gi, " ")
-        .replace(/\s+/g, " ")
-        .trim();
+    return String(value ?? "").replace(/\s+/g, " ").trim();
 }
 
 export function escapeAttribute(value) {
-    return escapeHtml(value).replace(/"/g, "&quot;");
+    return escapeHtml(value);
 }
 
 export function escapeRegex(value) {
