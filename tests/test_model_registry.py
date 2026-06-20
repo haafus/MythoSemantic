@@ -41,10 +41,9 @@ class TestListFunctions:
         assert "gemini25-flash" in providers
         assert "qwen3-8b" not in providers
 
-    def test_inactive_llm_still_resolves(self):
-        result = resolve_llm_provider("qwen3-8b")
-        assert result["model"] == "qwen3:8b"
-        assert "localhost" in result["base_url"]
+    def test_inactive_llm_raises(self):
+        with pytest.raises(ValueError, match="not found"):
+            resolve_llm_provider("qwen3-8b")
 
     def test_list_embedding_aliases(self):
         aliases = list_embedding_aliases()
@@ -57,6 +56,6 @@ class TestListFunctions:
         assert models[0] == "BAAI/bge-m3"
         assert "Qwen/Qwen3-Embedding-4B" not in models
 
-    def test_inactive_embedding_still_resolves(self):
-        assert resolve_embedding_model("qwen-4b") == "Qwen/Qwen3-Embedding-4B"
-        assert resolve_embedding_model("story-emb") == "uhhlt/story-emb"
+    def test_inactive_embedding_passes_through(self):
+        assert resolve_embedding_model("qwen-4b") == "qwen-4b"
+        assert resolve_embedding_model("story-emb") == "story-emb"

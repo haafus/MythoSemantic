@@ -59,6 +59,7 @@ class ServerSettings(BaseModel):
 
 
 class Settings(BaseSettings):
+    config_dir: Path = Path("config")
     corpus_dir: Path = Path("outputs/corpus")
     embeddings_dir: Path = Path("outputs/embeddings")
     projections_dir: Path = Path("outputs/projections")

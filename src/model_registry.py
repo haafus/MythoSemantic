@@ -1,7 +1,8 @@
 import json
 import os
-from pathlib import Path
 from typing import Any
+
+from settings import settings
 
 _registry: dict[str, Any] | None = None
 
@@ -9,26 +10,24 @@ _registry: dict[str, Any] | None = None
 def _load_registry() -> dict[str, Any]:
     global _registry
     if _registry is None:
-        path = Path(__file__).resolve().parent.parent / "config" / "models.json"
+        path = settings.config_dir / "models.json"
         _registry = json.loads(path.read_text(encoding="utf-8"))
     return _registry
 
 
 def resolve_embedding_model(name: str) -> str:
     registry = _load_registry()
-    emb = registry.get("embedding", {})
-    all_models = {**emb.get("models", {}), **emb.get("inactive", {})}
-    return all_models.get(name, name)
+    models = registry.get("embedding", {}).get("models", {})
+    return models.get(name, name)
 
 
 def resolve_llm_provider(name: str) -> dict[str, str | None]:
     registry = _load_registry()
-    llm = registry.get("llm", {})
-    all_models = {**llm.get("models", {}), **llm.get("inactive", {})}
-    if name not in all_models:
-        available = ", ".join(sorted(all_models.keys()))
+    models = registry.get("llm", {}).get("models", {})
+    if name not in models:
+        available = ", ".join(sorted(models.keys()))
         raise ValueError(f"LLM provider '{name}' not found. Available: {available}")
-    entry = all_models[name]
+    entry = models[name]
     api_key = None
     env_key = entry.get("env_key")
     if env_key:
@@ -49,8 +48,7 @@ def active_embedding_models() -> list[str]:
 
 
 def list_embedding_aliases() -> dict[str, str]:
-    emb = _load_registry().get("embedding", {})
-    return {**emb.get("models", {}), **emb.get("inactive", {})}
+    return dict(_load_registry().get("embedding", {}).get("models", {}))
 
 
 def model_to_key(model_name: str) -> str:
