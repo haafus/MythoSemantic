@@ -30,28 +30,23 @@
     "inactive": {
       "qwen3-8b": {
         "base_url": "http://localhost:11434/v1",
-        "model": "qwen3:8b",
-        "env_key": null
+        "model": "qwen3:8b"
       },
       "qwen3-32b": {
         "base_url": "http://localhost:11434/v1",
-        "model": "qwen3:32b",
-        "env_key": null
+        "model": "qwen3:32b"
       },
       "gemma3-12b": {
         "base_url": "http://localhost:11434/v1",
-        "model": "gemma3:12b",
-        "env_key": null
+        "model": "gemma3:12b"
       },
       "gemma3-27b": {
         "base_url": "http://localhost:11434/v1",
-        "model": "gemma3:27b",
-        "env_key": null
+        "model": "gemma3:27b"
       },
       "llama31-8b": {
         "base_url": "http://localhost:11434/v1",
-        "model": "llama3.1:8b",
-        "env_key": null
+        "model": "llama3.1:8b"
       }
     }
   },
