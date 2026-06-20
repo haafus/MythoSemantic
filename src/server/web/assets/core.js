@@ -85,15 +85,6 @@ export function cleanupRoute() {
         state.graphCy.destroy();
         state.graphCy = null;
     }
-    if (window.Plotly) {
-        document.querySelectorAll("#scatter-plot").forEach((plot) => {
-            try {
-                Plotly.purge(plot);
-            } catch {
-                // Plotly may already have been torn down by a route change.
-            }
-        });
-    }
 }
 
 export async function api(path, options = {}) {

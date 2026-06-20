@@ -22,8 +22,12 @@ import {
     state,
 } from "./core.js";
 
+import { destroyChart, resizeChart, renderScatter, renderHeatmap, renderDistribution } from "./chart.js";
+
 function render() {
     cleanupRoute();
+    const scatterPlot = document.getElementById("scatter-plot");
+    if (scatterPlot) destroyChart(scatterPlot);
 
     const parsed = parseHash();
     const path = normalizeRoute(parsed.path);
@@ -678,13 +682,10 @@ function scheduleSearchWarmup(model) {
 
 function toggleFullscreen() {
     const plotContainer = document.getElementById("plotContainer");
-    const scatterPlot = document.getElementById("scatter-plot");
     if (!plotContainer) return;
 
     plotContainer.classList.toggle("fullscreen");
-    if (window.Plotly && scatterPlot && scatterPlot.dataset.plotly === "1") {
-        setTimeout(() => Plotly.relayout(scatterPlot, {autosize: true}), 100);
-    }
+    resizeChart(document.getElementById("scatter-plot"));
 }
 
 async function loadVisualization() {
@@ -699,21 +700,22 @@ async function loadVisualization() {
     loadingPlaceholder.textContent = "Loading visualization...";
     document.querySelector(".plot-hover-tooltip")?.classList.remove("visible");
     scatterPlot.style.display = "none";
-    scatterPlot.dataset.plotly = "";
     scatterPlot.style.minWidth = "";
     scatterPlot.style.minHeight = "";
-    if (window.Plotly) Plotly.purge(scatterPlot);
-    scatterPlot.innerHTML = "";
+    destroyChart(scatterPlot);
 
     try {
         const data = await api(`/api/similarity/projections/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(method)}`);
 
+        await loadTraditionInfo();
         if (method === "distance_heatmap") {
-            await renderHeatmapPlot(data);
+            await renderHeatmap(scatterPlot, data);
         } else if (method === "tradition_distribution") {
-            await renderDistributionPlot(data);
+            const names = (data.traditions || []).map((t) => t.name);
+            await renderDistribution(scatterPlot, data, { colorMap: getColorMap(names) });
         } else {
-            await renderProjectionPlot(data);
+            const traditions = [...new Set((data.points || []).map((p) => p.tradition || "Unknown"))];
+            await renderScatter(scatterPlot, data, { colorMap: getColorMap(traditions), onPointClick: displayPointInfo });
         }
 
         loadingPlaceholder.style.display = "none";
@@ -723,245 +725,6 @@ async function loadVisualization() {
         loadingPlaceholder.style.display = "block";
         updateStatus("Load error", "error");
     }
-}
-
-async function renderProjectionPlot(data) {
-    const scatterPlot = document.getElementById("scatter-plot");
-    const points = Array.isArray(data.points) ? data.points : [];
-    if (!window.Plotly || !points.length) throw new Error("Projection data is empty.");
-
-    scatterPlot.style.display = "block";
-
-    await loadTraditionInfo();
-    const traditions = [...new Set(points.map((point) => point.tradition || "Unknown"))];
-    const colorMap = getColorMap(traditions);
-    const showLegend = scatterPlot.clientWidth >= 720;
-
-    const traces = traditions.map((tradition) => {
-        const pts = points.filter((point) => (point.tradition || "Unknown") === tradition);
-        return {
-            type: "scattergl",
-            x: pts.map((point) => point.x),
-            y: pts.map((point) => point.y),
-            mode: "markers",
-            name: tradition,
-            marker: {
-                size: 6,
-                opacity: 0.74,
-                color: colorMap[tradition],
-                line: {width: 0.4, color: "rgba(255,255,255,0.85)"},
-            },
-            customdata: pts.map((point) => [
-                point.id,
-                point.tradition,
-                point.chunk_index,
-                normalizePreviewText(point.text).substring(0, 220),
-            ]),
-            hoverinfo: "none",
-        };
-    });
-
-    const layout = {
-        margin: showLegend ? {l: 50, r: 176, t: 28, b: 48} : {l: 50, r: 28, t: 28, b: 48},
-        plot_bgcolor: "#fbfcfd",
-        paper_bgcolor: "#fff",
-        hovermode: "closest",
-        hoverlabel: {
-            align: "left",
-            bgcolor: "#fff",
-            bordercolor: "#ced4da",
-            font: {color: "#212529", size: 12},
-            namelength: 24,
-        },
-        showlegend: showLegend,
-        legend: {
-            orientation: "v",
-            x: 1.02,
-            xanchor: "left",
-            y: 1,
-            yanchor: "top",
-            bgcolor: "rgba(255,255,255,0.84)",
-            bordercolor: "rgba(222,226,230,0.9)",
-            borderwidth: 1,
-            font: {size: 11, color: "#495057"},
-            itemwidth: 30,
-        },
-        xaxis: {
-            automargin: true,
-            gridcolor: "#edf1f5",
-            zeroline: false,
-            tickfont: {size: 11, color: "#6c757d"},
-        },
-        yaxis: {
-            automargin: true,
-            gridcolor: "#edf1f5",
-            zeroline: false,
-            tickfont: {size: 11, color: "#6c757d"},
-        },
-    };
-
-    await Plotly.newPlot(scatterPlot, traces, layout, {responsive: true, displaylogo: false, displayModeBar: true, scrollZoom: true});
-    scatterPlot.style.display = "block";
-    scatterPlot.dataset.plotly = "1";
-    bindProjectionTooltip(scatterPlot);
-    scatterPlot.on("plotly_click", (event) => {
-        if (event.points && event.points[0]) {
-            displayPointInfo(event.points[0].customdata[0], event.points[0].customdata[2]);
-        }
-    });
-}
-
-async function renderHeatmapPlot(data) {
-    const scatterPlot = document.getElementById("scatter-plot");
-    const traditions = data.traditions || [];
-    const distances = data.distances || [];
-    if (!window.Plotly || !traditions.length) throw new Error("Heatmap data is empty.");
-
-    scatterPlot.style.display = "block";
-
-    const trace = {
-        type: "heatmap",
-        z: distances,
-        x: traditions,
-        y: traditions,
-        colorscale: "Viridis",
-        hovertemplate: "Distance between %{x} and %{y}: %{z:.4f}<extra></extra>",
-    };
-
-    const layout = {
-        margin: {l: 120, r: 60, t: 40, b: 140},
-        paper_bgcolor: "#fff",
-        plot_bgcolor: "#fff",
-        xaxis: {tickangle: 45, tickfont: {size: 11}, automargin: true},
-        yaxis: {tickfont: {size: 11}, automargin: true},
-    };
-
-    await Plotly.newPlot(scatterPlot, [trace], layout, {responsive: true, displaylogo: false, displayModeBar: true});
-    scatterPlot.dataset.plotly = "1";
-}
-
-async function renderDistributionPlot(data) {
-    const scatterPlot = document.getElementById("scatter-plot");
-    const traditions = data.traditions || [];
-    if (!window.Plotly || !traditions.length) throw new Error("Distribution data is empty.");
-
-    scatterPlot.style.display = "block";
-
-    await loadTraditionInfo();
-    const names = traditions.map((t) => t.name);
-    const colorMap = getColorMap(names);
-
-    const trace = {
-        type: "bar",
-        x: traditions.map((t) => t.chunks),
-        y: names,
-        orientation: "h",
-        marker: {color: names.map((n) => colorMap[n])},
-        text: traditions.map((t) => `${t.chunks.toLocaleString()} chunks (${t.percentage}%)`),
-        textposition: "outside",
-        cliponaxis: false,
-        hovertemplate: "<b>%{y}</b><br>Chunks: %{x:,}<br>Source texts: %{customdata}<extra></extra>",
-        customdata: traditions.map((t) => t.doc_count),
-    };
-
-    const layout = {
-        margin: {l: 160, r: 140, t: 40, b: 60},
-        paper_bgcolor: "#fff",
-        plot_bgcolor: "rgba(248,249,250,0.95)",
-        showlegend: false,
-        height: Math.max(500, 28 * names.length + 120),
-        xaxis: {title: {text: "Number of chunks"}, automargin: true, tickfont: {size: 11}},
-        yaxis: {autorange: "reversed", tickfont: {size: 11}, automargin: true},
-    };
-
-    await Plotly.newPlot(scatterPlot, [trace], layout, {responsive: true, displaylogo: false, displayModeBar: true});
-    scatterPlot.dataset.plotly = "1";
-}
-
-function bindProjectionTooltip(scatterPlot) {
-    const canvas = document.getElementById("plotCanvas");
-    if (!canvas) return;
-    clearProjectionTooltipHandlers(scatterPlot);
-
-    let tooltip = canvas.querySelector(".plot-hover-tooltip");
-    if (!tooltip) {
-        tooltip = document.createElement("div");
-        tooltip.className = "plot-hover-tooltip";
-        canvas.appendChild(tooltip);
-    }
-
-    const hideTooltip = () => {
-        tooltip.classList.remove("visible");
-    };
-
-    const showTooltip = (event) => {
-        const point = event.points && event.points[0];
-        if (!point) return hideTooltip();
-
-        const custom = Array.isArray(point.customdata) ? point.customdata : [];
-        tooltip.innerHTML = `
-            <div class="plot-hover-title">${escapeHtml(custom[1] || "Unknown")}</div>
-            <div class="plot-hover-meta">ID: ${escapeHtml(custom[0] || "")} | Chunk: ${escapeHtml(custom[2] ?? 0)}</div>
-            <div class="plot-hover-text">${escapeHtml(normalizePreviewText(custom[3]) || "No preview available.")}</div>
-        `;
-
-        tooltip.classList.add("visible");
-        positionPlotTooltip(canvas, tooltip, event.event);
-    };
-
-    const moveTooltip = (event) => {
-        if (tooltip.classList.contains("visible")) {
-            positionPlotTooltip(canvas, tooltip, event);
-        }
-    };
-
-    scatterPlot.on("plotly_hover", showTooltip);
-    scatterPlot.on("plotly_unhover", hideTooltip);
-    scatterPlot.addEventListener("mouseleave", hideTooltip);
-    scatterPlot.addEventListener("mousemove", moveTooltip);
-    scatterPlot._projectionTooltipHandlers = {showTooltip, hideTooltip, moveTooltip};
-}
-
-function clearProjectionTooltipHandlers(scatterPlot) {
-    const handlers = scatterPlot._projectionTooltipHandlers;
-    if (!handlers) return;
-
-    if (typeof scatterPlot.removeListener === "function") {
-        scatterPlot.removeListener("plotly_hover", handlers.showTooltip);
-        scatterPlot.removeListener("plotly_unhover", handlers.hideTooltip);
-    }
-    scatterPlot.removeEventListener("mouseleave", handlers.hideTooltip);
-    scatterPlot.removeEventListener("mousemove", handlers.moveTooltip);
-    scatterPlot._projectionTooltipHandlers = null;
-}
-
-function positionPlotTooltip(container, tooltip, event) {
-    const rect = container.getBoundingClientRect();
-    const clientX = event?.clientX ?? (rect.left + rect.width / 2);
-    const clientY = event?.clientY ?? (rect.top + rect.height / 2);
-    const gap = 14;
-    const padding = 10;
-
-    tooltip.style.left = "0px";
-    tooltip.style.top = "0px";
-
-    const width = tooltip.offsetWidth;
-    const height = tooltip.offsetHeight;
-    let left = clientX - rect.left + gap;
-    let top = clientY - rect.top + gap;
-
-    if (left + width + padding > rect.width) {
-        left = clientX - rect.left - width - gap;
-    }
-    if (top + height + padding > rect.height) {
-        top = clientY - rect.top - height - gap;
-    }
-
-    left = Math.max(padding, Math.min(left, rect.width - width - padding));
-    top = Math.max(padding, Math.min(top, rect.height - height - padding));
-
-    tooltip.style.left = `${left}px`;
-    tooltip.style.top = `${top}px`;
 }
 
 function getColorMap(traditions) {
