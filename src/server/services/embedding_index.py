@@ -150,7 +150,6 @@ class EmbeddingIndexService:
                     "major_tradition": item["major_tradition"],
                     "chunk_index": item["chunk_index"],
                     "similarity_score": similarity,
-                    "distance": 1 - similarity,
                     "text": text,
                     "text_preview": preview,
                     "filename": item["filename"],

@@ -93,7 +93,6 @@ class TestTopResults:
         assert r["tradition"] == "Norse"
         assert r["major_tradition"] == "Euro"
         assert r["similarity_score"] == 0.8
-        assert r["distance"] == pytest.approx(0.2)
         assert r["filename"] == "doc.txt"
         assert r["book_title"] == "doc"
 

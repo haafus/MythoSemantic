@@ -28,7 +28,6 @@ class SearchResult(BaseModel):
     major_tradition: str = ""
     chunk_index: int = 0
     similarity_score: float
-    distance: float
     text: str = ""
     text_preview: str = ""
     filename: str = ""
