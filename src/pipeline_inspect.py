@@ -186,8 +186,8 @@ PROJECTION_PLOTS = [
     "residual_umap_2d.json",
     "residual_normalized_umap_2d.json",
     "rlace_umap_2d.json",
-    "distance_heatmap.html",
-    "tradition_distribution.html",
+    "distance_heatmap.json",
+    "tradition_distribution.json",
 ]
 
 

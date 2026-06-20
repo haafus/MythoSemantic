@@ -1,11 +1,8 @@
 import json
 import logging
 from pathlib import Path
-from typing import Any
 
 import numpy as np
-import plotly.express as px
-import plotly.graph_objects as go
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics.pairwise import cosine_distances
 from sklearn.preprocessing import LabelEncoder, Normalizer
@@ -15,42 +12,8 @@ from settings import settings
 from .utils import reduce_dimensions
 
 MAX_TEXT_PREVIEW_LEN = 200
-RANDOM_SEED = 42
-HEATMAP_WIDTH = 1000
-HEATMAP_HEIGHT = 900
-DISTRIBUTION_HEIGHT = 600
-DISTRIBUTION_WIDTH = 900
-GRID_COLOR = "rgba(190,200,210,0.45)"
-ZERO_LINE_COLOR = "rgba(120,130,140,0.55)"
-AXIS_LINE_COLOR = "rgba(120,130,140,0.65)"
 
 logger = logging.getLogger(__name__)
-
-
-
-def _get_color_map(data: list[dict]) -> dict[str, str]:
-    traditions_path = settings.corpus_dir / "traditions.json"
-    traditions_info: dict = {}
-    if traditions_path.exists():
-        try:
-            with open(traditions_path, encoding="utf-8") as f:
-                traditions_info = json.load(f)
-        except (OSError, json.JSONDecodeError):
-            pass
-
-    color_map = {}
-    for name, info in traditions_info.items():
-        if info.get("color"):
-            color_map[name] = info["color"]
-
-    base_colors = px.colors.qualitative.Plotly
-    unique_traditions = sorted(set(item.get("tradition", "unknown") for item in data))
-
-    for i, trad in enumerate(unique_traditions):
-        if trad not in color_map:
-            color_map[trad] = base_colors[i % len(base_colors)]
-
-    return color_map
 
 
 def _reduce_dimensions_safe(
@@ -67,25 +30,6 @@ def _reduce_dimensions_safe(
     except Exception:
         logger.exception("Dimension reduction failed")
         return None
-
-
-def _cartesian_axis(title: str, tickangle: int = 0, showticklabels: bool = True) -> dict[str, Any]:
-    return dict(
-        title=dict(text=title, font=dict(size=12)),
-        showgrid=True,
-        gridcolor=GRID_COLOR,
-        gridwidth=1,
-        zeroline=True,
-        zerolinecolor=ZERO_LINE_COLOR,
-        zerolinewidth=1,
-        showline=True,
-        linecolor=AXIS_LINE_COLOR,
-        mirror=True,
-        ticks="outside",
-        tickfont=dict(size=10),
-        tickangle=tickangle,
-        showticklabels=showticklabels,
-    )
 
 
 def _compute_tradition_residuals(data: list[dict], embeddings: np.ndarray) -> np.ndarray:
@@ -241,8 +185,8 @@ def plot_rlace_umap(
 
 def plot_distance_heatmap(
     data: list[dict], embeddings: np.ndarray,
-    output_dir: Path | None = None, model_name: str | None = None, save_html: bool = True
-) -> go.Figure | None:
+    output_dir: Path | None = None, model_name: str | None = None,
+) -> None:
     if output_dir is None:
         output_dir = settings.projections_dir
 
@@ -254,56 +198,29 @@ def plot_distance_heatmap(
         traditions_data[trad].append(emb)
 
     centroids = {}
-    for trad, embeddings in traditions_data.items():
-        centroids[trad] = np.mean(embeddings, axis=0)
+    for trad, embs in traditions_data.items():
+        centroids[trad] = np.mean(embs, axis=0)
 
     trad_list = sorted(centroids.keys())
     centroid_matrix = np.array([centroids[trad] for trad in trad_list])
     distance_matrix = cosine_distances(centroid_matrix, centroid_matrix)
 
-    fig = px.imshow(
-        distance_matrix,
-        x=trad_list,
-        y=trad_list,
-        text_auto=".3f",
-        aspect="auto",
-        color_continuous_scale="Viridis",
-        title=f"Heatmap of distances between traditions{' - ' + model_name if model_name else ''}",
-        labels=dict(x="Tradition", y="Tradition", color="Cosine distance"),
-    )
+    result = {
+        "model": model_name or "",
+        "traditions": trad_list,
+        "distances": [[round(float(v), 6) for v in row] for row in distance_matrix],
+    }
 
-    fig.update_layout(
-        width=HEATMAP_WIDTH,
-        height=HEATMAP_HEIGHT,
-        title=dict(font=dict(size=16), x=0.5, xanchor="center"),
-        xaxis=dict(
-            title=dict(text="Tradition", font=dict(size=12)),
-            tickangle=45,
-            tickfont=dict(size=11),
-            side="bottom",
-            showgrid=False,
-        ),
-        yaxis=dict(tickfont=dict(size=11), title=dict(text="Tradition", font=dict(size=12)), showgrid=False),
-        margin=dict(l=100, r=50, t=80, b=150),
-    )
-
-    fig.update_traces(
-        textfont=dict(size=10, color="white" if distance_matrix.max() > 0.5 else "black"),
-        hovertemplate="Distance between %{x} and %{y}: %{z:.4f}<extra></extra>",
-    )
-
-    if save_html and output_dir:
-        output_path = output_dir / "distance_heatmap.html"
-        fig.write_html(str(output_path))
-        logger.info(f"Heatmap saved: {output_path}")
-
-    return fig
+    if output_dir:
+        json_path = output_dir / "distance_heatmap.json"
+        json_path.write_text(json.dumps(result), encoding="utf-8")
+        logger.info(f"Heatmap saved: {json_path}")
 
 
 def plot_tradition_distribution(
     data: list[dict], embeddings: np.ndarray,
-    output_dir: Path | None = None, model_name: str | None = None, save_html: bool = True
-) -> go.Figure | None:
+    output_dir: Path | None = None, model_name: str | None = None,
+) -> None:
     if output_dir is None:
         output_dir = settings.projections_dir
 
@@ -315,60 +232,22 @@ def plot_tradition_distribution(
         tradition_docs.setdefault(trad, set()).add(item["text_id"])
 
     sorted_traditions = sorted(tradition_counts.items(), key=lambda x: -x[1])
-    traditions = [t[0] for t in sorted_traditions]
-    counts = [t[1] for t in sorted_traditions]
-    total_chunks = sum(counts)
-    percentages = [(count / total_chunks * 100) if total_chunks else 0 for count in counts]
-    doc_counts = [len(tradition_docs.get(trad, set())) for trad in traditions]
+    total_chunks = sum(c for _, c in sorted_traditions)
 
-    color_map = _get_color_map(data)
-    colors = [color_map[t] for t in traditions]
+    traditions = []
+    for name, count in sorted_traditions:
+        traditions.append({
+            "name": name,
+            "chunks": count,
+            "percentage": round(count / total_chunks * 100, 2) if total_chunks else 0,
+            "doc_count": len(tradition_docs.get(name, set())),
+        })
 
-    fig = go.Figure(
-        data=[
-            go.Bar(
-                x=counts,
-                y=traditions,
-                orientation="h",
-                marker=dict(color=colors, line=dict(color="rgba(255,255,255,0.9)", width=1)),
-                customdata=np.column_stack([percentages, doc_counts]),
-                text=[f"{count:,} chunks ({pct:.1f}%)" for count, pct in zip(counts, percentages, strict=False)],
-                textposition="outside",
-                cliponaxis=False,
-                hovertemplate="<b>%{y}</b><br>"
-                "Chunks: %{x:,}<br>"
-                "Share: %{customdata[0]:.2f}%<br>"
-                "Source texts: %{customdata[1]}<extra></extra>",
-            )
-        ]
-    )
+    result = {"model": model_name or "", "total_chunks": total_chunks, "traditions": traditions}
 
-    title = f"Distribution of chunks by tradition{' - ' + model_name if model_name else ''}"
-    fig.update_layout(
-        title=dict(text=title, font=dict(size=16), x=0.5, xanchor="center"),
-        showlegend=False,
-        height=max(DISTRIBUTION_HEIGHT, 28 * len(traditions) + 180),
-        width=max(DISTRIBUTION_WIDTH, 1050),
-        margin=dict(l=180, r=160, t=90, b=80),
-        plot_bgcolor="rgba(248,249,250,0.95)",
-        paper_bgcolor="white",
-        xaxis=_cartesian_axis("Number of chunks"),
-        yaxis=dict(
-            title=dict(text="Tradition", font=dict(size=12)),
-            autorange="reversed",
-            showgrid=False,
-            showline=True,
-            linecolor=AXIS_LINE_COLOR,
-            ticks="outside",
-            tickfont=dict(size=11),
-        ),
-    )
-
-    if save_html and output_dir:
-        output_path = output_dir / "tradition_distribution.html"
-        fig.write_html(str(output_path))
-        logger.info(f"Distribution chart saved: {output_path}")
-
-    return fig
+    if output_dir:
+        json_path = output_dir / "tradition_distribution.json"
+        json_path.write_text(json.dumps(result), encoding="utf-8")
+        logger.info(f"Distribution saved: {json_path}")
 
 

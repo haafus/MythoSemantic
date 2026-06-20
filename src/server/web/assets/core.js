@@ -29,11 +29,6 @@ export const SIMILARITY_METHODS = [
     ["tradition_distribution", "Tradition Distribution"],
 ];
 
-export const HTML_ONLY_METHODS = new Set([
-    "distance_heatmap",
-    "tradition_distribution",
-]);
-
 export function parseHash() {
     const raw = (window.location.hash || "#/").slice(1) || "/";
     const splitAt = raw.indexOf("?");

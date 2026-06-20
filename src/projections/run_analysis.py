@@ -63,8 +63,8 @@ def _generate_all_plots(analyzer: EmbeddingAnalyzer, force: bool = False) -> Non
         ("Residual UMAP projection", "residual_umap_2d.json", plot_residual_umap),
         ("Residual Normalized UMAP projection", "residual_normalized_umap_2d.json", plot_residual_normalized_umap),
         ("RLACE UMAP projection (INLP concept erasure)", "rlace_umap_2d.json", plot_rlace_umap),
-        ("Distance heatmap", "distance_heatmap.html", plot_distance_heatmap),
-        ("Tradition distribution chart", "tradition_distribution.html", plot_tradition_distribution),
+        ("Distance heatmap", "distance_heatmap.json", plot_distance_heatmap),
+        ("Tradition distribution chart", "tradition_distribution.json", plot_tradition_distribution),
     ]
 
     for label, filename, plot_fn in plots:

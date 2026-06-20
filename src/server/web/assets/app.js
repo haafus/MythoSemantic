@@ -11,7 +11,6 @@ import {
     escapeRegex,
     formatNumber,
     groupDocuments,
-    HTML_ONLY_METHODS,
     normalizePreviewText,
     normalizeRoute,
     parseHash,
@@ -22,10 +21,6 @@ import {
     SIMILARITY_METHODS,
     state,
 } from "./core.js";
-import {
-    renderSavedPlotInto,
-    resizeEmbeddedPlots,
-} from "./plot-utils.js";
 
 function render() {
     cleanupRoute();
@@ -687,7 +682,6 @@ function toggleFullscreen() {
     if (window.Plotly && scatterPlot && scatterPlot.dataset.plotly === "1") {
         setTimeout(() => Plotly.relayout(scatterPlot, {autosize: true}), 100);
     }
-    resizeEmbeddedPlots();
 }
 
 async function loadVisualization() {
@@ -709,26 +703,16 @@ async function loadVisualization() {
     scatterPlot.innerHTML = "";
 
     try {
-        if (!HTML_ONLY_METHODS.has(method)) {
-            try {
-                const data = await api(`/api/similarity/projections/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(method)}`);
-                await renderProjectionPlot(data);
-                loadingPlaceholder.style.display = "none";
-                updateStatus("Ready", "loaded");
-                return;
-            } catch {
-                // Fall back to the generated HTML file, matching the old template behavior for missing JSON data.
-            }
+        const data = await api(`/api/similarity/projections/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(method)}`);
+
+        if (method === "distance_heatmap") {
+            await renderHeatmapPlot(data);
+        } else if (method === "tradition_distribution") {
+            await renderDistributionPlot(data);
+        } else {
+            await renderProjectionPlot(data);
         }
 
-        const savedHtml = await api(`/api/similarity/saved-html/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(method)}`);
-        if (!savedHtml.exists || !savedHtml.url) throw new Error(savedHtml.reason || "File not found. Generate the data through the CLI.");
-
-        scatterPlot.style.display = "block";
-        await renderSavedPlotInto(scatterPlot, savedHtml.url, {
-            title: SIMILARITY_METHODS.find(([value]) => value === method)?.[1],
-            preserveSize: HTML_ONLY_METHODS.has(method),
-        });
         loadingPlaceholder.style.display = "none";
         updateStatus("Ready", "loaded");
     } catch (error) {
@@ -822,6 +806,73 @@ async function renderProjectionPlot(data) {
             displayPointInfo(event.points[0].customdata[0], event.points[0].customdata[2]);
         }
     });
+}
+
+async function renderHeatmapPlot(data) {
+    const scatterPlot = document.getElementById("scatter-plot");
+    const traditions = data.traditions || [];
+    const distances = data.distances || [];
+    if (!window.Plotly || !traditions.length) throw new Error("Heatmap data is empty.");
+
+    scatterPlot.style.display = "block";
+
+    const trace = {
+        type: "heatmap",
+        z: distances,
+        x: traditions,
+        y: traditions,
+        colorscale: "Viridis",
+        hovertemplate: "Distance between %{x} and %{y}: %{z:.4f}<extra></extra>",
+    };
+
+    const layout = {
+        margin: {l: 120, r: 60, t: 40, b: 140},
+        paper_bgcolor: "#fff",
+        plot_bgcolor: "#fff",
+        xaxis: {tickangle: 45, tickfont: {size: 11}, automargin: true},
+        yaxis: {tickfont: {size: 11}, automargin: true},
+    };
+
+    await Plotly.newPlot(scatterPlot, [trace], layout, {responsive: true, displaylogo: false, displayModeBar: true});
+    scatterPlot.dataset.plotly = "1";
+}
+
+async function renderDistributionPlot(data) {
+    const scatterPlot = document.getElementById("scatter-plot");
+    const traditions = data.traditions || [];
+    if (!window.Plotly || !traditions.length) throw new Error("Distribution data is empty.");
+
+    scatterPlot.style.display = "block";
+
+    await loadTraditionInfo();
+    const names = traditions.map((t) => t.name);
+    const colorMap = getColorMap(names);
+
+    const trace = {
+        type: "bar",
+        x: traditions.map((t) => t.chunks),
+        y: names,
+        orientation: "h",
+        marker: {color: names.map((n) => colorMap[n])},
+        text: traditions.map((t) => `${t.chunks.toLocaleString()} chunks (${t.percentage}%)`),
+        textposition: "outside",
+        cliponaxis: false,
+        hovertemplate: "<b>%{y}</b><br>Chunks: %{x:,}<br>Source texts: %{customdata}<extra></extra>",
+        customdata: traditions.map((t) => t.doc_count),
+    };
+
+    const layout = {
+        margin: {l: 160, r: 140, t: 40, b: 60},
+        paper_bgcolor: "#fff",
+        plot_bgcolor: "rgba(248,249,250,0.95)",
+        showlegend: false,
+        height: Math.max(500, 28 * names.length + 120),
+        xaxis: {title: {text: "Number of chunks"}, automargin: true, tickfont: {size: 11}},
+        yaxis: {autorange: "reversed", tickfont: {size: 11}, automargin: true},
+    };
+
+    await Plotly.newPlot(scatterPlot, [trace], layout, {responsive: true, displaylogo: false, displayModeBar: true});
+    scatterPlot.dataset.plotly = "1";
 }
 
 function bindProjectionTooltip(scatterPlot) {
@@ -1595,4 +1646,3 @@ window.addEventListener("message", (event) => {
 
 window.addEventListener("hashchange", render);
 window.addEventListener("DOMContentLoaded", render);
-window.addEventListener("resize", resizeEmbeddedPlots);

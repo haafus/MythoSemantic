@@ -8,7 +8,6 @@ from server.schemas import (
     ModelSummary,
     NeighborsResponse,
     PointInfo,
-    SavedPlotResponse,
     SearchRequest,
     SearchResponse,
     SearchResult,
@@ -146,13 +145,3 @@ class TestModelListResponse:
             models=[ModelSummary(name="m1", key="k1")]
         )
         assert len(resp.models) == 1
-
-
-class TestSavedPlotResponse:
-    def test_not_found(self):
-        r = SavedPlotResponse(exists=False, reason="not found")
-        assert r.url is None
-
-    def test_found(self):
-        r = SavedPlotResponse(exists=True, url="/projections/model/plot.html", path="/tmp/plot.html")
-        assert r.exists

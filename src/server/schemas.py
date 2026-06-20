@@ -78,10 +78,3 @@ class CatalogResponse(BaseModel):
 class TraditionsResponse(BaseModel):
     traditions: dict[str, Any]
     total: int
-
-
-class SavedPlotResponse(BaseModel):
-    exists: bool
-    url: str | None = None
-    path: str | None = None
-    reason: str | None = None
