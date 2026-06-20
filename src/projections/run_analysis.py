@@ -1,5 +1,4 @@
 import logging
-from pathlib import Path
 
 from model_registry import resolve_embedding_model
 

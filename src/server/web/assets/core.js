@@ -80,7 +80,7 @@ export function cleanupRoute() {
         state.geographyMap = null;
     }
     if (window.Plotly) {
-        document.querySelectorAll("#scatter-plot, .plotly-managed").forEach((plot) => {
+        document.querySelectorAll("#scatter-plot").forEach((plot) => {
             try {
                 Plotly.purge(plot);
             } catch {

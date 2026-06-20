@@ -19,8 +19,6 @@ logger = logging.getLogger(__name__)
 def _reduce_dimensions_safe(
     embeddings: np.ndarray, n_components: int = 2,
 ) -> np.ndarray | None:
-    from settings import settings
-
     cfg = settings.projection
     try:
         return reduce_dimensions(

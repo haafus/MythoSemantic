@@ -882,12 +882,6 @@ body.route-embeddings {
     height: calc(100vh - 70px);
 }
 
-.analysis-page .plot-iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-}
-
 .analysis-page .loading-placeholder {
     position: absolute;
     top: 50%;

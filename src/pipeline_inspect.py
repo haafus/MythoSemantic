@@ -75,7 +75,7 @@ def corpus_status(settings) -> dict[str, Any]:
 
 
 def corpus_orphans(settings) -> list[tuple[Path, int]]:
-    if not settings.corpus_dir / "corpus.json".exists():
+    if not (settings.corpus_dir / "corpus.json").exists():
         return []
 
     info = corpus_status(settings)

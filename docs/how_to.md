@@ -294,7 +294,6 @@ Caddy сам получит TLS-сертификат, настроит реди�
 - `index.html` подключает стили и JS.
 - `assets/app.js` содержит маршруты и экраны.
 - `assets/core.js` содержит API helpers и состояние.
-- `assets/plot-utils.js` работает с Plotly-графиками.
 - `assets/app.css` содержит стили.
 
 Запускается через:
