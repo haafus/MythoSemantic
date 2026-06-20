@@ -36,15 +36,16 @@ PLOTLY_DTYPE_FORMATS = {
 
 def get_projection_data(model_key: str, method: str) -> dict | None:
     output_dir = settings.projections_dir / model_key
-    candidates = [
-        output_dir / f"{method}_2d_coords.json",
-        output_dir / f"{method}_coords.json",
-    ]
 
-    for path in candidates:
-        if path.exists():
-            with path.open("r", encoding="utf-8") as handle:
-                return json.load(handle)
+    html_filename = SAVED_HTML_METHOD_FILES.get(method)
+    if html_filename:
+        json_path = output_dir / html_filename.replace(".html", ".json")
+        if json_path.exists():
+            with json_path.open("r", encoding="utf-8") as handle:
+                data = json.load(handle)
+            data["method"] = method
+            data.setdefault("source", "json")
+            return data
 
     if method in INTERACTIVE_SAVED_HTML_METHODS:
         saved_html_plot = get_saved_html_plot(model_key, method, output_dir=output_dir)

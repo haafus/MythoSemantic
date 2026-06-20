@@ -217,6 +217,23 @@ def _plot_umap_scatter(
         fig.write_html(str(html_path), include_plotlyjs="cdn", full_html=True)
         logger.info(f"Saved: {html_path}")
 
+        points = []
+        for i, item in enumerate(data):
+            text_preview = item.get("text", "")[:MAX_TEXT_PREVIEW_LEN]
+            if len(item.get("text", "")) > MAX_TEXT_PREVIEW_LEN:
+                text_preview += "..."
+            points.append({
+                "id": item["text_id"],
+                "tradition": item.get("tradition", "unknown"),
+                "chunk_index": item["chunk_index"],
+                "text": text_preview,
+                "x": round(float(embedding_2d[i, 0]), 6),
+                "y": round(float(embedding_2d[i, 1]), 6),
+            })
+        json_path = output_dir / filename.replace(".html", ".json")
+        json_path.write_text(json.dumps({"model": model_name or "", "points": points}), encoding="utf-8")
+        logger.info(f"Saved: {json_path}")
+
     return fig
 
 
