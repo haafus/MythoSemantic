@@ -23,6 +23,18 @@ import {
 
 import { destroyChart, resizeChart, renderScatter, renderHeatmap, renderDistribution } from "./chart.js";
 
+const CHART_RENDERERS = {
+    scatter: async (el, data) => {
+        const traditions = [...new Set((data.points || []).map((p) => p.tradition || "Unknown"))];
+        await renderScatter(el, data, { colorMap: getColorMap(traditions), onPointClick: displayPointInfo });
+    },
+    heatmap: (el, data) => renderHeatmap(el, data),
+    distribution: async (el, data) => {
+        const names = (data.traditions || []).map((t) => t.name);
+        await renderDistribution(el, data, { colorMap: getColorMap(names) });
+    },
+};
+
 function render() {
     cleanupRoute();
     const scatterPlot = document.getElementById("scatter-plot");
@@ -719,15 +731,7 @@ async function loadVisualization() {
 
         await loadTraditionInfo();
         const chartType = (state.similarityMethods.find((m) => m.key === method) || {}).chart_type || "scatter";
-        if (chartType === "heatmap") {
-            await renderHeatmap(scatterPlot, data);
-        } else if (chartType === "distribution") {
-            const names = (data.traditions || []).map((t) => t.name);
-            await renderDistribution(scatterPlot, data, { colorMap: getColorMap(names) });
-        } else {
-            const traditions = [...new Set((data.points || []).map((p) => p.tradition || "Unknown"))];
-            await renderScatter(scatterPlot, data, { colorMap: getColorMap(traditions), onPointClick: displayPointInfo });
-        }
+        await CHART_RENDERERS[chartType](scatterPlot, data);
 
         loadingPlaceholder.style.display = "none";
         updateStatus("Ready", "loaded");
