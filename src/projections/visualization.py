@@ -122,7 +122,7 @@ def plot_interactive_2d(
     _plot_umap_scatter(
         data, embeddings,
         title_prefix="UMAP visualization by tradition",
-        filename="umap_2d_traditions.json",
+        filename="umap.json",
         axis_prefix="UMAP",
         output_dir=output_dir,
         model_name=model_name,
@@ -139,7 +139,7 @@ def plot_residual_umap(
     _plot_umap_scatter(
         data, residuals,
         title_prefix="Residual UMAP (tradition centroid removed)",
-        filename="residual_umap_2d.json",
+        filename="residual_umap.json",
         axis_prefix="Residual UMAP",
         output_dir=output_dir,
         model_name=model_name,
@@ -157,7 +157,7 @@ def plot_residual_normalized_umap(
     _plot_umap_scatter(
         data, residuals,
         title_prefix="Residual Normalized UMAP (tradition centroid removed, L2-normalized)",
-        filename="residual_normalized_umap_2d.json",
+        filename="residual_normalized_umap.json",
         axis_prefix="Residual Normalized UMAP",
         output_dir=output_dir,
         model_name=model_name,
@@ -174,7 +174,7 @@ def plot_rlace_umap(
     _plot_umap_scatter(
         data, erased,
         title_prefix="RLACE UMAP (tradition signal erased via INLP)",
-        filename="rlace_umap_2d.json",
+        filename="rlace_umap.json",
         axis_prefix="RLACE UMAP",
         output_dir=output_dir,
         model_name=model_name,

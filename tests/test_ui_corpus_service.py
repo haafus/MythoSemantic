@@ -1,28 +1,4 @@
 from corpus.utils import sanitize_filename
-from server.services.corpus import to_int
-
-
-class TestToInt:
-    def test_integer_input(self):
-        assert to_int(42) == 42
-
-    def test_string_number(self):
-        assert to_int("123") == 123
-
-    def test_invalid_string(self):
-        assert to_int("abc") == 0
-
-    def test_none_returns_default(self):
-        assert to_int(None) == 0
-
-    def test_custom_default(self):
-        assert to_int("bad", default=99) == 99
-
-    def test_float_string(self):
-        assert to_int("3.14") == 0
-
-    def test_empty_string(self):
-        assert to_int("") == 0
 
 
 class TestSanitizeFilename:

@@ -58,10 +58,10 @@ def _generate_all_plots(analyzer: EmbeddingAnalyzer, force: bool = False) -> Non
     out = analyzer.output_dir
 
     plots = [
-        ("UMAP projection", "umap_2d_traditions.json", plot_interactive_2d),
-        ("Residual UMAP projection", "residual_umap_2d.json", plot_residual_umap),
-        ("Residual Normalized UMAP projection", "residual_normalized_umap_2d.json", plot_residual_normalized_umap),
-        ("RLACE UMAP projection (INLP concept erasure)", "rlace_umap_2d.json", plot_rlace_umap),
+        ("UMAP projection", "umap.json", plot_interactive_2d),
+        ("Residual UMAP projection", "residual_umap.json", plot_residual_umap),
+        ("Residual Normalized UMAP projection", "residual_normalized_umap.json", plot_residual_normalized_umap),
+        ("RLACE UMAP projection (INLP concept erasure)", "rlace_umap.json", plot_rlace_umap),
         ("Distance heatmap", "distance_heatmap.json", plot_distance_heatmap),
         ("Tradition distribution chart", "tradition_distribution.json", plot_tradition_distribution),
     ]
@@ -80,7 +80,7 @@ def _generate_all_plots(analyzer: EmbeddingAnalyzer, force: bool = False) -> Non
 
 
 def _generate_motif_plot(analyzer: EmbeddingAnalyzer, force: bool = False) -> None:
-    if not force and (analyzer.output_dir / "motif_umap_2d.json").exists():
+    if not force and (analyzer.output_dir / "motif_umap.json").exists():
         logger.info("Skipping Motif UMAP (already exists)")
         return
 

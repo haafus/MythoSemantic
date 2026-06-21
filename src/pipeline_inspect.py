@@ -182,10 +182,10 @@ def embeddings_orphan_chunks(settings, *, skip_collections: set[str] | None = No
 # ---------------------------------------------------------------------------
 
 PROJECTION_PLOTS = [
-    "umap_2d_traditions.json",
-    "residual_umap_2d.json",
-    "residual_normalized_umap_2d.json",
-    "rlace_umap_2d.json",
+    "umap.json",
+    "residual_umap.json",
+    "residual_normalized_umap.json",
+    "rlace_umap.json",
     "distance_heatmap.json",
     "tradition_distribution.json",
 ]

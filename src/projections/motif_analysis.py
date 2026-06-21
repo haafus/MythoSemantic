@@ -118,7 +118,7 @@ def run_motif_analysis(
         data,
         motif_embeddings,
         title_prefix="Motif UMAP (plot summaries, tradition colors)",
-        filename="motif_umap_2d.json",
+        filename="motif_umap.json",
         axis_prefix="Motif UMAP",
         output_dir=output_dir,
         model_name=model_name,
