@@ -21,19 +21,11 @@ def get_catalog_documents() -> list[dict]:
 
     for row in metadata_rows:
         tradition_info = traditions_info.get(row.get("tradition", ""), {})
-        documents.append(
-            {
-                "id": row.get("id", ""),
-                "major_tradition": row.get("major_tradition", ""),
-                "tradition": row.get("tradition", ""),
-                "url": row.get("url", ""),
-                "word_count": row.get("word_count", 0),
-                "sentence_count": row.get("sentence_count", 0),
-                "char_count": row.get("char_count", 0),
-                "color": tradition_info.get("color") or "#6b7280",
-                "description": row.get("description") or tradition_info.get("description", ""),
-            }
-        )
+        documents.append({
+            **row,
+            "color": tradition_info.get("color") or "#6b7280",
+            "description": row.get("description") or tradition_info.get("description", ""),
+        })
 
     documents.sort(
         key=lambda item: (
