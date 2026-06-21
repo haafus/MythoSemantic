@@ -102,7 +102,7 @@ def run_motif_analysis(
     embedding_model: str,
     model_name: str | None = None,
 ) -> None:
-    from .visualization import _plot_umap_scatter
+    from .visualization import generate_scatter
 
     summaries = generate_motif_summaries(data, output_dir)
 
@@ -114,13 +114,10 @@ def run_motif_analysis(
     motif_embeddings = embed_summaries(summaries, embedding_model)
 
     logger.info("Building motif UMAP projection...")
-    _plot_umap_scatter(
+    generate_scatter(
         data,
         motif_embeddings,
-        title_prefix="Motif UMAP (plot summaries, tradition colors)",
-        filename="motif_umap.json",
-        axis_prefix="Motif UMAP",
-        output_dir=output_dir,
+        output_path=output_dir / "motif_umap.json",
         model_name=model_name,
     )
     logger.info("Motif UMAP projection saved")

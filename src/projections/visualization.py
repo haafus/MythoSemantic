@@ -30,6 +30,15 @@ def _reduce_dimensions_safe(
         return None
 
 
+# ---------------------------------------------------------------------------
+# Embedding transforms (scatter methods differ only in how they transform
+# the raw embeddings before UMAP reduction)
+# ---------------------------------------------------------------------------
+
+def _identity(data: list[dict], embeddings: np.ndarray) -> np.ndarray:
+    return embeddings
+
+
 def _compute_tradition_residuals(data: list[dict], embeddings: np.ndarray) -> np.ndarray:
     traditions = [item.get("tradition", "unknown") for item in data]
     unique_traditions = set(traditions)
@@ -41,6 +50,11 @@ def _compute_tradition_residuals(data: list[dict], embeddings: np.ndarray) -> np
     for i, trad in enumerate(traditions):
         residuals[i] = embeddings[i] - centroids[trad]
     return residuals
+
+
+def _residual_normalized(data: list[dict], embeddings: np.ndarray) -> np.ndarray:
+    residuals = _compute_tradition_residuals(data, embeddings)
+    return Normalizer(norm="l2").fit_transform(residuals)
 
 
 def _concept_erasure(data: list[dict], embeddings: np.ndarray, max_iters: int = 35) -> np.ndarray:
@@ -78,116 +92,59 @@ def _concept_erasure(data: list[dict], embeddings: np.ndarray, max_iters: int = 
     return (X @ P).astype(embeddings.dtype)
 
 
-def _plot_umap_scatter(
+SCATTER_TRANSFORMS = {
+    "umap": _identity,
+    "residual_umap": _compute_tradition_residuals,
+    "residual_normalized_umap": _residual_normalized,
+    "rlace_umap": _concept_erasure,
+    "motif_umap": _identity,
+}
+
+
+# ---------------------------------------------------------------------------
+# Generators by chart type
+# ---------------------------------------------------------------------------
+
+def generate_scatter(
     data: list[dict],
     embeddings: np.ndarray,
-    title_prefix: str,
-    filename: str,
-    axis_prefix: str,
-    output_dir: Path | None = None,
+    output_path: Path,
     model_name: str | None = None,
+    transform=_identity,
 ) -> None:
-    if output_dir is None:
-        output_dir = settings.projections_dir
-
-    embedding_2d = _reduce_dimensions_safe(embeddings, n_components=2)
+    transformed = transform(data, embeddings)
+    embedding_2d = _reduce_dimensions_safe(transformed, n_components=2)
     if embedding_2d is None:
         return
 
-    if output_dir:
-        points = []
-        for i, item in enumerate(data):
-            text_preview = item.get("text", "")[:MAX_TEXT_PREVIEW_LEN]
-            if len(item.get("text", "")) > MAX_TEXT_PREVIEW_LEN:
-                text_preview += "..."
-            points.append({
-                "id": item["text_id"],
-                "tradition": item.get("tradition", "unknown"),
-                "chunk_index": item["chunk_index"],
-                "text": text_preview,
-                "x": round(float(embedding_2d[i, 0]), 6),
-                "y": round(float(embedding_2d[i, 1]), 6),
-            })
-        json_path = output_dir / filename
-        json_path.write_text(json.dumps({"model": model_name or "", "points": points}), encoding="utf-8")
-        logger.info(f"Saved: {json_path}")
+    points = []
+    for i, item in enumerate(data):
+        text_preview = item.get("text", "")[:MAX_TEXT_PREVIEW_LEN]
+        if len(item.get("text", "")) > MAX_TEXT_PREVIEW_LEN:
+            text_preview += "..."
+        points.append({
+            "id": item["text_id"],
+            "tradition": item.get("tradition", "unknown"),
+            "chunk_index": item["chunk_index"],
+            "text": text_preview,
+            "x": round(float(embedding_2d[i, 0]), 6),
+            "y": round(float(embedding_2d[i, 1]), 6),
+        })
+
+    output_path.write_text(
+        json.dumps({"model": model_name or "", "points": points}),
+        encoding="utf-8",
+    )
+    logger.info(f"Scatter saved: {output_path}")
 
 
-def plot_interactive_2d(
+def generate_heatmap(
     data: list[dict],
     embeddings: np.ndarray,
-    output_dir: Path | None = None,
+    output_path: Path,
     model_name: str | None = None,
+    **_kwargs,
 ) -> None:
-    _plot_umap_scatter(
-        data, embeddings,
-        title_prefix="UMAP visualization by tradition",
-        filename="umap.json",
-        axis_prefix="UMAP",
-        output_dir=output_dir,
-        model_name=model_name,
-    )
-
-
-def plot_residual_umap(
-    data: list[dict],
-    embeddings: np.ndarray,
-    output_dir: Path | None = None,
-    model_name: str | None = None,
-) -> None:
-    residuals = _compute_tradition_residuals(data, embeddings)
-    _plot_umap_scatter(
-        data, residuals,
-        title_prefix="Residual UMAP (tradition centroid removed)",
-        filename="residual_umap.json",
-        axis_prefix="Residual UMAP",
-        output_dir=output_dir,
-        model_name=model_name,
-    )
-
-
-def plot_residual_normalized_umap(
-    data: list[dict],
-    embeddings: np.ndarray,
-    output_dir: Path | None = None,
-    model_name: str | None = None,
-) -> None:
-    residuals = _compute_tradition_residuals(data, embeddings)
-    residuals = Normalizer(norm="l2").fit_transform(residuals)
-    _plot_umap_scatter(
-        data, residuals,
-        title_prefix="Residual Normalized UMAP (tradition centroid removed, L2-normalized)",
-        filename="residual_normalized_umap.json",
-        axis_prefix="Residual Normalized UMAP",
-        output_dir=output_dir,
-        model_name=model_name,
-    )
-
-
-def plot_rlace_umap(
-    data: list[dict],
-    embeddings: np.ndarray,
-    output_dir: Path | None = None,
-    model_name: str | None = None,
-) -> None:
-    erased = _concept_erasure(data, embeddings)
-    _plot_umap_scatter(
-        data, erased,
-        title_prefix="RLACE UMAP (tradition signal erased via INLP)",
-        filename="rlace_umap.json",
-        axis_prefix="RLACE UMAP",
-        output_dir=output_dir,
-        model_name=model_name,
-    )
-
-
-def plot_distance_heatmap(
-    data: list[dict], embeddings: np.ndarray,
-    output_dir: Path | None = None, model_name: str | None = None,
-) -> None:
-    if output_dir is None:
-        output_dir = settings.projections_dir
-
     traditions_data: dict[str, list] = {}
     for item, emb in zip(data, embeddings, strict=True):
         trad = item.get("tradition", "unknown")
@@ -209,19 +166,17 @@ def plot_distance_heatmap(
         "distances": [[round(float(v), 6) for v in row] for row in distance_matrix],
     }
 
-    if output_dir:
-        json_path = output_dir / "distance_heatmap.json"
-        json_path.write_text(json.dumps(result), encoding="utf-8")
-        logger.info(f"Heatmap saved: {json_path}")
+    output_path.write_text(json.dumps(result), encoding="utf-8")
+    logger.info(f"Heatmap saved: {output_path}")
 
 
-def plot_tradition_distribution(
-    data: list[dict], embeddings: np.ndarray,
-    output_dir: Path | None = None, model_name: str | None = None,
+def generate_distribution(
+    data: list[dict],
+    embeddings: np.ndarray,
+    output_path: Path,
+    model_name: str | None = None,
+    **_kwargs,
 ) -> None:
-    if output_dir is None:
-        output_dir = settings.projections_dir
-
     tradition_counts: dict[str, int] = {}
     tradition_docs: dict[str, set] = {}
     for item in data:
@@ -243,9 +198,12 @@ def plot_tradition_distribution(
 
     result = {"model": model_name or "", "total_chunks": total_chunks, "traditions": traditions}
 
-    if output_dir:
-        json_path = output_dir / "tradition_distribution.json"
-        json_path.write_text(json.dumps(result), encoding="utf-8")
-        logger.info(f"Distribution saved: {json_path}")
+    output_path.write_text(json.dumps(result), encoding="utf-8")
+    logger.info(f"Distribution saved: {output_path}")
 
 
+CHART_GENERATORS = {
+    "scatter": generate_scatter,
+    "heatmap": generate_heatmap,
+    "distribution": generate_distribution,
+}

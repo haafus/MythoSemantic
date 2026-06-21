@@ -2,15 +2,9 @@ import logging
 
 from model_registry import resolve_embedding_model
 
+from . import PROJECTION_METHODS
 from .analyzer import EmbeddingAnalyzer
-from .visualization import (
-    plot_distance_heatmap,
-    plot_interactive_2d,
-    plot_residual_normalized_umap,
-    plot_residual_umap,
-    plot_rlace_umap,
-    plot_tradition_distribution,
-)
+from .visualization import CHART_GENERATORS, SCATTER_TRANSFORMS
 
 logger = logging.getLogger(__name__)
 
@@ -43,60 +37,59 @@ def analyze_embeddings(
             continue
 
         if generate_all_plots:
-            _generate_all_plots(analyzer, force=force)
-
-        if motif_analysis:
-            _generate_motif_plot(analyzer, force=force)
+            _generate_plots(analyzer, force=force, include_motif=motif_analysis)
 
     logger.info("Projection analysis complete.")
     return analyzer
 
 
-def _generate_all_plots(analyzer: EmbeddingAnalyzer, force: bool = False) -> None:
+def _generate_plots(analyzer: EmbeddingAnalyzer, force: bool = False, include_motif: bool = False) -> None:
     data = analyzer.data
     embeddings = analyzer.embeddings
     out = analyzer.output_dir
 
-    plots = [
-        ("UMAP projection", "umap.json", plot_interactive_2d),
-        ("Residual UMAP projection", "residual_umap.json", plot_residual_umap),
-        ("Residual Normalized UMAP projection", "residual_normalized_umap.json", plot_residual_normalized_umap),
-        ("RLACE UMAP projection (INLP concept erasure)", "rlace_umap.json", plot_rlace_umap),
-        ("Distance heatmap", "distance_heatmap.json", plot_distance_heatmap),
-        ("Tradition distribution chart", "tradition_distribution.json", plot_tradition_distribution),
-    ]
+    for method in PROJECTION_METHODS:
+        key = method["key"]
+        chart_type = method["chart_type"]
+        label = method["label"]
+        output_path = out / f"{key}.json"
 
-    for label, filename, plot_fn in plots:
-        if not force and (out / filename).exists():
+        if key == "motif_umap":
+            if not include_motif:
+                continue
+            if not force and output_path.exists():
+                logger.info("Skipping %s (already exists)", label)
+                continue
+            _generate_motif_plot(analyzer)
+            continue
+
+        if not force and output_path.exists():
             logger.info("Skipping %s (already exists)", label)
             continue
+
         logger.info("Generating %s...", label)
+        generator = CHART_GENERATORS[chart_type]
         try:
-            plot_fn(data, embeddings, output_dir=out, model_name=analyzer.model_name)
+            kwargs = {}
+            if chart_type == "scatter":
+                kwargs["transform"] = SCATTER_TRANSFORMS[key]
+            generator(data, embeddings, output_path, model_name=analyzer.model_name, **kwargs)
         except Exception:
             logger.exception("Error creating %s", label)
 
     logger.info("Visualizations for %s: %s", analyzer.model_name, out)
 
 
-def _generate_motif_plot(analyzer: EmbeddingAnalyzer, force: bool = False) -> None:
-    if not force and (analyzer.output_dir / "motif_umap.json").exists():
-        logger.info("Skipping Motif UMAP (already exists)")
-        return
-
+def _generate_motif_plot(analyzer: EmbeddingAnalyzer) -> None:
     from .motif_analysis import run_motif_analysis
-
-    data = analyzer.data
 
     logger.info("Generating Motif UMAP projection (LLM summaries)...")
     try:
         run_motif_analysis(
-            data,
+            analyzer.data,
             output_dir=analyzer.output_dir,
             embedding_model=analyzer.model_name,
             model_name=analyzer.model_name,
         )
     except Exception:
         logger.exception("Error creating Motif UMAP plot")
-
-
