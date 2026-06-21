@@ -23,8 +23,7 @@ def get_catalog_documents() -> list[dict]:
         tradition_info = traditions_info.get(row.get("tradition", ""), {})
         documents.append({
             **row,
-            "color": tradition_info.get("color") or "#6b7280",
-            "description": row.get("description") or tradition_info.get("description", ""),
+            "color": tradition_info.get("color", ""),
         })
 
     documents.sort(
