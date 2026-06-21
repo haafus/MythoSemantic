@@ -70,10 +70,6 @@ class TestSimilarityEndpoints:
         response = client.post("/api/similarity/search", json={"query": "", "model": "m"})
         assert response.status_code == 422
 
-    def test_search_job_not_found(self):
-        response = client.get("/api/similarity/search/jobs/nonexistent_id")
-        assert response.status_code == 404
-
     def test_projection_not_found(self):
         response = client.get("/api/similarity/projections/fake_model/umap")
         assert response.status_code == 404

@@ -48,8 +48,6 @@ class ServerSettings(BaseModel):
     host: str = "127.0.0.1"
     port: int = 8000
     gzip_minimum_size: int = 1024
-    search_job_ttl_seconds: int = 1800
-    search_max_workers: int = 1
 
 
 # ---------------------------------------------------------------------------

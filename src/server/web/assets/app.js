@@ -969,83 +969,11 @@ function bindSearchResultClicks(container, handler) {
     });
 }
 
-const SEARCH_JOB_POLL_MS = 1000;
-
-function delay(ms) {
-    return new Promise((resolve) => {
-        window.setTimeout(resolve, ms);
-    });
-}
-
-function renderSearchStatus(job) {
-    const status = job.status === "queued" ? "Queued" : "Searching";
-    const model = escapeHtml(String(job.model || "").replace(/_/g, "/"));
-    return `
-        <div class="search-loading">
-            ${status}...
-            <small>Model: ${model}</small>
-        </div>
-    `;
-}
-
-async function runSemanticSearch({query, model, topK = 20, onStatus, shouldContinue}) {
-    const startJob = () => api("/api/similarity/search/jobs", {
+async function runSemanticSearch({query, model, topK = 20}) {
+    return api("/api/similarity/search", {
         method: "POST",
-        body: JSON.stringify({
-            query,
-            model,
-            top_k: topK,
-        }),
+        body: JSON.stringify({query, model, top_k: topK}),
     });
-
-    let started = await startJob();
-    let restarts = 0;
-
-    if (Array.isArray(started.results) && started.status === undefined) {
-        return started;
-    }
-
-    if (!started.job_id) {
-        throw new Error("Search did not start.");
-    }
-
-    if (onStatus) onStatus(started);
-
-    while (true) {
-        if (shouldContinue && !shouldContinue()) return null;
-        await delay(SEARCH_JOB_POLL_MS);
-        if (shouldContinue && !shouldContinue()) return null;
-
-        let job;
-        try {
-            job = await api(`/api/similarity/search/jobs/${encodeURIComponent(started.job_id)}`);
-        } catch (error) {
-            const message = String(error.message || "");
-            const jobWasLost = message.includes("Search job not found") || message.includes("Failed to fetch");
-            if (jobWasLost && restarts < 2) {
-                restarts += 1;
-                await delay(SEARCH_JOB_POLL_MS);
-                if (shouldContinue && !shouldContinue()) return null;
-                started = await startJob();
-                if (onStatus) onStatus({...started, status: "queued"});
-                continue;
-            }
-            throw error;
-        }
-
-        if (job.status === "complete") {
-            return {
-                query: job.query,
-                model: job.model,
-                results: Array.isArray(job.results) ? job.results : [],
-                total: Number(job.total || 0),
-            };
-        }
-        if (job.status === "failed") {
-            throw new Error(job.error || "Search failed.");
-        }
-        if (onStatus) onStatus(job);
-    }
 }
 
 async function performAnalysisSearch() {
@@ -1066,12 +994,6 @@ async function performAnalysisSearch() {
             query: text,
             model: state.selectedModel,
             topK: 20,
-            shouldContinue: () => requestId === state.analysisSearchRequestId,
-            onStatus: (job) => {
-                if (requestId === state.analysisSearchRequestId) {
-                    setSearchResults(renderSearchStatus(job));
-                }
-            },
         });
         if (requestId !== state.analysisSearchRequestId) return;
         if (!data) return;
@@ -1268,12 +1190,6 @@ async function performSearchPageSearch() {
             query: searchText,
             model: modelSelect.value,
             topK: 20,
-            shouldContinue: () => requestId === state.searchPageRequestId,
-            onStatus: (job) => {
-                if (requestId === state.searchPageRequestId) {
-                    resultsArea.innerHTML = renderSearchStatus(job);
-                }
-            },
         });
         if (requestId !== state.searchPageRequestId) return;
         if (!data) return;

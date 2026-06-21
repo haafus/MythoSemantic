@@ -234,9 +234,7 @@ FastAPI-сервер и SPA-интерфейс.
 | GET | `/api/similarity/projections/{model}/{method}` | JSON-данные проекции |
 | GET | `/api/similarity/points/{model}/{point_id}` | Информация о точке |
 | GET | `/api/similarity/points/{model}/{point_id}/neighbors` | Ближайшие соседи точки |
-| POST | `/api/similarity/search` | Синхронный семантический поиск |
-| POST | `/api/similarity/search/jobs` | Запуск асинхронного поиска |
-| GET | `/api/similarity/search/jobs/{job_id}` | Статус/результат асинхронного поиска |
+| POST | `/api/similarity/search` | Семантический поиск |
 | POST | `/api/similarity/search/warmup` | Предзагрузка модели и индекса |
 
 ### Интерактивная документация
