@@ -20,11 +20,7 @@ def get_catalog_documents() -> list[dict]:
     traditions_info = read_traditions(settings.corpus_dir)
 
     for row in metadata_rows:
-        tradition_info = traditions_info.get(row.get("tradition", ""), {})
-        documents.append({
-            **row,
-            "color": tradition_info.get("color", ""),
-        })
+        documents.append({**row, "color": traditions_info[row["tradition"]]["color"]})
 
     documents.sort(
         key=lambda item: (
