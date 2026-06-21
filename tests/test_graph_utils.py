@@ -106,12 +106,12 @@ class TestDeduplicateRelations:
 
 class TestCheckpoint:
     def test_roundtrip(self, tmp_path):
-        results = {"characters": [{"Name": "Zeus"}], "relations": [], "locations": [], "times": []}
+        results = {"beings": [{"Name": "Zeus"}], "relations": [], "locations": [], "times": []}
         save_checkpoint(tmp_path, 3, results)
 
         cp = load_checkpoint(tmp_path)
         assert cp["next_chunk"] == 3
-        assert cp["characters"] == [{"Name": "Zeus"}]
+        assert cp["beings"] == [{"Name": "Zeus"}]
 
     def test_missing_returns_none(self, tmp_path):
         assert load_checkpoint(tmp_path) is None
@@ -146,10 +146,10 @@ class _FakeLLM:
 
 class TestExtractFromChunk:
     def test_collects_all_entity_types(self):
-        prompts = {"characters": "c", "relations": "r", "locations": "l", "time": "t"}
+        prompts = {"beings": "c", "relations": "r", "locations": "l", "time": "t"}
         out = extract_from_chunk(_FakeLLM(), "some text", prompts)
 
-        assert out["characters"] == [{"Name": "Zeus"}]
+        assert out["beings"] == [{"Name": "Zeus"}]
         assert out["relations"][0]["Subject"] == "Zeus"
         assert out["locations"] == [{"Name": "Olympus"}]
         assert out["times"] == []

@@ -51,12 +51,15 @@ class TestGetCatalogDocuments:
         metadata = [
             {"id": "Iliad", "major_tradition": "European", "tradition": "Greek"},
         ]
+        traditions = {"Greek": {"color": "#ff0000"}}
         (tmp_path / "corpus.json").write_text(json.dumps(metadata))
+        (tmp_path / "traditions.json").write_text(json.dumps(traditions))
         _patch_corpus(monkeypatch, tmp_path)
 
         docs = get_catalog_documents()
         assert len(docs) == 1
         assert docs[0]["id"] == "Iliad"
+        assert docs[0]["color"] == "#ff0000"
 
     def test_missing_corpus_json_raises(self, tmp_path, monkeypatch):
         _patch_corpus(monkeypatch, tmp_path)
@@ -71,7 +74,9 @@ class TestGetCatalogDocuments:
             {"id": "B", "major_tradition": "Z", "tradition": "Z"},
             {"id": "A", "major_tradition": "A", "tradition": "A"},
         ]
+        traditions = {"Z": {"color": "#000000"}, "A": {"color": "#ffffff"}}
         (tmp_path / "corpus.json").write_text(json.dumps(metadata))
+        (tmp_path / "traditions.json").write_text(json.dumps(traditions))
         _patch_corpus(monkeypatch, tmp_path)
 
         docs = get_catalog_documents()

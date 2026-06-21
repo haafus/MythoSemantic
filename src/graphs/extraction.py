@@ -15,14 +15,14 @@ def extract_from_chunk(llm: LLMProcessor, chunk: str, prompts: dict) -> dict[str
     relations depend on extracted characters and run afterwards.
     """
     with ThreadPoolExecutor(max_workers=3) as pool:
-        chars_future = pool.submit(llm.ask_json, prompts["characters"], chunk)
+        chars_future = pool.submit(llm.ask_json, prompts["beings"], chunk)
         locs_future = pool.submit(llm.ask_json, prompts["locations"], chunk)
         times_future = pool.submit(llm.ask_json, prompts["time"], chunk)
 
         try:
             chars = chars_future.result(timeout=600)
         except Exception:
-            logger.exception("Failed to extract characters from chunk")
+            logger.exception("Failed to extract beings from chunk")
             chars = []
 
         relations_content = (
@@ -44,7 +44,7 @@ def extract_from_chunk(llm: LLMProcessor, chunk: str, prompts: dict) -> dict[str
             times = []
 
     return {
-        "characters": chars if isinstance(chars, list) else [],
+        "beings": chars if isinstance(chars, list) else [],
         "relations": rels if isinstance(rels, list) else [],
         "locations": locs if isinstance(locs, list) else [],
         "times": times if isinstance(times, list) else [],

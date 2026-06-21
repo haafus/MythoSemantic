@@ -44,7 +44,7 @@ function render() {
     if (path === "/geography") return renderGeography();
     if (path === "/embeddings_analysis") return renderEmbeddingsAnalysis();
     if (path === "/searchSimilarities") return renderSearchSimilarities(parsed.params);
-    if (path === "/beings") return renderGraphPage("beings", "characters");
+    if (path === "/beings") return renderGraphPage("beings", "beings");
     if (path === "/realms") return renderGraphPage("realms", "realms");
     if (path === "/ages") return renderGraphPage("ages", "ages");
 
@@ -1349,7 +1349,7 @@ const GRAPH_CATEGORY_COLORS = {
 };
 
 const GRAPH_INFO_FIELDS = {
-    characters: ["Name", "Category", "Description", "Roles", "Epithets", "Attributes", "Actions", "Degree", "BetweennessCentrality"],
+    beings: ["Name", "Category", "Description", "Roles", "Epithets", "Attributes", "Actions", "Degree", "BetweennessCentrality"],
     realms: ["Name", "Category", "Description", "Function", "Adjacent To", "Degree", "BetweennessCentrality"],
     ages: ["Name", "Category", "Description", "Keyactors", "Keyevents", "Degree", "BetweennessCentrality"],
 };
@@ -1546,7 +1546,7 @@ function renderCytoscapeGraph(container, data, graphType) {
 
     cy.on("tap", "node", (evt) => {
         const d = evt.target.data();
-        const fields = GRAPH_INFO_FIELDS[graphType] || GRAPH_INFO_FIELDS.characters;
+        const fields = GRAPH_INFO_FIELDS[graphType] || GRAPH_INFO_FIELDS.beings;
         let html = `<h4>${escapeHtml(d.display_name || d.Name || d.id)}</h4><table>`;
         fields.forEach((f) => {
             if (d[f] !== undefined && d[f] !== null && d[f] !== "") {

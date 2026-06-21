@@ -82,7 +82,7 @@ def _save_graph(data: dict, output_path: Path) -> None:
     logger.info(f"Graph saved: {output_path}")
 
 
-def generate_characters_graph(personas_data: list, relations_data: list, output_dir: Path) -> None:
+def generate_beings_graph(personas_data: list, relations_data: list, output_dir: Path) -> None:
     personas = _normalize_df(personas_data)
     relations = _normalize_df(relations_data)
 
@@ -101,12 +101,12 @@ def generate_characters_graph(personas_data: list, relations_data: list, output_
             G.add_node(obj)
             G.add_edge(subj, obj, relation=relation_val)
     else:
-        logger.warning("No valid relations for characters graph.")
+        logger.warning("No valid relations for beings graph.")
         for name in entity_names:
             G.add_node(name)
 
     data = _graph_to_json(G, entity_names, node_metadata, "Character")
-    _save_graph(data, output_dir / "characters.json")
+    _save_graph(data, output_dir / "beings.json")
 
 
 def _parse_adjacent(value) -> list[str]:

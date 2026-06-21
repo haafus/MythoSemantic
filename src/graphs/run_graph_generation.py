@@ -9,7 +9,7 @@ from settings import settings
 from .checkpointing import clear_checkpoint, load_checkpoint, save_checkpoint
 from .chunking import chunk_text
 from .extraction import deduplicate_entities, deduplicate_relations, extract_from_chunk
-from .graph_generator import generate_ages_graph, generate_characters_graph, generate_realms_graph
+from .graph_generator import generate_ages_graph, generate_beings_graph, generate_realms_graph
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +53,7 @@ def generate_graphs(llm: str | None = None, force: bool = False, max_texts: int 
         book_out_dir = settings.graphs_dir / text_id
         book_out_dir.mkdir(parents=True, exist_ok=True)
 
-        expected_path = book_out_dir / "characters.json"
+        expected_path = book_out_dir / "beings.json"
 
         if expected_path.exists():
             if not force:
@@ -79,13 +79,13 @@ def generate_graphs(llm: str | None = None, force: bool = False, max_texts: int 
         logger.info(f"Text split into {len(chunks)} chunks.")
 
         chunk_prompts = {
-            "characters": prompts.get("characters", "Extract characters..."),
+            "beings": prompts.get("beings", "Extract characters..."),
             "relations": prompts.get("relations", "Extract relations..."),
             "locations": prompts.get("locations", "Extract locations..."),
             "time": prompts.get("time", "Extract time..."),
         }
 
-        results: dict[str, list] = {"characters": [], "relations": [], "locations": [], "times": []}
+        results: dict[str, list] = {"beings": [], "relations": [], "locations": [], "times": []}
         start_chunk = 0
 
         checkpoint = None if force else load_checkpoint(book_out_dir)
@@ -102,12 +102,12 @@ def generate_graphs(llm: str | None = None, force: bool = False, max_texts: int 
                 results[key].extend(chunk_results[key])
             save_checkpoint(book_out_dir, i + 1, results)
 
-        all_characters = deduplicate_entities(results["characters"])
+        all_characters = deduplicate_entities(results["beings"])
         all_relations = deduplicate_relations(results["relations"])
         all_locations = deduplicate_entities(results["locations"])
         all_times = deduplicate_entities(results["times"])
         logger.info(
-            f"Extracted unique items: Characters ({len(all_characters)}), Relations ({len(all_relations)}), Locations ({len(all_locations)}), Times ({len(all_times)})"
+            f"Extracted unique items: Beings ({len(all_characters)}), Relations ({len(all_relations)}), Locations ({len(all_locations)}), Times ({len(all_times)})"
         )
 
         try:
@@ -123,7 +123,7 @@ def generate_graphs(llm: str | None = None, force: bool = False, max_texts: int 
             with open(book_out_dir / "times.json", "w", encoding="utf-8") as f:
                 json.dump(all_times, f, ensure_ascii=False, indent=2)
 
-            generate_characters_graph(all_characters, all_relations, book_out_dir)
+            generate_beings_graph(all_characters, all_relations, book_out_dir)
             generate_realms_graph(all_locations, book_out_dir)
             generate_ages_graph(all_times, book_out_dir)
             clear_checkpoint(book_out_dir)
