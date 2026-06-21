@@ -804,8 +804,8 @@ async function displayPointInfo(pointId, chunkIndex = null) {
     infoContent.classList.remove("empty");
 
     try {
-        const [point, neighborsData] = await fetchPointAndNeighbors(pointId, chunkIndex);
-        const neighbors = Array.isArray(neighborsData.neighbors) ? neighborsData.neighbors : [];
+        const point = await fetchPointWithNeighbors(pointId, chunkIndex);
+        const neighbors = Array.isArray(point.neighbors) ? point.neighbors : [];
         let html = `
             <div class="badge">${escapeHtml(point.tradition)}</div>
             <div class="search-result-meta">${escapeHtml(chunkMetaLine(point))}</div>
@@ -946,20 +946,12 @@ function scoreClass(similarityScore) {
     return {percent, cls};
 }
 
-function buildPointQueries(chunkIndex) {
-    const hasChunk = chunkIndex !== null && chunkIndex !== undefined && chunkIndex !== "";
-    const pointQuery = hasChunk ? `?chunk_index=${encodeURIComponent(chunkIndex)}` : "";
-    const neighborsQuery = new URLSearchParams({n: "5"});
-    if (hasChunk) neighborsQuery.set("chunk_index", String(chunkIndex));
-    return {pointQuery, neighborsQuery};
-}
-
-function fetchPointAndNeighbors(pointId, chunkIndex) {
-    const {pointQuery, neighborsQuery} = buildPointQueries(chunkIndex);
-    return Promise.all([
-        api(`/api/similarity/points/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(pointId)}${pointQuery}`),
-        api(`/api/similarity/points/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(pointId)}/neighbors?${neighborsQuery.toString()}`),
-    ]);
+function fetchPointWithNeighbors(pointId, chunkIndex, neighbors = 5) {
+    const params = new URLSearchParams({neighbors: String(neighbors)});
+    if (chunkIndex !== null && chunkIndex !== undefined && chunkIndex !== "") {
+        params.set("chunk_index", String(chunkIndex));
+    }
+    return api(`/api/similarity/points/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(pointId)}?${params}`);
 }
 
 function bindSearchResultClicks(container, handler) {
@@ -1074,8 +1066,8 @@ async function displaySearchModalPointInfo(pointId, chunkIndex = null) {
     setSearchResults('<div class="search-loading">Loading nearest chunks...</div>');
 
     try {
-        const [point, neighborsData] = await fetchPointAndNeighbors(pointId, chunkIndex);
-        const neighbors = Array.isArray(neighborsData.neighbors) ? neighborsData.neighbors : [];
+        const point = await fetchPointWithNeighbors(pointId, chunkIndex);
+        const neighbors = Array.isArray(point.neighbors) ? point.neighbors : [];
 
         setSearchResults(`
             <div class="search-detail">

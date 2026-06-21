@@ -32,11 +32,13 @@ class EmbeddingIndexService:
             self._index = self._load_index(model_name)
             return self._index
 
-    def get_point(self, model_key: str, point_id: str, chunk_index: int | None = None) -> dict:
+    def get_point(self, model_key: str, point_id: str, chunk_index: int | None = None,
+                  neighbors: int = 0, offset: int = 0) -> dict:
         index = self.get_index(model_name_for_key(model_key))
-        item = index.items[self._resolve_index(index, point_id, chunk_index)]
+        item_index = self._resolve_index(index, point_id, chunk_index)
+        item = index.items[item_index]
 
-        return {
+        result = {
             "id": item["text_id"],
             "text": item["text"],
             "tradition": item["tradition"],
@@ -47,16 +49,16 @@ class EmbeddingIndexService:
                 "major_tradition": item["major_tradition"],
                 "url": item["url"],
             },
+            "neighbors": [],
         }
 
-    def get_neighbors(self, model_key: str, point_id: str, n: int = 10, chunk_index: int | None = None) -> list[dict]:
-        index = self.get_index(model_name_for_key(model_key))
-        item_index = self._resolve_index(index, point_id, chunk_index)
+        if neighbors > 0:
+            query_vector = index.normalized_matrix[item_index]
+            similarities = index.normalized_matrix @ query_vector
+            similarities[item_index] = -np.inf
+            result["neighbors"] = self._top_results(index, similarities, neighbors, offset)
 
-        query_vector = index.normalized_matrix[item_index]
-        similarities = index.normalized_matrix @ query_vector
-        similarities[item_index] = -np.inf
-        return self._top_results(index, similarities, n)
+        return result
 
     def search(self, model_key: str, query: str, top_k: int = 20) -> list[dict]:
         model_name = model_name_for_key(model_key)
@@ -120,13 +122,14 @@ class EmbeddingIndexService:
         return np.asarray(raw[0], dtype=np.float32)
 
     @staticmethod
-    def _top_results(index: ModelIndex, similarities: np.ndarray, limit: int) -> list[dict]:
-        limit = min(limit, len(index.items))
-        if limit <= 0:
+    def _top_results(index: ModelIndex, similarities: np.ndarray, limit: int, offset: int = 0) -> list[dict]:
+        total_needed = min(offset + limit, len(index.items))
+        if total_needed <= 0:
             return []
 
-        candidate_indices = np.argpartition(-similarities, limit - 1)[:limit]
+        candidate_indices = np.argpartition(-similarities, total_needed - 1)[:total_needed]
         candidate_indices = candidate_indices[np.argsort(-similarities[candidate_indices])]
+        candidate_indices = candidate_indices[offset:]
 
         results = []
         for idx in candidate_indices:

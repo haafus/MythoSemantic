@@ -6,8 +6,7 @@ from server.schemas import (
     CorpusDocument,
     ModelListResponse,
     ModelSummary,
-    NeighborsResponse,
-    PointInfo,
+    PointResponse,
     SearchRequest,
     SearchResponse,
     SearchResult,
@@ -69,26 +68,24 @@ class TestSearchResponse:
         assert len(resp.results) == 1
 
 
-class TestPointInfo:
+class TestPointResponse:
     def test_defaults(self):
-        p = PointInfo(id="p1")
+        p = PointResponse(id="p1")
         assert p.text == ""
         assert p.tradition == "Unknown"
         assert p.metadata == {}
+        assert p.neighbors == []
 
     def test_with_metadata(self):
-        p = PointInfo(id="p1", metadata={"key": "val"})
+        p = PointResponse(id="p1", metadata={"key": "val"})
         assert p.metadata["key"] == "val"
 
-
-class TestNeighborsResponse:
-    def test_structure(self):
-        n = NeighborsResponse(
-            point_id="p1",
-            neighbors=[SearchResult(id="p2", similarity_score=0.8, distance=0.2)],
+    def test_with_neighbors(self):
+        p = PointResponse(
+            id="p1",
+            neighbors=[SearchResult(id="p2", similarity_score=0.8)],
         )
-        assert n.point_id == "p1"
-        assert len(n.neighbors) == 1
+        assert len(p.neighbors) == 1
 
 
 class TestCorpusDocument:

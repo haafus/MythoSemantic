@@ -232,8 +232,7 @@ FastAPI-сервер и SPA-интерфейс.
 | GET | `/api/graphs/` | Список книг с доступными графами |
 | GET | `/api/graphs/{book_id}/{graph_type}` | JSON-данные графа (nodes + edges) |
 | GET | `/api/similarity/projections/{model}/{method}` | JSON-данные проекции |
-| GET | `/api/similarity/points/{model}/{point_id}` | Информация о точке |
-| GET | `/api/similarity/points/{model}/{point_id}/neighbors` | Ближайшие соседи точки |
+| GET | `/api/similarity/points/{model}/{point_id}` | Информация о точке (+ соседи через `?neighbors=N&offset=M`) |
 | POST | `/api/similarity/search` | Семантический поиск |
 | POST | `/api/similarity/search/warmup` | Предзагрузка модели и индекса |
 
