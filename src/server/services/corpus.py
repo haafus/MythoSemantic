@@ -14,13 +14,6 @@ _catalog_cache: dict[str, tuple[float, list[dict]]] = {}
 _CATALOG_TTL = 300
 
 
-def to_int(value, default: int = 0) -> int:
-    try:
-        return int(value)
-    except (TypeError, ValueError):
-        return default
-
-
 def get_catalog_documents() -> list[dict]:
     cached = _catalog_cache.get("corpus")
     if cached and time.monotonic() - cached[0] < _CATALOG_TTL:
@@ -47,9 +40,9 @@ def get_catalog_documents() -> list[dict]:
                 "major_tradition": row.get("major_tradition", ""),
                 "tradition": row.get("tradition", ""),
                 "url": row.get("url", ""),
-                "word_count": to_int(row.get("word_count")),
-                "sentence_count": to_int(row.get("sentence_count")),
-                "char_count": to_int(row.get("char_count")),
+                "word_count": row.get("word_count", 0),
+                "sentence_count": row.get("sentence_count", 0),
+                "char_count": row.get("char_count", 0),
                 "color": tradition_info.get("color") or "#6b7280",
                 "description": row.get("description") or tradition_info.get("description", ""),
             }
