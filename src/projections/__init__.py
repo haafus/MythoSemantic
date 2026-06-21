@@ -3,7 +3,6 @@ PROJECTION_METHODS = {
     "residual_umap",
     "residual_normalized_umap",
     "rlace_umap",
-    "story_umap",
     "motif_umap",
     "distance_heatmap",
     "tradition_distribution",

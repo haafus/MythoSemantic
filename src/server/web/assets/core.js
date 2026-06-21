@@ -24,7 +24,6 @@ export const SIMILARITY_METHODS = [
     ["residual_umap", "Residual UMAP"],
     ["residual_normalized_umap", "Residual Normalized UMAP"],
     ["rlace_umap", "RLACE UMAP"],
-    ["story_umap", "Story UMAP"],
     ["motif_umap", "Motif UMAP"],
     ["distance_heatmap", "Distance Heatmap"],
     ["tradition_distribution", "Tradition Distribution"],
