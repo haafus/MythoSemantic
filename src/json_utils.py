@@ -6,15 +6,13 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 
-def load_json(path: Path, default: Any = None) -> Any:
-    if not path.exists():
-        return default
+def load_json_optional(path: Path) -> Any:
+    """Load JSON from a file that may not exist or may be corrupt (caches, checkpoints)."""
     try:
-        with open(path, encoding="utf-8") as f:
-            return json.load(f)
-    except (OSError, json.JSONDecodeError) as e:
-        logger.warning(f"Failed to load {path}: {e}")
-        return default
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError, OSError) as e:
+        logger.debug(f"Could not load {path}: {e}")
+        return None
 
 
 def save_json(path: Path, data: Any, **kwargs: Any) -> None:

@@ -43,7 +43,7 @@ def build_embeddings(
                     if count > 0:
                         logger.info(f"   Resuming {model}: {count} chunks exist")
                 except Exception:
-                    pass
+                    logger.debug(f"   No existing collection for {model}, creating new")
 
             encoder.load(model)
             logger.info(f"   Model: {model}")

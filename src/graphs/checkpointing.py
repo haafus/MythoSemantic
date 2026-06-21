@@ -1,12 +1,12 @@
 from pathlib import Path
 
-from json_utils import load_json, save_json
+from json_utils import load_json_optional, save_json
 
 CHECKPOINT_FILE = "checkpoint.json"
 
 
 def load_checkpoint(book_out_dir: Path) -> dict | None:
-    data = load_json(book_out_dir / CHECKPOINT_FILE)
+    data = load_json_optional(book_out_dir / CHECKPOINT_FILE)
     if isinstance(data, dict) and isinstance(data.get("next_chunk"), int):
         return data
     return None

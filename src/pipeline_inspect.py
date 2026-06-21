@@ -38,24 +38,23 @@ def format_size(nbytes: int) -> str:
 # Corpus inspection
 # ---------------------------------------------------------------------------
 
-def corpus_status(settings) -> dict[str, Any]:
+def _read_corpus_config(settings) -> int:
     config_path = settings.config_dir / "corpus.json"
-    config_count = 0
-    if config_path.exists():
-        try:
-            with open(config_path, encoding="utf-8") as f:
-                config_count = len(json.load(f))
-        except Exception:
-            pass
+    if not config_path.exists():
+        return 0
+    return len(json.loads(config_path.read_text(encoding="utf-8")))
 
+
+def _read_corpus_metadata(settings) -> list[dict]:
     meta_path = settings.corpus_dir / "corpus.json"
-    meta_entries: list[dict] = []
-    if meta_path.exists():
-        try:
-            with open(meta_path, encoding="utf-8") as f:
-                meta_entries = json.load(f)
-        except Exception:
-            pass
+    if not meta_path.exists():
+        return []
+    return json.loads(meta_path.read_text(encoding="utf-8"))
+
+
+def corpus_status(settings) -> dict[str, Any]:
+    config_count = _read_corpus_config(settings)
+    meta_entries = _read_corpus_metadata(settings)
 
     known_paths: set[str] = set()
     corpus_dir = Path(settings.corpus_dir)
@@ -141,14 +140,8 @@ def embeddings_orphan_chunks(settings, *, skip_collections: set[str] | None = No
     if skip_collections is None:
         skip_collections = {c["name"] for c in embeddings_orphan_collections(settings)}
 
-    meta_path = settings.corpus_dir / "corpus.json"
-    if not meta_path.exists():
-        return []
-
-    try:
-        with open(meta_path, encoding="utf-8") as f:
-            meta_entries = json.load(f)
-    except Exception:
+    meta_entries = _read_corpus_metadata(settings)
+    if not meta_entries:
         return []
 
     known_text_ids = {normalize_catalog_id(e["id"]) for e in meta_entries if e.get("id")}
@@ -255,14 +248,8 @@ def graphs_orphans(settings) -> list[tuple[Path, int]]:
     if not graphs_dir.exists():
         return []
 
-    meta_path = settings.corpus_dir / "corpus.json"
-    if not meta_path.exists():
-        return []
-
-    try:
-        with open(meta_path, encoding="utf-8") as f:
-            meta_entries = json.load(f)
-    except Exception:
+    meta_entries = _read_corpus_metadata(settings)
+    if not meta_entries:
         return []
 
     known_text_ids = {normalize_catalog_id(e["id"]) for e in meta_entries if e.get("id")}
