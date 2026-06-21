@@ -5,6 +5,8 @@ import logging
 from pathlib import Path
 from typing import Any
 
+from projections import PROJECTION_METHODS
+
 logger = logging.getLogger(__name__)
 
 
@@ -181,14 +183,7 @@ def embeddings_orphan_chunks(settings, *, skip_collections: set[str] | None = No
 # Projections inspection
 # ---------------------------------------------------------------------------
 
-PROJECTION_PLOTS = [
-    "umap.json",
-    "residual_umap.json",
-    "residual_normalized_umap.json",
-    "rlace_umap.json",
-    "distance_heatmap.json",
-    "tradition_distribution.json",
-]
+PROJECTION_PLOTS = [f"{m}.json" for m in sorted(PROJECTION_METHODS)]
 
 
 def projections_status(settings) -> dict[str, Any]:
