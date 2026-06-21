@@ -18,7 +18,6 @@ import {
     renderModelOptions,
     setActiveNav,
     setBodyClass,
-    SIMILARITY_METHODS,
     state,
 } from "./core.js";
 
@@ -520,9 +519,7 @@ async function renderEmbeddingsAnalysis() {
                         <div class="card-header">
                             <div class="form-group">
                                 <label>Method:</label>
-                                <select id="viz-select">
-                                    ${SIMILARITY_METHODS.map(([value, label]) => `<option value="${value}">${label}</option>`).join("")}
-                                </select>
+                                <select id="viz-select"><option value="">Loading...</option></select>
                             </div>
                             <div style="display: flex; gap: 8px;">
                                 <button class="btn btn-outline enter-fullscreen" type="button" id="enter-fullscreen">Enter Fullscreen</button>
@@ -579,6 +576,7 @@ async function renderEmbeddingsAnalysis() {
     bindEmbeddingsControls();
 
     try {
+        await loadSimilarityMethods();
         await loadModelsIntoSelect();
         await initializeAnalysisLibrary();
         if (state.pendingPoint) {
@@ -627,6 +625,18 @@ function bindEmbeddingsControls() {
         }
     };
     document.addEventListener("keydown", state.keydownHandler);
+}
+
+async function loadSimilarityMethods() {
+    if (!state.similarityMethods.length) {
+        state.similarityMethods = await api("/api/similarity/methods");
+    }
+    const vizSelect = document.getElementById("viz-select");
+    if (vizSelect) {
+        vizSelect.innerHTML = state.similarityMethods
+            .map((m) => `<option value="${escapeAttribute(m.key)}">${escapeHtml(m.label)}</option>`)
+            .join("");
+    }
 }
 
 async function loadModelsIntoSelect() {
@@ -708,9 +718,10 @@ async function loadVisualization() {
         const data = await api(`/api/similarity/projections/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(method)}`);
 
         await loadTraditionInfo();
-        if (method === "distance_heatmap") {
+        const chartType = (state.similarityMethods.find((m) => m.key === method) || {}).chart_type || "scatter";
+        if (chartType === "heatmap") {
             await renderHeatmap(scatterPlot, data);
-        } else if (method === "tradition_distribution") {
+        } else if (chartType === "distribution") {
             const names = (data.traditions || []).map((t) => t.name);
             await renderDistribution(scatterPlot, data, { colorMap: getColorMap(names) });
         } else {

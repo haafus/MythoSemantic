@@ -17,17 +17,8 @@ export const state = {
     warmedSearchModels: new Set(),
     keydownHandler: null,
     graphCy: null,
+    similarityMethods: [],
 };
-
-export const SIMILARITY_METHODS = [
-    ["umap", "UMAP 2D"],
-    ["residual_umap", "Residual UMAP"],
-    ["residual_normalized_umap", "Residual Normalized UMAP"],
-    ["rlace_umap", "RLACE UMAP"],
-    ["motif_umap", "Motif UMAP"],
-    ["distance_heatmap", "Distance Heatmap"],
-    ["tradition_distribution", "Tradition Distribution"],
-];
 
 export function parseHash() {
     const raw = (window.location.hash || "#/").slice(1) || "/";

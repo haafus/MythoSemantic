@@ -1,8 +1,14 @@
 from fastapi import APIRouter, HTTPException
 
+from projections import PROJECTION_METHODS
 from server.services.projections import get_projection_data
 
 router = APIRouter(prefix="/api/similarity", tags=["projections"])
+
+
+@router.get("/methods")
+def methods() -> list[dict]:
+    return PROJECTION_METHODS
 
 
 @router.get("/projections/{model_key}/{method}")

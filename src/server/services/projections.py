@@ -1,12 +1,12 @@
 import json
 from pathlib import Path
 
-from projections import PROJECTION_METHODS
+from projections import PROJECTION_KEYS
 from settings import settings
 
 
 def get_projection_data(model_key: str, method: str) -> dict | None:
-    if method not in PROJECTION_METHODS:
+    if method not in PROJECTION_KEYS:
         return None
     json_path = settings.projections_dir / model_key / f"{method}.json"
     if not json_path.exists():

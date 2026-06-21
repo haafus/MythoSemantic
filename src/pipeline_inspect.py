@@ -5,7 +5,7 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from projections import PROJECTION_METHODS
+from projections import PROJECTION_KEYS
 
 logger = logging.getLogger(__name__)
 
@@ -183,7 +183,7 @@ def embeddings_orphan_chunks(settings, *, skip_collections: set[str] | None = No
 # Projections inspection
 # ---------------------------------------------------------------------------
 
-PROJECTION_PLOTS = [f"{m}.json" for m in sorted(PROJECTION_METHODS)]
+PROJECTION_PLOTS = [f"{m}.json" for m in sorted(PROJECTION_KEYS)]
 
 
 def projections_status(settings) -> dict[str, Any]:
