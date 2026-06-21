@@ -55,9 +55,8 @@ function render() {
     if (path === "/geography") return renderGeography();
     if (path === "/embeddings_analysis") return renderEmbeddingsAnalysis();
     if (path === "/searchSimilarities") return renderSearchSimilarities(parsed.params);
-    if (path === "/beings") return renderGraphPage("beings", "beings");
-    if (path === "/realms") return renderGraphPage("realms", "realms");
-    if (path === "/ages") return renderGraphPage("ages", "ages");
+    const graphType = path.slice(1);
+    if (["beings", "realms", "ages"].includes(graphType)) return renderGraphPage(graphType);
 
     window.location.hash = "#/corpus";
 }
@@ -1369,8 +1368,8 @@ const GRAPH_INFO_FIELDS = {
     ages: ["Name", "Category", "Description", "Keyactors", "Keyevents", "Degree", "BetweennessCentrality"],
 };
 
-async function renderGraphPage(pageName, graphType) {
-    document.title = `MythoScope - ${pageName.charAt(0).toUpperCase() + pageName.slice(1)}`;
+async function renderGraphPage(graphType) {
+    document.title = `MythoScope - ${graphType.charAt(0).toUpperCase() + graphType.slice(1)}`;
     app.innerHTML = `
         <main class="graph-page container">
             <div class="graph-sidebar">
