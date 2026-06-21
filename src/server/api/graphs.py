@@ -1,14 +1,8 @@
 from fastapi import APIRouter, HTTPException
 
-from server.services.graphs import get_graph_data, list_books_with_graphs
+from server.services.graphs import get_graph_data
 
 router = APIRouter(prefix="/api/graphs", tags=["graphs"])
-
-
-@router.get("/")
-def list_graphs() -> dict:
-    books = list_books_with_graphs()
-    return {"books": books, "total": len(books)}
 
 
 @router.get("/{book_id}/{graph_type}")

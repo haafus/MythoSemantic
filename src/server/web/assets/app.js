@@ -1390,8 +1390,8 @@ async function renderGraphPage(pageName, graphType) {
     `;
 
     try {
-        const data = await api("/api/graphs/");
-        const books = Array.isArray(data.books) ? data.books.filter((b) => b.graphs.includes(graphType)) : [];
+        const docs = await ensureCorpusDocuments();
+        const books = [...new Set(docs.map((d) => d.id))].sort().map((id) => ({ id }));
         renderGraphBookList(books, graphType);
     } catch (error) {
         const list = document.getElementById("graphBookList");

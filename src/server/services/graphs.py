@@ -7,19 +7,6 @@ from settings import settings
 GRAPH_TYPES = {"beings", "realms", "ages"}
 
 
-def list_books_with_graphs() -> list[dict]:
-    if not settings.graphs_dir.exists():
-        return []
-    books = []
-    for book_dir in sorted(settings.graphs_dir.iterdir()):
-        if not book_dir.is_dir():
-            continue
-        available = [t for t in GRAPH_TYPES if (book_dir / f"{t}.json").exists()]
-        if available:
-            books.append({"id": book_dir.name, "graphs": available})
-    return books
-
-
 def get_graph_data(book_id: str, graph_type: str) -> dict | None:
     if graph_type not in GRAPH_TYPES:
         return None
