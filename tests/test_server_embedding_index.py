@@ -71,19 +71,6 @@ class TestTopResults:
         assert len(results) == 1
         assert results[0]["id"] == "a"
 
-    def test_text_preview_truncated(self):
-        items = [self._item("a", text="x" * 1000)]
-        index = _make_index(items)
-        results = EmbeddingIndexService._top_results(index, np.array([0.9]), 1)
-        assert results[0]["text_preview"].endswith("...")
-        assert len(results[0]["text_preview"]) == 703
-
-    def test_text_preview_short_text(self):
-        items = [self._item("a", text="short")]
-        index = _make_index(items)
-        results = EmbeddingIndexService._top_results(index, np.array([0.9]), 1)
-        assert results[0]["text_preview"] == "short"
-
     def test_result_fields(self):
         items = [self._item("doc", text="hello", tradition="Norse", major_tradition="Euro", filename="doc.txt")]
         index = _make_index(items)
@@ -94,7 +81,8 @@ class TestTopResults:
         assert r["major_tradition"] == "Euro"
         assert r["similarity_score"] == 0.8
         assert r["filename"] == "doc.txt"
-        assert r["book_title"] == "doc"
+        assert "book_title" not in r
+        assert "text_preview" not in r
 
     def test_limit_clamped_to_items(self):
         items = [self._item("a")]

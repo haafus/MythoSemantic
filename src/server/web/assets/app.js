@@ -771,8 +771,7 @@ function normalizeBookTitle(value) {
 
 function resultBookTitle(item) {
     return normalizeBookTitle(
-        item.book_title
-        || item.filename
+        item.filename
         || (item.metadata && item.metadata.filename)
         || item.id
         || "Unknown book"
@@ -788,7 +787,7 @@ function searchResultMetaLine(item) {
 }
 
 function chunkTextHtml(item, query = "") {
-    const text = item.text || item.text_preview || "";
+    const text = item.text || "";
     if (!text) {
         return '<span class="chunk-text-empty">Chunk text is unavailable.</span>';
     }
@@ -819,7 +818,7 @@ async function displayPointInfo(pointId, chunkIndex = null) {
                 <div class="neighbor-item" data-neighbor-id="${escapeAttribute(neighbor.id)}" data-neighbor-chunk="${escapeAttribute(neighbor.chunk_index)}">
                     <span class="badge" style="background:#dee2e6; color:#212529">${escapeHtml(neighbor.tradition)}</span>
                     <div class="neighbor-meta">${escapeHtml(chunkMetaLine(neighbor))}</div>
-                    <div class="neighbor-text">${escapeHtml(neighbor.text || neighbor.text_preview || "")}</div>
+                    <div class="neighbor-text">${escapeHtml(neighbor.text || "")}</div>
                     <div class="neighbor-stats">Similarity: ${(Number(neighbor.similarity_score || 0) * 100).toFixed(1)}%</div>
                 </div>
             `).join("");

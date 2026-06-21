@@ -39,12 +39,11 @@ class TestSearchRequest:
 
 class TestSearchResult:
     def test_defaults(self):
-        r = SearchResult(id="1", similarity_score=0.95, distance=0.05)
+        r = SearchResult(id="1", similarity_score=0.95)
         assert r.tradition == "Unknown"
         assert r.major_tradition == ""
         assert r.chunk_index == 0
         assert r.text == ""
-        assert r.text_preview == ""
 
     def test_all_fields(self):
         r = SearchResult(
@@ -53,13 +52,10 @@ class TestSearchResult:
             major_tradition="European",
             chunk_index=3,
             similarity_score=0.9,
-            distance=0.1,
             text="full text",
-            text_preview="full...",
             filename="doc.txt",
-            book_title="The Book",
         )
-        assert r.book_title == "The Book"
+        assert r.filename == "doc.txt"
 
 
 class TestSearchResponse:

@@ -29,9 +29,7 @@ class SearchResult(BaseModel):
     chunk_index: int = 0
     similarity_score: float
     text: str = ""
-    text_preview: str = ""
     filename: str = ""
-    book_title: str = ""
 
 
 class SearchResponse(BaseModel):
@@ -46,7 +44,6 @@ class PointInfo(BaseModel):
     text: str = ""
     tradition: str = "Unknown"
     chunk_index: int = 0
-    book_title: str = ""
     model: str = ""
     metadata: dict[str, Any] = Field(default_factory=dict)
 
