@@ -1,6 +1,5 @@
 import json
 
-import server.services.corpus as corpus_mod
 from corpus.utils import read_traditions, read_document
 from server.services.corpus import get_catalog_documents
 from settings import settings
@@ -54,27 +53,18 @@ class TestGetCatalogDocuments:
         ]
         (tmp_path / "corpus.json").write_text(json.dumps(metadata))
         _patch_corpus(monkeypatch, tmp_path)
-        monkeypatch.setattr(corpus_mod, "_catalog_cache", {})
 
         docs = get_catalog_documents()
         assert len(docs) == 1
         assert docs[0]["id"] == "Iliad"
 
-    def test_empty_corpus(self, tmp_path, monkeypatch):
+    def test_missing_corpus_json_raises(self, tmp_path, monkeypatch):
         _patch_corpus(monkeypatch, tmp_path)
-        monkeypatch.setattr(corpus_mod, "_catalog_cache", {})
 
-        docs = get_catalog_documents()
-        assert docs == []
+        import pytest
 
-    def test_cache_hit(self, tmp_path, monkeypatch):
-        _patch_corpus(monkeypatch, tmp_path)
-        monkeypatch.setattr(corpus_mod, "_catalog_cache", {})
-
-        get_catalog_documents()
-        (tmp_path / "corpus.json").write_text(json.dumps([{"id": "new"}]))
-        docs = get_catalog_documents()
-        assert docs == []
+        with pytest.raises(FileNotFoundError):
+            get_catalog_documents()
 
     def test_sorted_by_tradition(self, tmp_path, monkeypatch):
         metadata = [
@@ -83,7 +73,6 @@ class TestGetCatalogDocuments:
         ]
         (tmp_path / "corpus.json").write_text(json.dumps(metadata))
         _patch_corpus(monkeypatch, tmp_path)
-        monkeypatch.setattr(corpus_mod, "_catalog_cache", {})
 
         docs = get_catalog_documents()
         assert docs[0]["major_tradition"] == "A"

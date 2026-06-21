@@ -1,7 +1,6 @@
 import io
 import json
 import logging
-import time
 import zipfile
 from pathlib import Path
 
@@ -10,24 +9,12 @@ from settings import settings
 
 logger = logging.getLogger(__name__)
 
-_catalog_cache: dict[str, tuple[float, list[dict]]] = {}
-_CATALOG_TTL = 300
-
 
 def get_catalog_documents() -> list[dict]:
-    cached = _catalog_cache.get("corpus")
-    if cached and time.monotonic() - cached[0] < _CATALOG_TTL:
-        return cached[1]
-
     metadata_path = settings.corpus_dir / "corpus.json"
 
-    metadata_rows = []
-    if metadata_path.exists():
-        try:
-            with metadata_path.open("r", encoding="utf-8") as handle:
-                metadata_rows = json.load(handle)
-        except (OSError, json.JSONDecodeError) as e:
-            logger.warning("Failed to read metadata %s: %s", metadata_path, e)
+    with metadata_path.open("r", encoding="utf-8") as handle:
+        metadata_rows = json.load(handle)
 
     documents = []
     traditions_info = read_traditions(settings.corpus_dir)
@@ -56,7 +43,6 @@ def get_catalog_documents() -> list[dict]:
         )
     )
 
-    _catalog_cache["corpus"] = (time.monotonic(), documents)
     return documents
 
 
