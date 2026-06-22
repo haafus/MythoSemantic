@@ -32,7 +32,7 @@ class EmbeddingIndexService:
             self._index = self._load_index(model_name)
             return self._index
 
-    def get_point(self, model_key: str, point_id: str, chunk_index: int | None = None,
+    def get_point(self, model_key: str, point_id: str, chunk_index: int,
                   neighbors: int = 0, offset: int = 0) -> list[dict]:
         index = self.get_index(model_name_for_key(model_key))
         item_index = self._resolve_index(index, point_id, chunk_index)
@@ -61,9 +61,7 @@ class EmbeddingIndexService:
 
         id_to_index: dict[str, int] = {}
         for idx, item in enumerate(items):
-            point_id = item["id"]
-            id_to_index.setdefault(point_id, idx)
-            id_to_index[self._point_key(point_id, item["chunk_index"])] = idx
+            id_to_index[self._point_key(item["id"], item["chunk_index"])] = idx
 
         return ModelIndex(
             model_name=model_name,
@@ -73,13 +71,11 @@ class EmbeddingIndexService:
         )
 
     @staticmethod
-    def _point_key(point_id: str, chunk_index: int | None = None) -> str:
-        if chunk_index is None:
-            return str(point_id)
+    def _point_key(point_id: str, chunk_index: int) -> str:
         return f"{point_id}::{chunk_index}"
 
     @staticmethod
-    def _resolve_index(index: ModelIndex, point_id: str, chunk_index: int | None = None) -> int:
+    def _resolve_index(index: ModelIndex, point_id: str, chunk_index: int) -> int:
         key = EmbeddingIndexService._point_key(point_id, chunk_index)
         item_index = index.id_to_index.get(key)
         if item_index is None:

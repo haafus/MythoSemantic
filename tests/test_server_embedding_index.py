@@ -24,17 +24,11 @@ def _make_index(items, matrix=None):
 
 
 class TestPointKey:
-    def test_no_chunk(self):
-        assert EmbeddingIndexService._point_key("doc1") == "doc1"
-
     def test_with_chunk(self):
         assert EmbeddingIndexService._point_key("doc1", 3) == "doc1::3"
 
     def test_chunk_zero(self):
         assert EmbeddingIndexService._point_key("doc1", 0) == "doc1::0"
-
-    def test_none_chunk(self):
-        assert EmbeddingIndexService._point_key("doc1", None) == "doc1"
 
 
 class TestTopResults:

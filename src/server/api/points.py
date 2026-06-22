@@ -10,7 +10,7 @@ router = APIRouter(prefix="/api/similarity", tags=["points"])
 def point_info(
     model_key: str,
     point_id: str,
-    chunk_index: int | None = Query(None),
+    chunk_index: int = Query(...),
     neighbors: int = Query(0, ge=0, le=100),
     offset: int = Query(0, ge=0),
 ):
