@@ -17,12 +17,12 @@ def catalog():
 
 @router.get("/documents", response_class=PlainTextResponse)
 def document(
-    doc_id: str = Query(..., alias="id"),
+    title: str = Query(...),
     major_tradition: str = Query(...),
     tradition: str = Query(...),
 ):
     try:
-        text, _ = read_document(settings.corpus_dir, doc_id, major_tradition, tradition)
+        text, _ = read_document(settings.corpus_dir, title, major_tradition, tradition)
         return text
     except PermissionError as exc:
         raise HTTPException(status_code=403, detail="Access denied") from exc

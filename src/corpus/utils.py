@@ -67,15 +67,14 @@ def text_path(corpus_dir: Path, major_tradition: str, tradition: str, title: str
     return corpus_dir / major / trad / f"{title}.txt"
 
 
-def read_document(corpus_dir: Path, doc_id: str, major_tradition: str, tradition: str) -> tuple[str, str]:
-    file_path = text_path(corpus_dir, major_tradition, tradition, doc_id)
+def read_document(corpus_dir: Path, title: str, major_tradition: str, tradition: str) -> tuple[str, str]:
+    file_path = text_path(corpus_dir, major_tradition, tradition, title)
     resolved = file_path.resolve()
     if not resolved.is_relative_to(corpus_dir.resolve()):
         raise PermissionError("Access denied")
     if not resolved.exists():
         raise FileNotFoundError(str(resolved))
-    title = sanitize_filename(doc_id)
-    return resolved.read_text(encoding="utf-8"), title
+    return resolved.read_text(encoding="utf-8"), sanitize_filename(title)
 
 
 def read_traditions(corpus_dir: Path) -> dict:

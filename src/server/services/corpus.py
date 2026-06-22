@@ -26,7 +26,7 @@ def get_catalog_documents() -> list[dict]:
         key=lambda item: (
             item.get("major_tradition", ""),
             item.get("tradition", ""),
-            item.get("id", ""),
+            item.get("title", ""),
         )
     )
 
@@ -43,7 +43,7 @@ def build_corpus_archive() -> io.BytesIO:
                 settings.corpus_dir,
                 doc.get("major_tradition", ""),
                 doc.get("tradition", ""),
-                doc.get("id", ""),
+                doc.get("title", ""),
             )
 
             if not file_path.exists():

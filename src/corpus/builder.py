@@ -139,7 +139,7 @@ def _load_existing_metadata() -> dict[str, dict]:
     try:
         with open(path, encoding="utf-8") as f:
             rows = json.load(f)
-        return {row["id"]: row for row in rows if "id" in row}
+        return {row["title"]: row for row in rows if "title" in row}
     except (OSError, json.JSONDecodeError, KeyError) as e:
         logger.warning("Failed to read existing %s: %s", path, e)
         return {}

@@ -167,7 +167,7 @@ export async function ensureCorpusDocuments() {
 
 export function buildCorpusApiUrl(doc) {
     const params = new URLSearchParams({
-        id: doc.id || "",
+        title: doc.title || "",
         major_tradition: doc.major_tradition || "",
         tradition: doc.tradition || "",
         source: doc.source || "corpus",

@@ -182,7 +182,7 @@ def generate_distribution(
     for item in data:
         trad = item.get("tradition", "unknown")
         tradition_counts[trad] = tradition_counts.get(trad, 0) + 1
-        tradition_docs.setdefault(trad, set()).add(item["id"])
+        tradition_docs.setdefault(trad, set()).add(item["title"])
 
     sorted_traditions = sorted(tradition_counts.items(), key=lambda x: -x[1])
     total_chunks = sum(c for _, c in sorted_traditions)

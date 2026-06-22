@@ -15,7 +15,7 @@ def traditions() -> dict:
     for doc in get_catalog_documents():
         trad = doc.get("tradition", "")
         if trad:
-            books_by_tradition.setdefault(trad, []).append(doc.get("id", ""))
+            books_by_tradition.setdefault(trad, []).append(doc.get("title", ""))
     for trad, info in data.items():
         info["books"] = sorted(books_by_tradition.get(trad, []))
     return {"traditions": data, "total": len(data)}

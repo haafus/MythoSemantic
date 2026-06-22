@@ -41,7 +41,7 @@ class SearchResponse(BaseModel):
 
 
 class CorpusDocument(BaseModel):
-    id: str
+    title: str
     major_tradition: str = ""
     tradition: str = ""
     url: str = ""

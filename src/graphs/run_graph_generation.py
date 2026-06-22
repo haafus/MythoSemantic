@@ -46,8 +46,7 @@ def generate_graphs(llm: str | None = None, force: bool = False, max_texts: int 
         corpus = corpus[:max_texts]
 
     for book in corpus:
-        book_id = book.get("id", "unknown_book")
-        text_id = normalize_catalog_id(book_id)
+        text_id = normalize_catalog_id(book["title"])
         txt_path = Path(book.get("path", ""))
 
         book_out_dir = settings.graphs_dir / text_id

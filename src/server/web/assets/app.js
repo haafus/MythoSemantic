@@ -153,13 +153,13 @@ async function renderCorpus() {
 }
 
 function createCorpusDocumentButton(doc, index) {
-    const active = state.selectedCorpusDoc && state.selectedCorpusDoc.id === doc.id
+    const active = state.selectedCorpusDoc && state.selectedCorpusDoc.title === doc.title
         && state.selectedCorpusDoc.major_tradition === doc.major_tradition
         && state.selectedCorpusDoc.tradition === doc.tradition;
     return `
         <li>
             <button class="document-button${active ? " active" : ""}" type="button" data-doc-index="${index}">
-                ${escapeHtml(doc.id)}
+                ${escapeHtml(doc.title)}
             </button>
         </li>
     `;
@@ -271,7 +271,7 @@ function renderBookInfo(doc, isLoading = false) {
 
     const url = buildCorpusApiUrl(doc);
     bookInfo.innerHTML = `
-        <div class="book-title">${escapeHtml(doc.id)}</div>
+        <div class="book-title">${escapeHtml(doc.title)}</div>
         <div class="book-tradition">
             <span class="info-dot" style="--book-color:${escapeAttribute(doc.color || "#6b7280")}"></span>
             <span>${escapeHtml(doc.major_tradition || "Other")} / ${escapeHtml(doc.tradition || "Unknown")}</span>
@@ -292,7 +292,7 @@ function renderBookInfo(doc, isLoading = false) {
         <div class="description-text">${escapeHtml(doc.description || "No description available.")}</div>
 
         <div class="actions">
-            <a class="btn btn-primary${isLoading ? " disabled" : ""}" href="${escapeAttribute(url)}" download="${escapeAttribute(doc.id || "book")}.txt">Download Book</a>
+            <a class="btn btn-primary${isLoading ? " disabled" : ""}" href="${escapeAttribute(url)}" download="${escapeAttribute(doc.title || "book")}.txt">Download Book</a>
             <a class="btn btn-outline" href="/api/corpus/archive">Download Full Archive</a>
         </div>
     `;
@@ -307,7 +307,7 @@ async function openCorpusDocument(doc) {
     const readerContent = document.getElementById("readerContent");
     if (!readerTitle || !readerContent) return;
 
-    readerTitle.textContent = doc.id;
+    readerTitle.textContent = doc.title;
     readerContent.innerHTML = '<div class="reader-placeholder">Loading book text...</div>';
 
     try {
@@ -864,7 +864,7 @@ function renderAnalysisTreeFromDocuments(documents, container) {
             attachTreeToggle(traditionWrapper.item, traditionChildren);
 
             docs.forEach((doc) => {
-                const leaf = createAnalysisTreeNode(doc.id, 2, true);
+                const leaf = createAnalysisTreeNode(doc.title, 2, true);
                 leaf.item.addEventListener("click", () => openBookReader(doc));
                 traditionChildren.appendChild(leaf.wrapper);
             });
@@ -923,7 +923,7 @@ async function openBookReader(doc) {
     const modalBody = document.getElementById("modalBody");
     if (!modal || !modalTitle || !modalBody) return;
 
-    modalTitle.textContent = doc.id;
+    modalTitle.textContent = doc.title;
     modalBody.textContent = "Loading...";
     modal.style.display = "block";
 
@@ -1295,7 +1295,7 @@ async function renderGraphPage(graphType) {
 
     try {
         const docs = await ensureCorpusDocuments();
-        const books = [...new Set(docs.map((d) => d.id))].sort().map((id) => ({ id }));
+        const books = [...new Set(docs.map((d) => d.title))].sort().map((title) => ({ title }));
         renderGraphBookList(books, graphType);
     } catch (error) {
         const list = document.getElementById("graphBookList");
@@ -1313,8 +1313,8 @@ function renderGraphBookList(books, graphType) {
     }
 
     list.innerHTML = books.map((book) => `
-        <button class="graph-book-btn" type="button" data-book-id="${escapeAttribute(book.id)}">
-            ${escapeHtml(book.id)}
+        <button class="graph-book-btn" type="button" data-book-id="${escapeAttribute(book.title)}">
+            ${escapeHtml(book.title)}
         </button>
     `).join("");
 

@@ -69,14 +69,14 @@ class TestSearchResponse:
 
 class TestCorpusDocument:
     def test_defaults(self):
-        doc = CorpusDocument(id="test")
+        doc = CorpusDocument(title="test")
         assert doc.color == "#6b7280"
         assert doc.word_count == 0
         assert doc.major_tradition == ""
 
     def test_all_fields(self):
         doc = CorpusDocument(
-            id="Iliad",
+            title="Iliad",
             major_tradition="European",
             tradition="Greek",
             language="en",
@@ -93,7 +93,7 @@ class TestCatalogResponse:
 
     def test_with_documents(self):
         resp = CatalogResponse(
-            documents=[CorpusDocument(id="d1"), CorpusDocument(id="d2")],
+            documents=[CorpusDocument(title="d1"), CorpusDocument(title="d2")],
             total=2,
         )
         assert len(resp.documents) == 2
