@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 def _build_chroma_entries(
     chunks: list[str], info: CorpusFileInfo,
 ) -> tuple[list[str], list[dict[str, Any]]]:
-    ids = [f"{info.text_id}_{i}" for i in range(len(chunks))]
+    ids = [f"{info.text_id}::{i}" for i in range(len(chunks))]
 
     metadatas = [
         {
