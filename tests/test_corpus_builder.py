@@ -61,11 +61,6 @@ class TestBuildMetadataFields:
         meta = _build_metadata(item, path="/tmp/x.txt", stats=stats)
         assert meta["description"] == ""
 
-    def test_missing_major_tradition_raises(self):
-        stats = {"md5": "abc", "char_count": 10, "word_count": 1, "sentence_count": 1}
-        item = {"title": "Test", "tradition": "T", "url": "http://example.com/no-major"}
-        with pytest.raises(KeyError):
-            _build_metadata(item, path="/tmp/x.txt", stats=stats)
 
 
 

@@ -26,33 +26,25 @@ data_lock = threading.Lock()
 
 
 
-def _finalize_text(text: str, url: str, tid: str) -> dict:
+def _finalize_text(text: str, url: str, tid: str) -> tuple[bytes, dict]:
     text = normalize_text(text)
     text = clean_gutenberg_in_builder(text, url, tid)
     data_utf8 = text.encode("utf-8")
-    return {
-        "text": text,
-        "data_utf8": data_utf8,
+    stats = {
         "md5": md5(data_utf8),
         "char_count": len(text),
         "word_count": count_words(text),
         "sentence_count": count_sentences(text),
     }
+    return data_utf8, stats
 
 
 def _build_metadata(item: dict, *, path: str, stats: dict) -> dict:
     return {
-        "title": item["title"],
-        "major_tradition": item["major_tradition"],
-        "tradition": item["tradition"],
-        "url": item["url"],
+        **item,
         "date_downloaded": datetime.now(timezone.utc).isoformat(),
-        "md5": stats["md5"],
         "path": path,
-        "char_count": stats["char_count"],
-        "word_count": stats["word_count"],
-        "sentence_count": stats["sentence_count"],
-        "description": item["description"],
+        **stats,
     }
 
 
@@ -92,13 +84,13 @@ def _download_and_process(item: dict) -> dict | None:
         if not text or not text.strip():
             raise ValueError("Empty content after conversion")
 
-        stats = _finalize_text(text, url, tid)
+        data_utf8, stats = _finalize_text(text, url, tid)
 
-        filename = text_path(settings.corpus_dir, item.get("major_tradition", "Unknown"), item["tradition"], tid)
+        filename = text_path(settings.corpus_dir, item["major_tradition"], item["tradition"], tid)
 
         with data_lock:
             ensure_dir(filename.parent)
-            filename.write_bytes(stats["data_utf8"])
+            filename.write_bytes(data_utf8)
 
         rel_path = str(filename.resolve().relative_to(Path(settings.corpus_dir).resolve()))
         meta = _build_metadata(item, path=rel_path, stats=stats)
