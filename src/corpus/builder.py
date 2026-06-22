@@ -44,7 +44,7 @@ def _finalize_text(text: str, url: str, tid: str) -> dict:
 
 def _build_metadata(item: dict, *, path: str, stats: dict) -> dict:
     return {
-        "id": _item_tid(item),
+        "title": _item_tid(item),
         "major_tradition": item.get("major_tradition", "Unknown"),
         "tradition": item["tradition"],
         "url": item["url"],

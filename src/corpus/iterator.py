@@ -14,7 +14,7 @@ class CorpusFileInfo:
     filename: str
     path: str
     text_id: str
-    catalog_id: str
+    title: str
     major_tradition: str
     tradition: str
     url: str
@@ -35,7 +35,7 @@ def iter_files(corpus_dir: Path) -> Generator[CorpusFileInfo, None, None]:
         items = json.load(f)
 
     for item in items:
-        tid = item.get("id")
+        tid = item.get("title", item.get("id"))
         if not tid:
             continue
 
@@ -53,7 +53,7 @@ def iter_files(corpus_dir: Path) -> Generator[CorpusFileInfo, None, None]:
             filename=txt_file.name,
             path=str(txt_file),
             text_id=normalize_catalog_id(tid),
-            catalog_id=tid,
+            title=tid,
             major_tradition=item.get("major_tradition", "unknown"),
             tradition=item.get("tradition", "unknown"),
             url=item.get("url", ""),
