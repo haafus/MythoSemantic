@@ -33,32 +33,12 @@ class EmbeddingIndexService:
             return self._index
 
     def get_point(self, model_key: str, point_id: str, chunk_index: int | None = None,
-                  neighbors: int = 0, offset: int = 0) -> dict:
+                  neighbors: int = 0, offset: int = 0) -> list[dict]:
         index = self.get_index(model_name_for_key(model_key))
         item_index = self._resolve_index(index, point_id, chunk_index)
-        item = index.items[item_index]
-
-        result = {
-            "id": item["text_id"],
-            "text": item["text"],
-            "tradition": item["tradition"],
-            "chunk_index": item["chunk_index"],
-            "model": index.model_name,
-            "metadata": {
-                "filename": item["filename"],
-                "major_tradition": item["major_tradition"],
-                "url": item["url"],
-            },
-            "neighbors": [],
-        }
-
-        if neighbors > 0:
-            query_vector = index.normalized_matrix[item_index]
-            similarities = index.normalized_matrix @ query_vector
-            similarities[item_index] = -np.inf
-            result["neighbors"] = self._top_results(index, similarities, neighbors, offset)
-
-        return result
+        query_vector = index.normalized_matrix[item_index]
+        similarities = index.normalized_matrix @ query_vector
+        return self._top_results(index, similarities, 1 + neighbors, offset)
 
     def search(self, model_key: str, query: str, top_k: int = 20) -> list[dict]:
         model_name = model_name_for_key(model_key)

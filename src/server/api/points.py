@@ -1,12 +1,12 @@
 from fastapi import APIRouter, HTTPException, Query
 
-from server.schemas import PointResponse
+from server.schemas import SearchResult
 from server.services.embedding_index import embedding_index_service
 
 router = APIRouter(prefix="/api/similarity", tags=["points"])
 
 
-@router.get("/points/{model_key}/{point_id}", response_model=PointResponse)
+@router.get("/points/{model_key}/{point_id}", response_model=list[SearchResult])
 def point_info(
     model_key: str,
     point_id: str,

@@ -39,16 +39,6 @@ class SearchResponse(BaseModel):
     total: int
 
 
-class PointResponse(BaseModel):
-    id: str
-    text: str = ""
-    tradition: str = "Unknown"
-    chunk_index: int = 0
-    model: str = ""
-    metadata: dict[str, Any] = Field(default_factory=dict)
-    neighbors: list[SearchResult] = Field(default_factory=list)
-
-
 class CorpusDocument(BaseModel):
     id: str
     major_tradition: str = ""

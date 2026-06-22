@@ -770,12 +770,7 @@ function normalizeBookTitle(value) {
 }
 
 function resultBookTitle(item) {
-    return normalizeBookTitle(
-        item.filename
-        || (item.metadata && item.metadata.filename)
-        || item.id
-        || "Unknown book"
-    );
+    return normalizeBookTitle(item.filename || item.id || "Unknown book");
 }
 
 function chunkMetaLine(item) {
@@ -804,8 +799,10 @@ async function displayPointInfo(pointId, chunkIndex = null) {
     infoContent.classList.remove("empty");
 
     try {
-        const point = await fetchPointWithNeighbors(pointId, chunkIndex);
-        const neighbors = Array.isArray(point.neighbors) ? point.neighbors : [];
+        const results = await fetchPointWithNeighbors(pointId, chunkIndex);
+        const point = results[0];
+        const neighbors = results.slice(1);
+        if (!point) throw new Error("Point not found");
         let html = `
             <div class="badge">${escapeHtml(point.tradition)}</div>
             <div class="search-result-meta">${escapeHtml(chunkMetaLine(point))}</div>
@@ -1066,8 +1063,10 @@ async function displaySearchModalPointInfo(pointId, chunkIndex = null) {
     setSearchResults('<div class="search-loading">Loading nearest chunks...</div>');
 
     try {
-        const point = await fetchPointWithNeighbors(pointId, chunkIndex);
-        const neighbors = Array.isArray(point.neighbors) ? point.neighbors : [];
+        const results = await fetchPointWithNeighbors(pointId, chunkIndex);
+        const point = results[0];
+        const neighbors = results.slice(1);
+        if (!point) throw new Error("Point not found");
 
         setSearchResults(`
             <div class="search-detail">
