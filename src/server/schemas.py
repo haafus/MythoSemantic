@@ -30,6 +30,7 @@ class SearchResult(BaseModel):
     similarity_score: float
     text: str = ""
     filename: str = ""
+    url: str = ""
 
 
 class SearchResponse(BaseModel):
