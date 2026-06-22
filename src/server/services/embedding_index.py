@@ -32,10 +32,10 @@ class EmbeddingIndexService:
             self._index = self._load_index(model_name)
             return self._index
 
-    def get_point(self, model_key: str, point_id: str, chunk_index: int,
+    def get_point(self, model_key: str, text_id: str, chunk_index: int,
                   neighbors: int = 0, offset: int = 0) -> list[dict]:
         index = self.get_index(model_name_for_key(model_key))
-        item_index = self._resolve_index(index, point_id, chunk_index)
+        item_index = self._resolve_index(index, text_id, chunk_index)
         query_vector = index.normalized_matrix[item_index]
         similarities = index.normalized_matrix @ query_vector
         return self._top_results(index, similarities, 1 + neighbors, offset)
@@ -71,10 +71,10 @@ class EmbeddingIndexService:
         )
 
     @staticmethod
-    def _resolve_index(index: ModelIndex, point_id: str, chunk_index: int) -> int:
-        item_index = index.id_to_index.get(f"{point_id}::{chunk_index}")
+    def _resolve_index(index: ModelIndex, text_id: str, chunk_index: int) -> int:
+        item_index = index.id_to_index.get(f"{text_id}::{chunk_index}")
         if item_index is None:
-            raise KeyError(point_id)
+            raise KeyError(text_id)
         return item_index
 
     def _encode_query(self, model_name: str, query: str) -> np.ndarray:
