@@ -29,6 +29,10 @@ def normalize_catalog_id(value: Any) -> str:
     return re.sub(r"\s+", "_", str(value or "").strip())
 
 
+def chunk_id(text_id: str, chunk_index: int) -> str:
+    return f"{text_id}::{chunk_index}"
+
+
 def normalize_text(text: str) -> str:
     if not text:
         return ""

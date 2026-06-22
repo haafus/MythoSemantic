@@ -9,6 +9,7 @@ from tqdm import tqdm
 from . import chroma_manager
 from .chunking import create_chunking_strategies
 from corpus.iterator import CorpusFileInfo, iter_files
+from corpus.utils import chunk_id
 from .model_manager import EmbeddingEncoder
 
 logger = logging.getLogger(__name__)
@@ -17,7 +18,7 @@ logger = logging.getLogger(__name__)
 def _build_chroma_entries(
     chunks: list[str], info: CorpusFileInfo,
 ) -> tuple[list[str], list[dict[str, Any]]]:
-    ids = [f"{info.text_id}::{i}" for i in range(len(chunks))]
+    ids = [chunk_id(info.text_id, i) for i in range(len(chunks))]
 
     metadatas = [
         {

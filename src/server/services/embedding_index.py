@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from corpus.utils import chunk_id
 from model_registry import model_name_for_key
 
 logger = logging.getLogger(__name__)
@@ -61,7 +62,7 @@ class EmbeddingIndexService:
 
         id_to_index: dict[str, int] = {}
         for idx, item in enumerate(items):
-            id_to_index[f"{item['id']}::{item['chunk_index']}"] = idx
+            id_to_index[chunk_id(item["id"], item["chunk_index"])] = idx
 
         return ModelIndex(
             model_name=model_name,
@@ -72,7 +73,7 @@ class EmbeddingIndexService:
 
     @staticmethod
     def _resolve_index(index: ModelIndex, text_id: str, chunk_index: int) -> int:
-        item_index = index.id_to_index.get(f"{text_id}::{chunk_index}")
+        item_index = index.id_to_index.get(chunk_id(text_id, chunk_index))
         if item_index is None:
             raise KeyError(text_id)
         return item_index
