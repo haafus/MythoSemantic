@@ -59,10 +59,7 @@ class TestSearchResult:
 class TestSearchResponse:
     def test_structure(self):
         resp = SearchResponse(
-            query="test",
-            model="m1",
-            results=[SearchResult(id="1", similarity_score=0.9, distance=0.1)],
-            total=1,
+            results=[SearchResult(id="1", similarity_score=0.9)],
         )
         assert len(resp.results) == 1
 

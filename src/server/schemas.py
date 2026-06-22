@@ -34,10 +34,7 @@ class SearchResult(BaseModel):
 
 
 class SearchResponse(BaseModel):
-    query: str
-    model: str
     results: list[SearchResult]
-    total: int
 
 
 class CorpusDocument(BaseModel):

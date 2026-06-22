@@ -957,10 +957,11 @@ function bindSearchResultClicks(container, handler) {
 }
 
 async function runSemanticSearch({query, model, topK = 20}) {
-    return api("/api/similarity/search", {
+    const data = await api("/api/similarity/search", {
         method: "POST",
         body: JSON.stringify({query, model, top_k: topK}),
     });
+    return {...data, query, model};
 }
 
 async function performAnalysisSearch() {
@@ -1030,7 +1031,7 @@ function displayAnalysisSearchResults(data) {
 
     setSearchResults(`
         <div class="search-summary">
-            <strong>Found:</strong> ${escapeHtml(data.total)} results
+            <strong>Found:</strong> ${results.length} results
             <span>Model: ${escapeHtml(String(data.model || "").replace(/_/g, "/"))}</span>
         </div>
         <div class="search-result-list">
@@ -1208,7 +1209,7 @@ function displaySearchResults(data) {
 
     resultsArea.innerHTML = `
         <div style="padding: 15px; background: #faf9f5; border-bottom: 1px solid #e8e6e4;">
-            <strong>Found:</strong> ${escapeHtml(data.total)} results
+            <strong>Found:</strong> ${results.length} results
             <span style="float: right; font-size: 0.8rem; color: #8a827c;">
                 Model: ${escapeHtml(String(data.model || "").replace(/_/g, "/"))}
             </span>

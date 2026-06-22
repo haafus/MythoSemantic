@@ -21,12 +21,7 @@ def search(request: SearchRequest) -> dict:
             status_code=503,
             detail="Semantic search unavailable",
         ) from exc
-    return {
-        "query": request.query,
-        "model": request.model,
-        "results": results,
-        "total": len(results),
-    }
+    return {"results": results}
 
 
 @router.post("/search/warmup")
