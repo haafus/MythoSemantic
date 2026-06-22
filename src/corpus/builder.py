@@ -24,8 +24,6 @@ logger = logging.getLogger(__name__)
 data_lock = threading.Lock()
 
 
-def _item_tid(item: dict) -> str:
-    return item["title"]
 
 
 def _finalize_text(text: str, url: str, tid: str) -> dict:
@@ -44,7 +42,7 @@ def _finalize_text(text: str, url: str, tid: str) -> dict:
 
 def _build_metadata(item: dict, *, path: str, stats: dict) -> dict:
     return {
-        "title": _item_tid(item),
+        "title": item["title"],
         "major_tradition": item.get("major_tradition", "Unknown"),
         "tradition": item["tradition"],
         "url": item["url"],
@@ -83,7 +81,7 @@ def _extract_text(data: bytes, url: str, tid: str, content_type: str = "") -> st
 
 
 def _download_and_process(item: dict) -> dict | None:
-    tid = _item_tid(item)
+    tid = item["title"]
     url = item["url"]
 
     try:
@@ -171,7 +169,7 @@ def build_corpus(force: bool = False, max_texts: int | None = None):
     corpus_root = Path(settings.corpus_dir).resolve()
 
     for item in download_list:
-        tid = _item_tid(item)
+        tid = item["title"]
         prev = existing.get(tid)
         if prev and (corpus_root / prev.get("path", "")).exists():
             metadata.append(prev)

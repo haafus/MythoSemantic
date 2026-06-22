@@ -22,16 +22,7 @@ if not hasattr(fu_mod, "UserAgent"):
 
 from datetime import datetime
 
-from corpus.builder import _build_metadata, _item_tid, _update_traditions
-
-
-class TestItemTid:
-    def test_returns_title(self):
-        assert _item_tid({"title": "Iliad"}) == "Iliad"
-
-    def test_missing_title_raises(self):
-        with pytest.raises(KeyError):
-            _item_tid({})
+from corpus.builder import _build_metadata, _update_traditions
 
 
 _BASE_ITEM = {
