@@ -56,11 +56,11 @@ class EmbeddingIndexService:
     def _load_index(self, model_name: str) -> ModelIndex:
         from embeddings import chroma_manager
 
-        ids, items, embeddings = chroma_manager.get_collection(model_name).load_data()
+        items, embeddings = chroma_manager.get_collection(model_name).load_data()
         if not items:
             raise KeyError(f"No embedding data found for {model_name}")
 
-        id_to_index = {cid: idx for idx, cid in enumerate(ids)}
+        id_to_index = {chunk_id(item["id"], item["chunk_index"]): idx for idx, item in enumerate(items)}
 
         return ModelIndex(
             model_name=model_name,
