@@ -23,14 +23,6 @@ def _make_index(items, matrix=None):
     return ModelIndex(model_name="test", items=items, normalized_matrix=matrix, id_to_index=id_to_index)
 
 
-class TestPointKey:
-    def test_with_chunk(self):
-        assert EmbeddingIndexService._point_key("doc1", 3) == "doc1::3"
-
-    def test_chunk_zero(self):
-        assert EmbeddingIndexService._point_key("doc1", 0) == "doc1::0"
-
-
 class TestTopResults:
     def _item(self, id, text="", tradition="Greek", **kw):
         return {"id": id, "text": text, "tradition": tradition, "major_tradition": "", "chunk_index": 0, "filename": "", **kw}
