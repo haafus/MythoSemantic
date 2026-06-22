@@ -957,11 +957,11 @@ function bindSearchResultClicks(container, handler) {
 }
 
 async function runSemanticSearch({query, model, topK = 20}) {
-    const data = await api("/api/similarity/search", {
+    const results = await api("/api/similarity/search", {
         method: "POST",
         body: JSON.stringify({query, model, top_k: topK}),
     });
-    return {...data, query, model};
+    return {results, query, model};
 }
 
 async function performAnalysisSearch() {

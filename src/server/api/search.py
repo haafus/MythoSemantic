@@ -2,7 +2,7 @@ import logging
 
 from fastapi import APIRouter, BackgroundTasks
 
-from server.schemas import SearchRequest, SearchResponse, WarmupRequest
+from server.schemas import SearchRequest, SearchResult, WarmupRequest
 from server.services.embedding_index import embedding_index_service
 
 router = APIRouter(prefix="/api/similarity", tags=["search"])
@@ -11,10 +11,9 @@ logger = logging.getLogger(__name__)
 _warmed_models: set[str] = set()
 
 
-@router.post("/search", response_model=SearchResponse)
-def search(request: SearchRequest) -> dict:
-    results = embedding_index_service.search(request.model, request.query, request.top_k)
-    return {"results": results}
+@router.post("/search", response_model=list[SearchResult])
+def search(request: SearchRequest):
+    return embedding_index_service.search(request.model, request.query, request.top_k)
 
 
 @router.post("/search/warmup")

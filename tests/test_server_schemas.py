@@ -7,7 +7,6 @@ from server.schemas import (
     ModelListResponse,
     ModelSummary,
     SearchRequest,
-    SearchResponse,
     SearchResult,
     TraditionsResponse,
 )
@@ -54,14 +53,6 @@ class TestSearchResult:
             filename="doc.txt",
         )
         assert r.filename == "doc.txt"
-
-
-class TestSearchResponse:
-    def test_structure(self):
-        resp = SearchResponse(
-            results=[SearchResult(id="1", similarity_score=0.9)],
-        )
-        assert len(resp.results) == 1
 
 
 class TestCorpusDocument:

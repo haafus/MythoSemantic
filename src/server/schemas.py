@@ -33,10 +33,6 @@ class SearchResult(BaseModel):
     url: str = ""
 
 
-class SearchResponse(BaseModel):
-    results: list[SearchResult]
-
-
 class CorpusDocument(BaseModel):
     title: str
     major_tradition: str = ""
