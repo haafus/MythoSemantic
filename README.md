@@ -62,5 +62,5 @@
 
 ### Documentation
 
-1. [Preliminary paper draft](DRAFT.rtf) ([overleaf](https://www.overleaf.com/3284195327nzmxtpqmsvwm#2b1a91))
-2. [Bibliography](LITERATURE.md)
+1. [Preliminary paper draft](docs/draft.md) ([overleaf](https://www.overleaf.com/3284195327nzmxtpqmsvwm#2b1a91))
+2. [Bibliography](docs/bibliography.md)
