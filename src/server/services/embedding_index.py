@@ -37,6 +37,8 @@ class EmbeddingIndexService:
                   neighbors: int = 0, offset: int = 0) -> list[dict]:
         index = self.get_index(model_name_for_key(model_key))
         item_index = self._resolve_index(index, text_id, chunk_index)
+        if item_index is None:
+            return []
         query_vector = index.normalized_matrix[item_index]
         similarities = index.normalized_matrix @ query_vector
         return self._top_results(index, similarities, 1 + neighbors, offset)
@@ -57,8 +59,6 @@ class EmbeddingIndexService:
         from embeddings import chroma_manager
 
         items, embeddings = chroma_manager.get_collection(model_name).load_data()
-        if not items:
-            raise KeyError(f"No embedding data found for {model_name}")
 
         id_to_index = {chunk_id(item["id"], item["chunk_index"]): idx for idx, item in enumerate(items)}
 
@@ -70,11 +70,8 @@ class EmbeddingIndexService:
         )
 
     @staticmethod
-    def _resolve_index(index: ModelIndex, text_id: str, chunk_index: int) -> int:
-        item_index = index.id_to_index.get(chunk_id(text_id, chunk_index))
-        if item_index is None:
-            raise KeyError(text_id)
-        return item_index
+    def _resolve_index(index: ModelIndex, text_id: str, chunk_index: int) -> int | None:
+        return index.id_to_index.get(chunk_id(text_id, chunk_index))
 
     def _encode_query(self, model_name: str, query: str) -> np.ndarray:
         if self._encoder is None:

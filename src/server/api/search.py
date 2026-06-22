@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import APIRouter, BackgroundTasks, HTTPException
+from fastapi import APIRouter, BackgroundTasks
 
 from server.schemas import SearchRequest, SearchResponse, WarmupRequest
 from server.services.embedding_index import embedding_index_service
@@ -13,14 +13,7 @@ _warmed_models: set[str] = set()
 
 @router.post("/search", response_model=SearchResponse)
 def search(request: SearchRequest) -> dict:
-    try:
-        results = embedding_index_service.search(request.model, request.query, request.top_k)
-    except Exception as exc:
-        logger.exception("Semantic search failed")
-        raise HTTPException(
-            status_code=503,
-            detail="Semantic search unavailable",
-        ) from exc
+    results = embedding_index_service.search(request.model, request.query, request.top_k)
     return {"results": results}
 
 
