@@ -58,7 +58,7 @@ class ChromaCollection:
         results = self._collection.get(include=["embeddings", "metadatas", "documents"])
 
         records = [
-            {**meta, "text": doc}
+            {**meta, "id": meta.pop("text_id"), "text": doc}
             for meta, doc in zip(results["metadatas"], results["documents"], strict=True)
         ]
         embeddings = np.array(results["embeddings"], dtype=np.float32) if records else np.empty((0, 0), dtype=np.float32)

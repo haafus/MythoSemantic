@@ -38,8 +38,8 @@ class TestPointKey:
 
 
 class TestTopResults:
-    def _item(self, text_id, text="", tradition="Greek", **kw):
-        return {"text_id": text_id, "text": text, "tradition": tradition, "major_tradition": "", "chunk_index": 0, "filename": "", **kw}
+    def _item(self, id, text="", tradition="Greek", **kw):
+        return {"id": id, "text": text, "tradition": tradition, "major_tradition": "", "chunk_index": 0, "filename": "", **kw}
 
     def test_returns_top_k(self):
         items = [self._item("a"), self._item("b"), self._item("c")]

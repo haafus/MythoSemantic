@@ -123,7 +123,7 @@ def generate_scatter(
         if len(item.get("text", "")) > MAX_TEXT_PREVIEW_LEN:
             text_preview += "..."
         points.append({
-            "id": item["text_id"],
+            "id": item["id"],
             "tradition": item.get("tradition", "unknown"),
             "chunk_index": item["chunk_index"],
             "text": text_preview,
@@ -182,7 +182,7 @@ def generate_distribution(
     for item in data:
         trad = item.get("tradition", "unknown")
         tradition_counts[trad] = tradition_counts.get(trad, 0) + 1
-        tradition_docs.setdefault(trad, set()).add(item["text_id"])
+        tradition_docs.setdefault(trad, set()).add(item["id"])
 
     sorted_traditions = sorted(tradition_counts.items(), key=lambda x: -x[1])
     total_chunks = sum(c for _, c in sorted_traditions)

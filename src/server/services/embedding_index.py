@@ -61,7 +61,7 @@ class EmbeddingIndexService:
 
         id_to_index: dict[str, int] = {}
         for idx, item in enumerate(items):
-            point_id = item["text_id"]
+            point_id = item["id"]
             id_to_index.setdefault(point_id, idx)
             id_to_index[self._point_key(point_id, item["chunk_index"])] = idx
 
@@ -116,19 +116,7 @@ class EmbeddingIndexService:
             similarity = float(similarities[idx])
             if not np.isfinite(similarity):
                 continue
-
-            item = index.items[int(idx)]
-            results.append(
-                {
-                    "id": item["text_id"],
-                    "tradition": item["tradition"],
-                    "major_tradition": item["major_tradition"],
-                    "chunk_index": item["chunk_index"],
-                    "similarity_score": similarity,
-                    "text": item.get("text", "") or "",
-                    "filename": item["filename"],
-                }
-            )
+            results.append({**index.items[int(idx)], "similarity_score": similarity})
 
         return results
 
