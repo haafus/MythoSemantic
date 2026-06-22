@@ -29,6 +29,7 @@ _BASE_ITEM = {
     "major_tradition": "Greek",
     "tradition": "Hellenic",
     "url": "http://example.com/text",
+    "description": "",
 }
 
 

@@ -52,7 +52,7 @@ def _build_metadata(item: dict, *, path: str, stats: dict) -> dict:
         "char_count": stats["char_count"],
         "word_count": stats["word_count"],
         "sentence_count": stats["sentence_count"],
-        "description": item.get("description", ""),
+        "description": item["description"],
     }
 
 
