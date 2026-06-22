@@ -82,8 +82,6 @@ class EmbeddingIndexService:
     def _resolve_index(index: ModelIndex, point_id: str, chunk_index: int | None = None) -> int:
         key = EmbeddingIndexService._point_key(point_id, chunk_index)
         item_index = index.id_to_index.get(key)
-        if item_index is None and chunk_index is not None:
-            item_index = index.id_to_index.get(str(point_id))
         if item_index is None:
             raise KeyError(point_id)
         return item_index
