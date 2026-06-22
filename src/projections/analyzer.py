@@ -28,7 +28,7 @@ class EmbeddingAnalyzer:
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         logger.info(f"Loading data for model: {model_name}...")
-        self.data, self.embeddings = chroma_manager.get_collection(model_name).load_data()
+        _, self.data, self.embeddings = chroma_manager.get_collection(model_name).load_data()
 
         if not self.data:
             logger.warning(f"No data found for model '{model_name}' ")

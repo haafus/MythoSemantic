@@ -54,7 +54,7 @@ class ChromaCollection:
     def delete(self, ids: list[str]) -> None:
         self._collection.delete(ids=ids)
 
-    def load_data(self) -> tuple[list[dict[str, Any]], np.ndarray]:
+    def load_data(self) -> tuple[list[str], list[dict[str, Any]], np.ndarray]:
         results = self._collection.get(include=["embeddings", "metadatas", "documents"])
 
         records = [
@@ -62,7 +62,7 @@ class ChromaCollection:
             for meta, doc in zip(results["metadatas"], results["documents"], strict=True)
         ]
         embeddings = np.array(results["embeddings"], dtype=np.float32) if records else np.empty((0, 0), dtype=np.float32)
-        return records, embeddings
+        return results["ids"], records, embeddings
 
 
 def get_or_create_collection(model_name: str, **kwargs) -> ChromaCollection:
