@@ -765,7 +765,6 @@ function getTraditionColor(name, fallback = "#555") {
 function normalizeBookTitle(value) {
     return String(value || "")
         .replace(/\.txt$/i, "")
-        .replace(/_/g, " ")
         .trim();
 }
 
@@ -1315,7 +1314,7 @@ function renderGraphBookList(books, graphType) {
 
     list.innerHTML = books.map((book) => `
         <button class="graph-book-btn" type="button" data-book-id="${escapeAttribute(book.id)}">
-            ${escapeHtml(book.id.replace(/_/g, " "))}
+            ${escapeHtml(book.id)}
         </button>
     `).join("");
 
