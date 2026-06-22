@@ -51,6 +51,9 @@ class ChromaCollection:
     def modify(self, metadata: dict) -> None:
         self._collection.modify(metadata=metadata)
 
+    def query(self, **kwargs) -> dict:
+        return self._collection.query(**kwargs)
+
     def delete(self, ids: list[str]) -> None:
         self._collection.delete(ids=ids)
 
