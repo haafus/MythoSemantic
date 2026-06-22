@@ -62,5 +62,7 @@
 
 ### Documentation
 
-1. [Preliminary paper draft](docs/draft.md) ([overleaf](https://www.overleaf.com/3284195327nzmxtpqmsvwm#2b1a91))
-2. [Bibliography](docs/bibliography.md)
+1. [How to](docs/how_to.md)
+2. [Preliminary paper draft](docs/draft.md) ([overleaf](https://www.overleaf.com/3284195327nzmxtpqmsvwm#2b1a91))
+3. [Bibliography](docs/bibliography.md)
+4. [Motif induction methods review](docs/motif-induction-review.md)

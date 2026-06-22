@@ -226,13 +226,13 @@ FastAPI-сервер и SPA-интерфейс.
 |-------|------|----------|
 | GET | `/api/models` | Список embedding-моделей |
 | GET | `/api/corpus/catalog` | Каталог текстов корпуса |
-| GET | `/api/corpus/documents` | Текст документа по ID |
+| GET | `/api/corpus/documents` | Текст документа по title |
 | GET | `/api/corpus/archive` | ZIP-архив корпуса |
 | GET | `/api/geography/traditions` | Традиции с координатами |
 | GET | `/api/graphs/` | Список книг с доступными графами |
 | GET | `/api/graphs/{book_id}/{graph_type}` | JSON-данные графа (nodes + edges) |
 | GET | `/api/similarity/projections/{model}/{method}` | JSON-данные проекции |
-| GET | `/api/similarity/points/{model}/{point_id}` | Информация о точке (+ соседи через `?neighbors=N&offset=M`) |
+| GET | `/api/similarity/points/{model}/{text_id}` | Информация о точке (+ соседи через `?chunk_index=N&neighbors=N&offset=M`) |
 | POST | `/api/similarity/search` | Семантический поиск |
 | POST | `/api/similarity/search/warmup` | Предзагрузка модели и индекса |
 
