@@ -48,7 +48,7 @@ class TestIterCorpusFiles:
         ])
 
         results = list(iter_files(corpus))
-        filenames = {r.filename for r in results}
+        filenames = {info.filename for _, info in results}
         assert filenames == {"file1.txt", "file2.txt"}
 
     def test_metadata_populates_fields(self, tmp_path):
@@ -64,25 +64,28 @@ class TestIterCorpusFiles:
 
         results = list(iter_files(corpus))
         assert len(results) == 1
-        r = results[0]
-        assert r.tradition == "Buddhism"
-        assert r.major_tradition == "Eastern"
-        assert r.url == "http://example.com"
-        assert r.text_id == "mytext"
+        _, info = results[0]
+        assert info.tradition == "Buddhism"
+        assert info.major_tradition == "Eastern"
+        assert info.url == "http://example.com"
+        assert info.text_id == "mytext"
 
-    def test_returns_corpus_file_info(self, tmp_path):
+    def test_returns_path_and_info(self, tmp_path):
         corpus = self._create_corpus(tmp_path, [
             {"title": "a", "tradition": "t", "major_tradition": "m", "path": "m/t/a/a.txt"},
         ])
         results = list(iter_files(corpus))
-        assert isinstance(results[0], CorpusFileInfo)
+        path, info = results[0]
+        assert path.exists()
+        assert isinstance(info, CorpusFileInfo)
 
-    def test_read_returns_content(self, tmp_path):
+    def test_path_is_readable(self, tmp_path):
         corpus = self._create_corpus(tmp_path, [
             {"title": "a", "tradition": "t", "major_tradition": "m", "path": "m/t/a/a.txt", "content": "hello world"},
         ])
         results = list(iter_files(corpus))
-        assert results[0].read() == "hello world"
+        path, _ = results[0]
+        assert path.read_text(encoding="utf-8") == "hello world"
 
     def test_missing_corpus_json_raises(self, tmp_path):
         corpus_dir = tmp_path / "corpus"
@@ -96,7 +99,7 @@ class TestIterCorpusFiles:
         (corpus_dir / "corpus.json").write_text("[]")
         assert list(iter_files(corpus_dir)) == []
 
-    def test_skips_entry_without_id(self, tmp_path):
+    def test_skips_entry_without_title(self, tmp_path):
         corpus = self._create_corpus(tmp_path, [
             {"title": "good", "tradition": "t", "major_tradition": "m", "path": "m/t/good/good.txt"},
         ])
@@ -117,11 +120,3 @@ class TestIterCorpusFiles:
 
         results = list(iter_files(corpus_dir))
         assert results == []
-
-    def test_does_not_read_file_content(self, tmp_path):
-        corpus = self._create_corpus(tmp_path, [
-            {"title": "big", "tradition": "t", "major_tradition": "m", "path": "m/t/big/big.txt", "content": "x" * 10000},
-        ])
-        results = list(iter_files(corpus))
-        assert not hasattr(results[0], "content")
-        assert not hasattr(results[0], "text")

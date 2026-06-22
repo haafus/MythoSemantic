@@ -20,7 +20,7 @@ def _build_chroma_entries(
     chunks: list[str], info: CorpusFileInfo,
 ) -> tuple[list[str], list[dict[str, Any]]]:
     ids = [chunk_id(info.text_id, i) for i in range(len(chunks))]
-    base = {k: v for k, v in dataclasses.asdict(info).items() if k not in ("path", "title")}
+    base = dataclasses.asdict(info)
     metadatas = [{**base, "chunk_index": i} for i in range(len(chunks))]
     return ids, metadatas
 
@@ -75,8 +75,8 @@ class EmbeddingBuilder:
         logger.info(f"Embedding {len(files_info)} files to collection '{collection.name}'")
 
         with tqdm(desc="Embedding", unit="chunk") as pbar:
-            for file_info in files_info:
-                content = file_info.read()
+            for file_path, file_info in files_info:
+                content = file_path.read_text(encoding="utf-8")
                 chunks = self._chunk_text(content)
                 if not chunks:
                     continue
