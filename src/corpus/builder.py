@@ -43,7 +43,7 @@ def _finalize_text(text: str, url: str, tid: str) -> dict:
 def _build_metadata(item: dict, *, path: str, stats: dict) -> dict:
     return {
         "title": item["title"],
-        "major_tradition": item.get("major_tradition", "Unknown"),
+        "major_tradition": item["major_tradition"],
         "tradition": item["tradition"],
         "url": item["url"],
         "date_downloaded": datetime.now(timezone.utc).isoformat(),
