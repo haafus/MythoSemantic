@@ -25,7 +25,7 @@ data_lock = threading.Lock()
 
 
 def _item_tid(item: dict) -> str:
-    return item.get("title", item.get("id", "unknown_id"))
+    return item["title"]
 
 
 def _finalize_text(text: str, url: str, tid: str) -> dict:

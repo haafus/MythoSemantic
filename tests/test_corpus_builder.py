@@ -2,6 +2,8 @@ import json
 import sys
 import types
 
+import pytest
+
 for stub in ["pymupdf", "trafilatura", "bs4", "fake_useragent"]:
     sys.modules.setdefault(stub, types.ModuleType(stub))
 bs4_mod = sys.modules["bs4"]
@@ -24,17 +26,12 @@ from corpus.builder import _build_metadata, _item_tid, _update_traditions
 
 
 class TestItemTid:
-    def test_prefers_title(self):
-        assert _item_tid({"title": "Iliad", "id": "123"}) == "Iliad"
+    def test_returns_title(self):
+        assert _item_tid({"title": "Iliad"}) == "Iliad"
 
-    def test_falls_back_to_id(self):
-        assert _item_tid({"id": "abc"}) == "abc"
-
-    def test_falls_back_to_unknown(self):
-        assert _item_tid({}) == "unknown_id"
-
-    def test_empty_title_still_returned(self):
-        assert _item_tid({"title": "", "id": "x"}) == ""
+    def test_missing_title_raises(self):
+        with pytest.raises(KeyError):
+            _item_tid({})
 
 
 _BASE_ITEM = {
@@ -74,7 +71,7 @@ class TestBuildMetadataFields:
 
     def test_missing_major_tradition_defaults(self):
         stats = {"md5": "abc", "char_count": 10, "word_count": 1, "sentence_count": 1}
-        item = {"tradition": "T", "url": "http://example.com/no-major"}
+        item = {"title": "Test", "tradition": "T", "url": "http://example.com/no-major"}
         meta = _build_metadata(item, path="/tmp/x.txt", stats=stats)
         assert meta["major_tradition"] == "Unknown"
 

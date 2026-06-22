@@ -35,7 +35,7 @@ def iter_files(corpus_dir: Path) -> Generator[CorpusFileInfo, None, None]:
         items = json.load(f)
 
     for item in items:
-        tid = item.get("title", item.get("id"))
+        tid = item.get("title")
         if not tid:
             continue
 

@@ -43,8 +43,8 @@ class TestIterCorpusFiles:
 
     def test_yields_files_from_catalog(self, tmp_path):
         corpus = self._create_corpus(tmp_path, [
-            {"id": "file1", "tradition": "t1", "major_tradition": "mt1", "path": "mt1/t1/file1/file1.txt"},
-            {"id": "file2", "tradition": "t2", "major_tradition": "mt2", "path": "mt2/t2/file2/file2.txt"},
+            {"title": "file1", "tradition": "t1", "major_tradition": "mt1", "path": "mt1/t1/file1/file1.txt"},
+            {"title": "file2", "tradition": "t2", "major_tradition": "mt2", "path": "mt2/t2/file2/file2.txt"},
         ])
 
         results = list(iter_files(corpus))
@@ -54,7 +54,7 @@ class TestIterCorpusFiles:
     def test_metadata_populates_fields(self, tmp_path):
         corpus = self._create_corpus(tmp_path, [
             {
-                "id": "mytext",
+                "title": "mytext",
                 "tradition": "Buddhism",
                 "major_tradition": "Eastern",
                 "url": "http://example.com",
@@ -72,14 +72,14 @@ class TestIterCorpusFiles:
 
     def test_returns_corpus_file_info(self, tmp_path):
         corpus = self._create_corpus(tmp_path, [
-            {"id": "a", "tradition": "t", "major_tradition": "m", "path": "m/t/a/a.txt"},
+            {"title": "a", "tradition": "t", "major_tradition": "m", "path": "m/t/a/a.txt"},
         ])
         results = list(iter_files(corpus))
         assert isinstance(results[0], CorpusFileInfo)
 
     def test_read_returns_content(self, tmp_path):
         corpus = self._create_corpus(tmp_path, [
-            {"id": "a", "tradition": "t", "major_tradition": "m", "path": "m/t/a/a.txt", "content": "hello world"},
+            {"title": "a", "tradition": "t", "major_tradition": "m", "path": "m/t/a/a.txt", "content": "hello world"},
         ])
         results = list(iter_files(corpus))
         assert results[0].read() == "hello world"
@@ -98,7 +98,7 @@ class TestIterCorpusFiles:
 
     def test_skips_entry_without_id(self, tmp_path):
         corpus = self._create_corpus(tmp_path, [
-            {"id": "good", "tradition": "t", "major_tradition": "m", "path": "m/t/good/good.txt"},
+            {"title": "good", "tradition": "t", "major_tradition": "m", "path": "m/t/good/good.txt"},
         ])
         with open(corpus / "corpus.json") as f:
             catalog = json.load(f)
@@ -112,7 +112,7 @@ class TestIterCorpusFiles:
     def test_skips_missing_file(self, tmp_path):
         corpus_dir = tmp_path / "corpus"
         corpus_dir.mkdir()
-        catalog = [{"id": "gone", "tradition": "t", "major_tradition": "m", "path": "m/t/gone/gone.txt"}]
+        catalog = [{"title": "gone", "tradition": "t", "major_tradition": "m", "path": "m/t/gone/gone.txt"}]
         (corpus_dir / "corpus.json").write_text(json.dumps(catalog))
 
         results = list(iter_files(corpus_dir))
@@ -120,7 +120,7 @@ class TestIterCorpusFiles:
 
     def test_does_not_read_file_content(self, tmp_path):
         corpus = self._create_corpus(tmp_path, [
-            {"id": "big", "tradition": "t", "major_tradition": "m", "path": "m/t/big/big.txt", "content": "x" * 10000},
+            {"title": "big", "tradition": "t", "major_tradition": "m", "path": "m/t/big/big.txt", "content": "x" * 10000},
         ])
         results = list(iter_files(corpus))
         assert not hasattr(results[0], "content")

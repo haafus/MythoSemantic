@@ -144,7 +144,7 @@ def embeddings_orphan_chunks(settings, *, skip_collections: set[str] | None = No
     if not meta_entries:
         return []
 
-    known_text_ids = {normalize_catalog_id(e.get("title", e.get("id"))) for e in meta_entries if e.get("title") or e.get("id")}
+    known_text_ids = {normalize_catalog_id(e["title"]) for e in meta_entries if e.get("title")}
     results = []
     try:
         from embeddings import chroma_manager
@@ -252,7 +252,7 @@ def graphs_orphans(settings) -> list[tuple[Path, int]]:
     if not meta_entries:
         return []
 
-    known_text_ids = {normalize_catalog_id(e.get("title", e.get("id"))) for e in meta_entries if e.get("title") or e.get("id")}
+    known_text_ids = {normalize_catalog_id(e["title"]) for e in meta_entries if e.get("title")}
 
     subdirs = [d for d in graphs_dir.iterdir() if d.is_dir()]
 
