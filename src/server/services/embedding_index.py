@@ -34,14 +34,14 @@ class EmbeddingIndexService:
             return self._index
 
     def get_point(self, model_key: str, text_id: str, chunk_index: int,
-                  neighbors: int = 0, offset: int = 0) -> list[dict]:
+                  top_k: int = 1, offset: int = 0) -> list[dict]:
         index = self.get_index(model_name_for_key(model_key))
         item_index = self._resolve_index(index, text_id, chunk_index)
         if item_index is None:
             return []
         query_vector = index.normalized_matrix[item_index]
         similarities = index.normalized_matrix @ query_vector
-        return self._top_results(index, similarities, 1 + neighbors, offset)
+        return self._top_results(index, similarities, top_k, offset)
 
     def search(self, model_key: str, query: str, top_k: int = 20) -> list[dict]:
         model_name = model_name_for_key(model_key)

@@ -942,8 +942,8 @@ function scoreClass(similarityScore) {
     return {percent, cls};
 }
 
-function fetchPointWithNeighbors(pointId, chunkIndex, neighbors = 5) {
-    const params = new URLSearchParams({neighbors: String(neighbors)});
+function fetchPointWithNeighbors(pointId, chunkIndex, topK = 6) {
+    const params = new URLSearchParams({top_k: String(topK)});
     if (chunkIndex !== null && chunkIndex !== undefined && chunkIndex !== "") {
         params.set("chunk_index", String(chunkIndex));
     }
