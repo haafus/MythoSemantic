@@ -1,3 +1,4 @@
+import dataclasses
 import logging
 import time
 from pathlib import Path
@@ -19,18 +20,8 @@ def _build_chroma_entries(
     chunks: list[str], info: CorpusFileInfo,
 ) -> tuple[list[str], list[dict[str, Any]]]:
     ids = [chunk_id(info.text_id, i) for i in range(len(chunks))]
-
-    metadatas = [
-        {
-            "filename": info.filename,
-            "tradition": info.tradition,
-            "major_tradition": info.major_tradition,
-            "chunk_index": i,
-            "text_id": info.text_id,
-            "url": info.url,
-        }
-        for i in range(len(chunks))
-    ]
+    base = {k: v for k, v in dataclasses.asdict(info).items() if k not in ("path", "title")}
+    metadatas = [{**base, "chunk_index": i} for i in range(len(chunks))]
     return ids, metadatas
 
 
