@@ -76,18 +76,3 @@ class TestTopResults:
         results = EmbeddingIndexService._top_results(index, np.array([0.9]), 100)
         assert len(results) == 1
 
-    def test_offset(self):
-        items = [self._item("a"), self._item("b"), self._item("c")]
-        index = _make_index(items)
-        sims = np.array([0.9, 0.5, 0.1], dtype=np.float32)
-        results = EmbeddingIndexService._top_results(index, sims, 2, offset=1)
-        assert len(results) == 2
-        assert results[0]["id"] == "b"
-        assert results[1]["id"] == "c"
-
-    def test_offset_beyond_items(self):
-        items = [self._item("a"), self._item("b")]
-        index = _make_index(items)
-        sims = np.array([0.9, 0.5], dtype=np.float32)
-        results = EmbeddingIndexService._top_results(index, sims, 5, offset=10)
-        assert results == []

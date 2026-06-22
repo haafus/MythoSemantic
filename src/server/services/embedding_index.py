@@ -34,14 +34,14 @@ class EmbeddingIndexService:
             return self._index
 
     def get_point(self, model_key: str, text_id: str, chunk_index: int,
-                  top_k: int = 1, offset: int = 0) -> list[dict]:
+                  top_k: int = 1) -> list[dict]:
         index = self.get_index(model_name_for_key(model_key))
         item_index = self._resolve_index(index, text_id, chunk_index)
         if item_index is None:
             return []
         query_vector = index.normalized_matrix[item_index]
         similarities = index.normalized_matrix @ query_vector
-        return self._top_results(index, similarities, top_k, offset)
+        return self._top_results(index, similarities, top_k)
 
     def search(self, model_key: str, query: str, top_k: int = 20) -> list[dict]:
         model_name = model_name_for_key(model_key)
@@ -87,14 +87,13 @@ class EmbeddingIndexService:
         return np.asarray(raw[0], dtype=np.float32)
 
     @staticmethod
-    def _top_results(index: ModelIndex, similarities: np.ndarray, limit: int, offset: int = 0) -> list[dict]:
-        total_needed = min(offset + limit, len(index.items))
-        if total_needed <= 0:
+    def _top_results(index: ModelIndex, similarities: np.ndarray, limit: int) -> list[dict]:
+        limit = min(limit, len(index.items))
+        if limit <= 0:
             return []
 
-        candidate_indices = np.argpartition(-similarities, total_needed - 1)[:total_needed]
+        candidate_indices = np.argpartition(-similarities, limit - 1)[:limit]
         candidate_indices = candidate_indices[np.argsort(-similarities[candidate_indices])]
-        candidate_indices = candidate_indices[offset:]
 
         results = []
         for idx in candidate_indices:

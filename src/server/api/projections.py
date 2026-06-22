@@ -11,9 +11,9 @@ def methods() -> list[dict]:
     return PROJECTION_METHODS
 
 
-@router.get("/projections/{model_key}/{method}")
-def projection(model_key: str, method: str) -> dict:
-    data = get_projection_data(model_key, method)
+@router.get("/projections/{model}/{method}")
+def projection(model: str, method: str) -> dict:
+    data = get_projection_data(model, method)
     if not data:
         raise HTTPException(status_code=404, detail="Projection data not found")
     return data
