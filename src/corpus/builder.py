@@ -26,9 +26,9 @@ data_lock = threading.Lock()
 
 
 
-def _finalize_text(text: str, url: str, tid: str) -> tuple[bytes, dict]:
+def _finalize_text(text: str, url: str, title: str) -> tuple[bytes, dict]:
     text = normalize_text(text)
-    text = clean_gutenberg_in_builder(text, url, tid)
+    text = clean_gutenberg_in_builder(text, url, title)
     data_utf8 = text.encode("utf-8")
     stats = {
         "md5": md5(data_utf8),
@@ -49,21 +49,21 @@ def _build_metadata(item: dict, *, path: str, stats: dict) -> dict:
 
 
 
-def _extract_text(data: bytes, url: str, tid: str, content_type: str = "") -> str:
+def _extract_text(data: bytes, url: str, title: str, content_type: str = "") -> str:
     is_pdf = url.lower().endswith(".pdf") or "application/pdf" in content_type or data[:4] == b"%PDF"
     is_html = (
         b"<html" in data[:200].lower() or "text/html" in content_type or b"<!doctype html" in data[:200].lower()
     )
 
     if is_pdf:
-        logger.debug(f"{tid}: PDF detected, extracting text")
+        logger.debug(f"{title}: PDF detected, extracting text")
         return pdf_to_text(
             data,
             extract_tables=settings.corpus.pdf_extract_tables,
             preserve_layout=settings.corpus.pdf_preserve_layout,
         )
     if is_html:
-        logger.debug(f"{tid}: HTML detected, converting to text")
+        logger.debug(f"{title}: HTML detected, converting to text")
         return html_to_text(
             data,
             include_comments=settings.corpus.html_include_comments,
@@ -73,20 +73,20 @@ def _extract_text(data: bytes, url: str, tid: str, content_type: str = "") -> st
 
 
 def _download_and_process(item: dict) -> dict | None:
-    tid = item["title"]
+    title = item["title"]
     url = item["url"]
 
     try:
         data = download_file(url)
         content_type = item.get("content_type", "")
-        text = _extract_text(data, url, tid, content_type)
+        text = _extract_text(data, url, title, content_type)
 
         if not text or not text.strip():
             raise ValueError("Empty content after conversion")
 
-        data_utf8, stats = _finalize_text(text, url, tid)
+        data_utf8, stats = _finalize_text(text, url, title)
 
-        filename = text_path(settings.corpus_dir, item["major_tradition"], item["tradition"], tid)
+        filename = text_path(settings.corpus_dir, item["major_tradition"], item["tradition"], title)
 
         with data_lock:
             ensure_dir(filename.parent)
@@ -98,7 +98,7 @@ def _download_and_process(item: dict) -> dict | None:
         return meta
 
     except Exception:
-        logger.exception("%s: Processing error", tid)
+        logger.exception("%s: Processing error", title)
         return None
 
 
@@ -161,11 +161,11 @@ def build_corpus(force: bool = False, max_texts: int | None = None):
     corpus_root = Path(settings.corpus_dir).resolve()
 
     for item in download_list:
-        tid = item["title"]
-        prev = existing.get(tid)
+        title = item["title"]
+        prev = existing.get(title)
         if prev and (corpus_root / prev.get("path", "")).exists():
             metadata.append(prev)
-            logger.debug(f"{tid}: already in corpus, skipping")
+            logger.debug(f"{title}: already in corpus, skipping")
         else:
             to_download.append(item)
 

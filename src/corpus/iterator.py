@@ -35,25 +35,25 @@ def iter_files(corpus_dir: Path) -> Generator[CorpusFileInfo, None, None]:
         items = json.load(f)
 
     for item in items:
-        tid = item.get("title")
-        if not tid:
+        title = item.get("title")
+        if not title:
             continue
 
         path = item.get("path")
         if not path:
-            logger.warning("Skipping entry '%s': no path", tid)
+            logger.warning("Skipping entry '%s': no path", title)
             continue
 
         txt_file = corpus_dir / path
         if not txt_file.exists():
-            logger.warning("Skipping entry '%s': file not found at %s", tid, txt_file)
+            logger.warning("Skipping entry '%s': file not found at %s", title, txt_file)
             continue
 
         yield CorpusFileInfo(
             filename=txt_file.name,
             path=str(txt_file),
-            text_id=normalize_catalog_id(tid),
-            title=tid,
+            text_id=normalize_catalog_id(title),
+            title=title,
             major_tradition=item.get("major_tradition", "unknown"),
             tradition=item.get("tradition", "unknown"),
             url=item.get("url", ""),

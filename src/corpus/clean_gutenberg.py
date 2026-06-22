@@ -132,13 +132,13 @@ def is_gutenberg_text(text: str) -> bool:
     return any(re.search(pattern, text, re.IGNORECASE) for pattern in patterns)
 
 
-def clean_gutenberg_in_builder(original_text: str, url: str = "", tid: str = "") -> str:
+def clean_gutenberg_in_builder(original_text: str, url: str = "", title: str = "") -> str:
     if url and ("gutenberg.org" in url or "gutenberg" in url.lower()):
-        logger.debug(f"{tid}: Project Gutenberg URL detected, applying cleanup")
-        return clean_gutenberg_text(original_text, tid or url)
+        logger.debug(f"{title}: Project Gutenberg URL detected, applying cleanup")
+        return clean_gutenberg_text(original_text, title or url)
 
     if is_gutenberg_text(original_text):
-        logger.debug(f"{tid}: Project Gutenberg text detected, applying cleanup")
-        return clean_gutenberg_text(original_text, tid or "unknown file")
+        logger.debug(f"{title}: Project Gutenberg text detected, applying cleanup")
+        return clean_gutenberg_text(original_text, title or "unknown file")
 
     return original_text

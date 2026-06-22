@@ -60,10 +60,10 @@ def ensure_dir(path: Path):
     path.mkdir(parents=True, exist_ok=True)
 
 
-def text_path(corpus_dir: Path, major_tradition: str, tradition: str, tid: str) -> Path:
+def text_path(corpus_dir: Path, major_tradition: str, tradition: str, title: str) -> Path:
     major = sanitize_filename(major_tradition)
     trad = sanitize_filename(tradition)
-    title = sanitize_filename(tid)
+    title = sanitize_filename(title)
     return corpus_dir / major / trad / f"{title}.txt"
 
 
