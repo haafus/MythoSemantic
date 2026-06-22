@@ -1,5 +1,4 @@
 import logging
-import re
 import time
 from pathlib import Path
 from typing import Any
@@ -15,17 +14,10 @@ from .model_manager import EmbeddingEncoder
 logger = logging.getLogger(__name__)
 
 
-def _safe_id_part(value: Any) -> str:
-    return re.sub(r"[^0-9A-Za-z_.-]+", "_", str(value or "unknown")).strip("_") or "unknown"
-
-
 def _build_chroma_entries(
-    chunks: list[str], info: CorpusFileInfo, model_name: str,
+    chunks: list[str], info: CorpusFileInfo,
 ) -> tuple[list[str], list[dict[str, Any]]]:
-    text_id_safe = _safe_id_part(info.text_id)
-    model_id = _safe_id_part(model_name)
-
-    ids = [f"{text_id_safe}_{model_id}_{i}" for i in range(len(chunks))]
+    ids = [f"{info.text_id}_{i}" for i in range(len(chunks))]
 
     metadatas = [
         {
@@ -99,9 +91,7 @@ class EmbeddingBuilder:
                 n_chunks = len(chunks)
                 total_chunks += n_chunks
                 try:
-                    ids, metadatas = _build_chroma_entries(
-                        chunks, file_info, model_name,
-                    )
+                    ids, metadatas = _build_chroma_entries(chunks, file_info)
 
                     missing = [
                         (i, chunk) for i, (cid, chunk) in enumerate(zip(ids, chunks, strict=True))
