@@ -67,8 +67,8 @@ def chunk_text(text: str, chunk_size: int, chunk_overlap: int) -> list[str]:
                     sub_chunks = _split_recursive(split, remaining_seps, current_tail, depth + 1)
                     if sub_chunks:
                         chunks.extend(sub_chunks)
-                        current_tail = _extract_tail(sub_chunks[-1], chunk_overlap)
-                        current_chunk = ""
+                        current_chunk = _extract_tail(sub_chunks[-1], chunk_overlap)
+                        current_tail = ""
                     else:
                         current_chunk = current_tail
                 else:

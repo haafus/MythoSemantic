@@ -38,3 +38,12 @@ class TestChunkText:
         no_overlap = chunk_text(text, chunk_size=100, chunk_overlap=0)
         with_overlap = chunk_text(text, chunk_size=100, chunk_overlap=30)
         assert len(with_overlap) >= len(no_overlap)
+
+    def test_overlap_preserved_after_recursive_split(self):
+        short_a = "A" * 50
+        long_b = "B" * 200
+        short_c = "C" * 50
+        text = f"{short_a}\n\n{long_b}\n\n{short_c}"
+        chunks = chunk_text(text, chunk_size=100, chunk_overlap=20)
+        last_chunk = chunks[-1]
+        assert "B" in last_chunk and "C" in last_chunk
