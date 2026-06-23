@@ -12,7 +12,7 @@ from model_registry import active_embedding_models, resolve_embedding_model
 from settings import settings
 
 from . import chroma_manager
-from .chunking import create_chunking_strategies
+from .chunking import chunk_text
 from .model_manager import EmbeddingEncoder
 
 logger = logging.getLogger(__name__)
@@ -57,9 +57,6 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
     corpus_dir = settings.corpus_dir
     batch_size = emb.batch_size
 
-    chunking_strategies = create_chunking_strategies()
-    chunking = chunking_strategies[emb.default_chunking]
-
     t0 = time.monotonic()
     files_info = list(iter_files(corpus_dir))
 
@@ -69,7 +66,7 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
 
     collection = chroma_manager.get_or_create_collection(
         model_name,
-        metadata={"model": model_name, "chunking": chunking.name, "hnsw:space": "cosine"},
+        metadata={"model": model_name, "hnsw:space": "cosine"},
     )
 
     existing_ids = collection.existing_ids()
@@ -86,7 +83,7 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
     with tqdm(desc="Embedding", unit="chunk") as pbar:
         for file_info in files_info:
             content = file_info.read_text()
-            chunks = [c for c in chunking(content) if c.strip()]
+            chunks = [c for c in chunk_text(content, emb.chunk_size, emb.chunk_overlap) if c.strip()]
             if not chunks:
                 continue
             n_chunks = len(chunks)
@@ -142,7 +139,7 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
 
     collection.modify(metadata={
         "model": model_name,
-        "chunking": chunking.name,
+        "chunk_size": emb.chunk_size,
         "total_chunks": total_chunks,
     })
 

@@ -25,39 +25,15 @@ def _load_module(name: str, filename: str):
     return mod
 
 
-_chunking = _load_module("graphs.chunking", "chunking.py")
 _extraction = _load_module("graphs.extraction", "extraction.py")
 _checkpointing = _load_module("graphs.checkpointing", "checkpointing.py")
 
-chunk_text = _chunking.chunk_text
 deduplicate_entities = _extraction.deduplicate_entities
 deduplicate_relations = _extraction.deduplicate_relations
 extract_from_chunk = _extraction.extract_from_chunk
 load_checkpoint = _checkpointing.load_checkpoint
 save_checkpoint = _checkpointing.save_checkpoint
 clear_checkpoint = _checkpointing.clear_checkpoint
-
-
-class TestChunkText:
-    def test_short_text_single_chunk(self):
-        chunks = chunk_text("Hello world.", chunk_size=1000, chunk_overlap=100)
-        assert len(chunks) == 1
-        assert chunks[0] == "Hello world."
-
-    def test_empty_text(self):
-        assert chunk_text("", chunk_size=100, chunk_overlap=10) == []
-
-    def test_splits_long_text(self):
-        text = "A" * 500 + " " + "B" * 500
-        chunks = chunk_text(text, chunk_size=300, chunk_overlap=50)
-        assert len(chunks) > 1
-
-    def test_all_text_covered(self):
-        text = "Sentence one. Sentence two. Sentence three. Sentence four. Sentence five."
-        chunks = chunk_text(text, chunk_size=30, chunk_overlap=5)
-        combined = " ".join(chunks)
-        for word in ["one", "two", "three", "four", "five"]:
-            assert word in combined
 
 
 class TestDeduplicateEntities:

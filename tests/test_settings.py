@@ -35,7 +35,8 @@ def test_default_embedding_settings():
     from settings import Settings
 
     s = Settings()
-    assert s.embedding.default_chunking == "paragraph"
+    assert s.embedding.chunk_size == 1024
+    assert s.embedding.chunk_overlap == 128
 
 
 def test_active_embedding_models():

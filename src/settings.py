@@ -22,7 +22,8 @@ class CorpusSettings(BaseModel):
 
 
 class EmbeddingSettings(BaseModel):
-    default_chunking: str = "paragraph"
+    chunk_size: int = 1024
+    chunk_overlap: int = 128
     batch_size: int = 32
     max_workers: int = 16
 

@@ -7,8 +7,9 @@ from corpus.iterator import iter_files
 from llm_client import LLMProcessor
 from settings import settings
 
+from embeddings.chunking import chunk_text
+
 from .checkpointing import clear_checkpoint, load_checkpoint, save_checkpoint
-from .chunking import chunk_text
 from .extraction import deduplicate_entities, deduplicate_relations, extract_from_chunk
 from .graph_generator import generate_ages_graph, generate_beings_graph, generate_realms_graph
 

@@ -86,7 +86,7 @@ mytho corpus --force
 Основные файлы:
 - `src/embeddings/build_embeddings.py` оркестрирует генерацию для нескольких моделей (skip/resume по метаданным коллекции).
 - `src/embeddings/builder.py` читает корпус, режет тексты на чанки, считает эмбеддинги и пишет в Chroma.
-- `src/embeddings/chunking.py` содержит стратегии chunking (character, sentence, paragraph).
+- `src/embeddings/chunking.py` разбивает тексты на чанки с перекрытием (используется и для embeddings, и для graphs).
 - `src/embeddings/chroma_manager.py` хранилище ChromaDB: module-level функции (создание/удаление коллекций, список моделей) и `ChromaCollection` (upsert, загрузка данных, existing_ids).
 - `src/embeddings/model_manager.py` загрузка/выгрузка SentenceTransformer моделей (`EmbeddingEncoder`).
 - `src/model_registry.py` резолвит алиасы моделей из `config/models.json`.
@@ -147,7 +147,7 @@ mytho projections --model bge-m3
 - `config/graphs_prompts.json` содержит промпты для извлечения сущностей.
 - `src/graphs/build_graphs.py` оркестрирует генерацию: итерация по текстам, чанкинг, агрегация.
 - `src/graphs/extraction.py` извлекает сущности через LLM и дедуплицирует их.
-- `src/graphs/chunking.py` разбивает тексты на чанки с перекрытием.
+- `src/embeddings/chunking.py` разбивает тексты на чанки (общий модуль).
 - `src/graphs/checkpointing.py` сохранение/загрузка промежуточных результатов.
 - `src/graphs/graph_generator.py` строит граф через NetworkX и сохраняет JSON.
 - `src/llm_client.py` вызывает OpenAI-compatible API (`LLMProcessor`).
