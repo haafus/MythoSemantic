@@ -1,5 +1,3 @@
-// regl-scatterplot chart backend (WebGL). Scatter only; heatmap and bar use Canvas fallback.
-// See chart.js for switching instructions.
 
 import { escapeHtml, normalizePreviewText } from "./core.js";
 

@@ -1,4 +1,3 @@
-// Plotly chart backend. See chart.js for switching instructions.
 
 import { escapeHtml, normalizePreviewText } from "./core.js";
 
