@@ -12,8 +12,7 @@ def chunk_text(text: str, chunk_size: int, chunk_overlap: int) -> list[str]:
         if overlap_size <= 0 or len(chunk) <= overlap_size:
             return ""
         tail_start = len(chunk) - overlap_size
-        priority_seps = SEPARATORS
-        for sep in priority_seps:
+        for sep in SEPARATORS:
             if not sep:
                 continue
             search_start = max(0, tail_start - 50)
