@@ -27,9 +27,6 @@ class EmbeddingIndexService:
         embedding = self._encode_query(model_name, query)
         return self._query(collection, embedding.tolist(), top_k)
 
-    def warmup(self, model_key: str) -> None:
-        self._encode_query(model_name_for_key(model_key), "warmup")
-
     def _get_collection(self, model_key: str):
         from embeddings import chroma_manager
         return chroma_manager.get_collection(model_name_for_key(model_key))

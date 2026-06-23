@@ -216,7 +216,7 @@ FastAPI-сервер и SPA-интерфейс.
 - `src/server/api/graphs.py` данные графов (персонажи, связи).
 - `src/server/api/projections.py` JSON-данные проекций.
 - `src/server/api/points.py` информация о точках эмбеддингов и соседи.
-- `src/server/api/search.py` семантический поиск (синхронный и асинхронный), warmup.
+- `src/server/api/search.py` семантический поиск.
 - `src/server/schemas.py` Pydantic-схемы запросов и ответов.
 - `src/server/services/` сервисный слой (кэширование каталога, ZIP-архив, загрузка проекций и индексов).
 
@@ -234,7 +234,6 @@ FastAPI-сервер и SPA-интерфейс.
 | GET | `/api/similarity/projections/{model}/{method}` | JSON-данные проекции |
 | GET | `/api/similarity/points/{model}/{text_id}` | Информация о точке (+ соседи через `?chunk_index=N&top_k=N`) |
 | POST | `/api/similarity/search` | Семантический поиск |
-| POST | `/api/similarity/search/warmup` | Предзагрузка модели и индекса |
 
 ### Интерактивная документация
 

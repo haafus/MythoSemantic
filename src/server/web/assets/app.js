@@ -618,9 +618,7 @@ function bindEmbeddingsControls() {
     vizSelect.addEventListener("change", loadVisualization);
     searchText.addEventListener("input", () => {
         searchBtn.disabled = searchText.value.trim().length === 0 || !state.selectedModel;
-        scheduleSearchWarmup(modelSelect.value);
     });
-    searchText.addEventListener("focus", () => scheduleSearchWarmup(modelSelect.value));
     searchBtn.addEventListener("click", performAnalysisSearch);
 
     document.getElementById("enter-fullscreen").addEventListener("click", toggleFullscreen);
@@ -686,19 +684,6 @@ function updateStatus(text, type = "loaded") {
     if (!status) return;
     status.textContent = text;
     status.className = `status-badge ${type}`;
-}
-
-function scheduleSearchWarmup(model) {
-    if (!model || state.warmedSearchModels.has(model)) return;
-    state.warmedSearchModels.add(model);
-    setTimeout(() => {
-        api("/api/similarity/search/warmup", {
-            method: "POST",
-            body: JSON.stringify({model}),
-        }).catch(() => {
-            state.warmedSearchModels.delete(model);
-        });
-    }, 700);
 }
 
 function toggleFullscreen() {
@@ -1145,9 +1130,6 @@ async function renderSearchSimilarities(params) {
     searchInput.addEventListener("keypress", (event) => {
         if (event.key === "Enter") performSearchPageSearch();
     });
-    searchInput.addEventListener("focus", () => scheduleSearchWarmup(modelSelect.value));
-    searchInput.addEventListener("input", () => scheduleSearchWarmup(modelSelect.value));
-
     if (queryParam) {
         searchInput.value = queryParam;
         performSearchPageSearch();
