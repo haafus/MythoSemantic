@@ -1,8 +1,9 @@
 import json
 import logging
+from itertools import islice
 from pathlib import Path
 
-from corpus.utils import normalize_catalog_id
+from corpus.iterator import iter_files
 from llm_client import LLMProcessor
 from settings import settings
 
@@ -22,18 +23,6 @@ def generate_graphs(llm: str | None = None, force: bool = False, max_texts: int 
         logger.exception("Failed to load prompts from %s", prompts_path)
         return
 
-    metadata_path = settings.corpus_dir / "corpus.json"
-    if not metadata_path.exists():
-        logger.error(f"Metadata file not found: {metadata_path}")
-        return
-
-    try:
-        with open(metadata_path, encoding="utf-8") as f:
-            corpus = json.load(f)
-    except Exception:
-        logger.exception("Failed to read metadata")
-        return
-
     graphs_cfg = settings.graphs
     processor = LLMProcessor(
         model_alias=llm,
@@ -42,37 +31,23 @@ def generate_graphs(llm: str | None = None, force: bool = False, max_texts: int 
 
     logger.info(f"Starting graph generation (model={processor.model_name}, force={force})...")
 
+    files = iter_files(settings.corpus_dir)
     if max_texts is not None:
-        corpus = corpus[:max_texts]
+        files = islice(files, max_texts)
 
-    for book in corpus:
-        text_id = normalize_catalog_id(book["title"])
-        txt_path = Path(book.get("path", ""))
+    for txt_path, file_info in files:
+        text_id = file_info.text_id
 
         book_out_dir = settings.graphs_dir / text_id
         book_out_dir.mkdir(parents=True, exist_ok=True)
 
-        expected_path = book_out_dir / "beings.json"
-
-        if expected_path.exists():
-            if not force:
-                logger.info(f"--- Skipping: {book_id} (already exists) ---")
-                continue
-            else:
-                logger.info(f"--- Overwriting: {book_id} (file exists, but force=True is enabled) ---")
-
-        if not txt_path.exists():
-            logger.warning(f"Text file not found: {txt_path}")
+        if (book_out_dir / "beings.json").exists() and not force:
+            logger.info(f"--- Skipping: {text_id} (already exists) ---")
             continue
 
-        try:
-            with open(txt_path, encoding="utf-8") as f:
-                text = f.read()
-        except Exception:
-            logger.exception("Error reading file %s", txt_path)
-            continue
+        text = txt_path.read_text(encoding="utf-8")
 
-        logger.info(f"--- Processing: {book_id} ---")
+        logger.info(f"--- Processing: {text_id} ---")
 
         chunks = chunk_text(text, max_chars=graphs_cfg.chunk_size, overlap=graphs_cfg.chunk_overlap)
         logger.info(f"Text split into {len(chunks)} chunks.")
@@ -128,6 +103,6 @@ def generate_graphs(llm: str | None = None, force: bool = False, max_texts: int 
             clear_checkpoint(book_out_dir)
 
         except Exception:
-            logger.exception("Error saving files or generating graph for %s", book_id)
+            logger.exception("Error saving files or generating graph for %s", text_id)
 
     logger.info("Graph generation complete.")
