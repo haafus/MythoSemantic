@@ -1,6 +1,6 @@
 import {
     api, app, state,
-    ensureCorpusDocuments, ensureModels,
+    buildCorpusApiUrl, ensureCorpusDocuments, ensureModels,
     escapeAttribute, escapeHtml,
     groupDocuments, loadTraditionInfo,
     persistSelectedModel, renderModelOptions,
@@ -411,16 +411,6 @@ async function openBookReader(doc) {
     } catch {
         modalBody.textContent = "Load error.";
     }
-}
-
-function buildCorpusApiUrl(doc) {
-    const params = new URLSearchParams({
-        title: doc.title || "",
-        major_tradition: doc.major_tradition || "",
-        tradition: doc.tradition || "",
-        source: doc.source || "corpus",
-    });
-    return `/api/corpus/documents?${params.toString()}`;
 }
 
 async function performAnalysisSearch() {
