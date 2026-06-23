@@ -66,3 +66,4 @@
 2. [Preliminary paper draft](docs/draft.md) ([overleaf](https://www.overleaf.com/3284195327nzmxtpqmsvwm#2b1a91))
 3. [Bibliography](docs/bibliography.md)
 4. [Motif induction methods review](docs/motif-induction-review.md)
+5. [Motif induction survey 2018–2026](docs/motif-induction-survey-2025.md)
