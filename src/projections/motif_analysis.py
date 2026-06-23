@@ -44,10 +44,11 @@ def _save_cache(path: Path, cache: dict[str, str]) -> None:
 def generate_motif_summaries(
     data: list[dict],
     output_dir: Path,
+    llm_model: str | None = None,
 ) -> list[str]:
     from llm_client import LLMProcessor
 
-    llm = LLMProcessor(use_json_mode=False)
+    llm = LLMProcessor(model_alias=llm_model, use_json_mode=False)
 
     cache_file = _cache_path(output_dir)
     cache = _load_cache(cache_file)
@@ -104,7 +105,7 @@ def run_motif_analysis(
 ) -> None:
     from .visualization import generate_scatter
 
-    summaries = generate_motif_summaries(data, output_dir)
+    summaries = generate_motif_summaries(data, output_dir, llm_model=llm_model)
 
     empty_count = sum(1 for s in summaries if not s.strip())
     if empty_count > len(summaries) * 0.5:
