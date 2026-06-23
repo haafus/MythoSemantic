@@ -1,12 +1,7 @@
 SEPARATORS = ["\n\n", "\n", ". ", "! ", "? ", "。", "！", "？", "।", "; ", ", ", "、", " ", ""]
 
 
-def chunk_text(
-    text: str, chunk_size: int, chunk_overlap: int,
-    separators: list[str] | None = None,
-) -> list[str]:
-    if separators is None:
-        separators = SEPARATORS
+def chunk_text(text: str, chunk_size: int, chunk_overlap: int) -> list[str]:
 
     if not text:
         return []
@@ -98,4 +93,4 @@ def chunk_text(
         merged.append(current)
         return merged
 
-    return _split_recursive(text, separators)
+    return _split_recursive(text, SEPARATORS)
