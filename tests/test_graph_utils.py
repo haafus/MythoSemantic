@@ -40,21 +40,21 @@ clear_checkpoint = _checkpointing.clear_checkpoint
 
 class TestChunkText:
     def test_short_text_single_chunk(self):
-        chunks = chunk_text("Hello world.", max_chars=1000, overlap=100)
+        chunks = chunk_text("Hello world.", chunk_size=1000, chunk_overlap=100)
         assert len(chunks) == 1
         assert chunks[0] == "Hello world."
 
     def test_empty_text(self):
-        assert chunk_text("", max_chars=100, overlap=10) == []
+        assert chunk_text("", chunk_size=100, chunk_overlap=10) == []
 
     def test_splits_long_text(self):
         text = "A" * 500 + " " + "B" * 500
-        chunks = chunk_text(text, max_chars=300, overlap=50)
+        chunks = chunk_text(text, chunk_size=300, chunk_overlap=50)
         assert len(chunks) > 1
 
     def test_all_text_covered(self):
         text = "Sentence one. Sentence two. Sentence three. Sentence four. Sentence five."
-        chunks = chunk_text(text, max_chars=30, overlap=5)
+        chunks = chunk_text(text, chunk_size=30, chunk_overlap=5)
         combined = " ".join(chunks)
         for word in ["one", "two", "three", "four", "five"]:
             assert word in combined

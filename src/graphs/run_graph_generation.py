@@ -15,7 +15,7 @@ from .graph_generator import generate_ages_graph, generate_beings_graph, generat
 logger = logging.getLogger(__name__)
 
 
-def generate_graphs(llm: str | None = None, force: bool = False, max_texts: int | None = None) -> None:
+def build_graphs(llm: str | None = None, force: bool = False, max_texts: int | None = None) -> None:
     prompts_path = Path("config/graphs_prompts.json")
     try:
         prompts = json.loads(prompts_path.read_text(encoding="utf-8"))
@@ -49,7 +49,7 @@ def generate_graphs(llm: str | None = None, force: bool = False, max_texts: int 
 
         logger.info(f"--- Processing: {text_id} ---")
 
-        chunks = chunk_text(text, max_chars=graphs_cfg.chunk_size, overlap=graphs_cfg.chunk_overlap)
+        chunks = chunk_text(text, chunk_size=graphs_cfg.chunk_size, chunk_overlap=graphs_cfg.chunk_overlap)
         logger.info(f"Text split into {len(chunks)} chunks.")
 
         chunk_prompts = {
@@ -76,17 +76,17 @@ def generate_graphs(llm: str | None = None, force: bool = False, max_texts: int 
                 results[key].extend(chunk_results[key])
             save_checkpoint(book_out_dir, i + 1, results)
 
-        all_characters = deduplicate_entities(results["beings"])
+        all_beings = deduplicate_entities(results["beings"])
         all_relations = deduplicate_relations(results["relations"])
         all_locations = deduplicate_entities(results["locations"])
         all_times = deduplicate_entities(results["times"])
         logger.info(
-            f"Extracted unique items: Beings ({len(all_characters)}), Relations ({len(all_relations)}), Locations ({len(all_locations)}), Times ({len(all_times)})"
+            f"Extracted unique items: Beings ({len(all_beings)}), Relations ({len(all_relations)}), Locations ({len(all_locations)}), Times ({len(all_times)})"
         )
 
         try:
-            with open(book_out_dir / "personas.json", "w", encoding="utf-8") as f:
-                json.dump(all_characters, f, ensure_ascii=False, indent=2)
+            with open(book_out_dir / "raw_beings.json", "w", encoding="utf-8") as f:
+                json.dump(all_beings, f, ensure_ascii=False, indent=2)
 
             with open(book_out_dir / "relations.json", "w", encoding="utf-8") as f:
                 json.dump(all_relations, f, ensure_ascii=False, indent=2)
@@ -97,7 +97,7 @@ def generate_graphs(llm: str | None = None, force: bool = False, max_texts: int 
             with open(book_out_dir / "times.json", "w", encoding="utf-8") as f:
                 json.dump(all_times, f, ensure_ascii=False, indent=2)
 
-            generate_beings_graph(all_characters, all_relations, book_out_dir)
+            generate_beings_graph(all_beings, all_relations, book_out_dir)
             generate_realms_graph(all_locations, book_out_dir)
             generate_ages_graph(all_times, book_out_dir)
             clear_checkpoint(book_out_dir)

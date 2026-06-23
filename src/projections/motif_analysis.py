@@ -100,7 +100,7 @@ def run_motif_analysis(
     data: list[dict],
     output_dir: Path,
     embedding_model: str,
-    model_name: str | None = None,
+    llm_model: str | None = None,
 ) -> None:
     from .visualization import generate_scatter
 
@@ -118,6 +118,6 @@ def run_motif_analysis(
         data,
         motif_embeddings,
         output_path=output_dir / "motif_umap.json",
-        model_name=model_name,
+        model_name=embedding_model,
     )
     logger.info("Motif UMAP projection saved")

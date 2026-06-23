@@ -1,10 +1,10 @@
-def chunk_text(text: str, max_chars: int, overlap: int) -> list[str]:
+def chunk_text(text: str, chunk_size: int, chunk_overlap: int) -> list[str]:
     chunks = []
     start = 0
     text_len = len(text)
 
     while start < text_len:
-        end = min(start + max_chars, text_len)
+        end = min(start + chunk_size, text_len)
         if end < text_len:
             split_pos = max(text.rfind("\n", start, end), text.rfind(".", start, end), text.rfind(" ", start, end))
             if split_pos == -1 or split_pos <= start:
@@ -15,7 +15,7 @@ def chunk_text(text: str, max_chars: int, overlap: int) -> list[str]:
             split_pos = end
 
         chunks.append(text[start:split_pos])
-        next_start = split_pos - overlap
+        next_start = split_pos - chunk_overlap
         start = split_pos if next_start <= start else next_start
 
     return chunks

@@ -144,15 +144,15 @@ def _build_embeddings(model: str | None, force: bool = False):
 
 
 def _build_projections(model: str | None, force: bool = False, motif_analysis: bool = False):
-    from projections.run_analysis import analyze_embeddings
+    from projections.run_analysis import build_projections
 
-    analyze_embeddings(model_name=model, motif_analysis=motif_analysis, force=force)
+    build_projections(model_name=model, motif_analysis=motif_analysis, force=force)
 
 
 def _build_graphs(llm: str | None = None, force: bool = False, max_texts: int | None = None):
-    from graphs.run_graph_generation import generate_graphs
+    from graphs.run_graph_generation import build_graphs
 
-    generate_graphs(llm=llm, force=force, max_texts=max_texts)
+    build_graphs(llm=llm, force=force, max_texts=max_texts)
 
 
 @mytho.command()

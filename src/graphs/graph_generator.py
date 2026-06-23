@@ -82,13 +82,13 @@ def _save_graph(data: dict, output_path: Path) -> None:
     logger.info(f"Graph saved: {output_path}")
 
 
-def generate_beings_graph(personas_data: list, relations_data: list, output_dir: Path) -> None:
-    personas = _normalize_df(personas_data)
+def generate_beings_graph(beings_data: list, relations_data: list, output_dir: Path) -> None:
+    beings = _normalize_df(beings_data)
     relations = _normalize_df(relations_data)
 
     G = nx.DiGraph()
-    entity_names = _extract_names(personas)
-    node_metadata = _collect_metadata(personas)
+    entity_names = _extract_names(beings)
+    node_metadata = _collect_metadata(beings)
 
     if not relations.empty and "Subject" in relations.columns and "Object" in relations.columns:
         relations = relations.dropna(subset=["Subject", "Object"])

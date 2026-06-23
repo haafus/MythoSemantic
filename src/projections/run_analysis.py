@@ -9,7 +9,7 @@ from .visualization import CHART_GENERATORS, SCATTER_TRANSFORMS
 logger = logging.getLogger(__name__)
 
 
-def analyze_embeddings(
+def build_projections(
     model_name: str | None = None,
     generate_all_plots: bool = True,
     motif_analysis: bool = False,
@@ -89,7 +89,6 @@ def _generate_motif_plot(analyzer: EmbeddingAnalyzer) -> None:
             analyzer.data,
             output_dir=analyzer.output_dir,
             embedding_model=analyzer.model_name,
-            model_name=analyzer.model_name,
         )
     except Exception:
         logger.exception("Error creating Motif UMAP plot")
