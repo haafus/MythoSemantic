@@ -144,13 +144,13 @@ def _build_embeddings(model: str | None, force: bool = False):
 
 
 def _build_projections(model: str | None, force: bool = False, motif_analysis: bool = False):
-    from projections.run_analysis import build_projections
+    from projections.build_projections import build_projections
 
     build_projections(model_name=model, motif_analysis=motif_analysis, force=force)
 
 
 def _build_graphs(llm: str | None = None, force: bool = False, max_texts: int | None = None):
-    from graphs.run_graph_generation import build_graphs
+    from graphs.build_graphs import build_graphs
 
     build_graphs(llm=llm, force=force, max_texts=max_texts)
 

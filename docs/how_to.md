@@ -120,7 +120,7 @@ mytho embeddings --model bge-m3 --force
 Основные файлы:
 - `src/projections/analyzer.py` загружает данные из Chroma и собирает статистику.
 - `src/projections/visualization.py` вычисляет UMAP-проекции, heatmap расстояний и distribution, сохраняет как JSON.
-- `src/projections/run_analysis.py` оркестрирует анализ для нескольких моделей.
+- `src/projections/build_projections.py` оркестрирует анализ для нескольких моделей.
 
 Возможности:
 - Получить статистику по модели.
@@ -145,7 +145,7 @@ mytho projections --model bge-m3
 
 Основные файлы:
 - `config/graphs_prompts.json` содержит промпты для извлечения сущностей.
-- `src/graphs/run_graph_generation.py` оркестрирует генерацию: итерация по текстам, чанкинг, агрегация.
+- `src/graphs/build_graphs.py` оркестрирует генерацию: итерация по текстам, чанкинг, агрегация.
 - `src/graphs/extraction.py` извлекает сущности через LLM и дедуплицирует их.
 - `src/graphs/chunking.py` разбивает тексты на чанки с перекрытием.
 - `src/graphs/checkpointing.py` сохранение/загрузка промежуточных результатов.
