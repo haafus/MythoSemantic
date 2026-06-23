@@ -35,7 +35,7 @@ def generate_graphs(llm: str | None = None, force: bool = False, max_texts: int 
     if max_texts is not None:
         files = islice(files, max_texts)
 
-    for txt_path, file_info in files:
+    for file_info in files:
         text_id = file_info.text_id
 
         book_out_dir = settings.graphs_dir / text_id
@@ -45,7 +45,7 @@ def generate_graphs(llm: str | None = None, force: bool = False, max_texts: int 
             logger.info(f"--- Skipping: {text_id} (already exists) ---")
             continue
 
-        text = txt_path.read_text(encoding="utf-8")
+        text = file_info.read_text()
 
         logger.info(f"--- Processing: {text_id} ---")
 

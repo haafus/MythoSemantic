@@ -11,14 +11,21 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True, slots=True)
 class CorpusFileInfo:
-    filename: str
+    _path: Path
     text_id: str
     major_tradition: str
     tradition: str
     url: str
 
+    @property
+    def filename(self) -> str:
+        return self._path.name
 
-def iter_files(corpus_dir: Path) -> Generator[tuple[Path, CorpusFileInfo], None, None]:
+    def read_text(self) -> str:
+        return self._path.read_text(encoding="utf-8")
+
+
+def iter_files(corpus_dir: Path) -> Generator[CorpusFileInfo, None, None]:
     metadata_file = corpus_dir / "corpus.json"
 
     if not metadata_file.exists():
@@ -44,8 +51,8 @@ def iter_files(corpus_dir: Path) -> Generator[tuple[Path, CorpusFileInfo], None,
             logger.warning("Skipping entry '%s': file not found at %s", title, txt_file)
             continue
 
-        yield txt_file, CorpusFileInfo(
-            filename=txt_file.name,
+        yield CorpusFileInfo(
+            _path=txt_file,
             text_id=normalize_catalog_id(title),
             major_tradition=item.get("major_tradition", "unknown"),
             tradition=item.get("tradition", "unknown"),

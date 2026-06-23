@@ -75,8 +75,8 @@ class EmbeddingBuilder:
         logger.info(f"Embedding {len(files_info)} files to collection '{collection.name}'")
 
         with tqdm(desc="Embedding", unit="chunk") as pbar:
-            for file_path, file_info in files_info:
-                content = file_path.read_text(encoding="utf-8")
+            for file_info in files_info:
+                content = file_info.read_text()
                 chunks = self._chunk_text(content)
                 if not chunks:
                     continue

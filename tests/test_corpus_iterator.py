@@ -48,7 +48,7 @@ class TestIterCorpusFiles:
         ])
 
         results = list(iter_files(corpus))
-        filenames = {info.filename for _, info in results}
+        filenames = {info.filename for info in results}
         assert filenames == {"file1.txt", "file2.txt"}
 
     def test_metadata_populates_fields(self, tmp_path):
@@ -64,28 +64,25 @@ class TestIterCorpusFiles:
 
         results = list(iter_files(corpus))
         assert len(results) == 1
-        _, info = results[0]
+        info = results[0]
         assert info.tradition == "Buddhism"
         assert info.major_tradition == "Eastern"
         assert info.url == "http://example.com"
         assert info.text_id == "mytext"
 
-    def test_returns_path_and_info(self, tmp_path):
+    def test_returns_corpus_file_info(self, tmp_path):
         corpus = self._create_corpus(tmp_path, [
             {"title": "a", "tradition": "t", "major_tradition": "m", "path": "m/t/a/a.txt"},
         ])
         results = list(iter_files(corpus))
-        path, info = results[0]
-        assert path.exists()
-        assert isinstance(info, CorpusFileInfo)
+        assert isinstance(results[0], CorpusFileInfo)
 
-    def test_path_is_readable(self, tmp_path):
+    def test_read_text(self, tmp_path):
         corpus = self._create_corpus(tmp_path, [
             {"title": "a", "tradition": "t", "major_tradition": "m", "path": "m/t/a/a.txt", "content": "hello world"},
         ])
-        results = list(iter_files(corpus))
-        path, _ = results[0]
-        assert path.read_text(encoding="utf-8") == "hello world"
+        info = list(iter_files(corpus))[0]
+        assert info.read_text() == "hello world"
 
     def test_missing_corpus_json_raises(self, tmp_path):
         corpus_dir = tmp_path / "corpus"
