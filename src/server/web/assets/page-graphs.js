@@ -1,4 +1,5 @@
-import { app, state, api, escapeHtml, escapeAttribute, ensureCorpusDocuments } from "./core.js";
+import { app, state, api, escapeHtml, escapeAttribute } from "./core.js";
+import { renderLibraryTree, setActiveBook } from "./library-tree.js";
 
 const GRAPH_CATEGORY_COLORS = {
     Character: "#dcd0ff",
@@ -19,7 +20,7 @@ export async function renderGraphPage(graphType) {
         <main class="graph-page container">
             <div class="graph-sidebar">
                 <div class="graph-sidebar-header">Books</div>
-                <div class="graph-book-list" id="graphBookList">Loading...</div>
+                <div id="graphBookList">Loading...</div>
             </div>
             <div class="graph-area">
                 <div class="graph-canvas" id="graphCanvas">
@@ -33,38 +34,12 @@ export async function renderGraphPage(graphType) {
         </main>
     `;
 
-    try {
-        const docs = await ensureCorpusDocuments();
-        const books = [...new Set(docs.map((d) => d.title))].sort().map((title) => ({ title }));
-        renderGraphBookList(books, graphType);
-    } catch (error) {
-        const list = document.getElementById("graphBookList");
-        if (list) list.innerHTML = `<div class="error-state">${escapeHtml(error.message)}</div>`;
-    }
-}
-
-function renderGraphBookList(books, graphType) {
-    const list = document.getElementById("graphBookList");
-    if (!list) return;
-
-    if (!books.length) {
-        list.innerHTML = '<div class="graph-empty">No graphs available. Run graph generation first.</div>';
-        return;
-    }
-
-    list.innerHTML = books.map((book) => `
-        <button class="graph-book-btn" type="button" data-book-id="${escapeAttribute(book.title)}">
-            ${escapeHtml(book.title)}
-        </button>
-    `).join("");
-
-    list.querySelectorAll(".graph-book-btn").forEach((btn) => {
-        btn.addEventListener("click", () => {
-            list.querySelectorAll(".graph-book-btn").forEach((b) => b.classList.remove("active"));
-            btn.classList.add("active");
-            loadGraphData(btn.dataset.bookId, graphType);
-        });
+    const bookList = document.getElementById("graphBookList");
+    bookList.addEventListener("book-select", (e) => {
+        setActiveBook(bookList, e.detail.doc);
+        loadGraphData(e.detail.doc.title, graphType);
     });
+    await renderLibraryTree(bookList);
 }
 
 async function loadGraphData(bookId, graphType) {

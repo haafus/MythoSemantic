@@ -1,8 +1,8 @@
 import {
     api, app, state,
-    buildCorpusApiUrl, ensureCorpusDocuments, ensureModels,
+    buildCorpusApiUrl, ensureModels,
     escapeAttribute, escapeHtml,
-    groupDocuments, loadTraditionInfo,
+    loadTraditionInfo,
     persistSelectedModel, renderModelOptions,
 } from "./core.js";
 import { destroyChart, resizeChart, renderScatter, renderHeatmap, renderDistribution } from "./chart.js";
@@ -12,6 +12,7 @@ import {
     resultBookTitle, runSemanticSearch,
     searchResultMetaLine,
 } from "./search-utils.js";
+import { renderLibraryTree } from "./library-tree.js";
 
 function getTraditionColor(name, fallback = "#555") {
     const info = state.traditionInfo || {};
@@ -63,7 +64,7 @@ export async function renderEmbeddingsAnalysis() {
                     <div class="tree-header">
                         <div class="tree-title">Corpus Chunks</div>
                     </div>
-                    <div id="tree-container" class="tree-container">Loading...</div>
+                    <div id="tree-container">Loading...</div>
                 </div>
 
                 <div class="plot-area">
@@ -314,86 +315,8 @@ async function initializeAnalysisLibrary() {
     const container = document.getElementById("tree-container");
     if (!container) return;
 
-    try {
-        const documents = await ensureCorpusDocuments();
-        container.innerHTML = "";
-        renderAnalysisTreeFromDocuments(documents, container);
-    } catch (error) {
-        container.innerHTML = `<div style="color:#d32f2f; padding:10px;">${escapeHtml(error.message)}</div>`;
-    }
-}
-
-function renderAnalysisTreeFromDocuments(documents, container) {
-    if (!documents.length) {
-        container.innerHTML = '<div style="padding:10px;">No corpus files found.</div>';
-        return;
-    }
-
-    const grouped = groupDocuments(documents);
-    grouped.forEach((traditions, major) => {
-        const majorWrapper = createAnalysisTreeNode(major, 0, false);
-        const majorChildren = document.createElement("div");
-        majorChildren.style.display = "block";
-        attachTreeToggle(majorWrapper.item, majorChildren);
-
-        traditions.forEach((docs, tradition) => {
-            const traditionWrapper = createAnalysisTreeNode(tradition, 1, false, getTraditionColor(tradition, docs[0]?.color || "#555"));
-            const traditionChildren = document.createElement("div");
-            traditionChildren.style.display = "block";
-            attachTreeToggle(traditionWrapper.item, traditionChildren);
-
-            docs.forEach((doc) => {
-                const leaf = createAnalysisTreeNode(doc.title, 2, true);
-                leaf.item.addEventListener("click", () => openBookReader(doc));
-                traditionChildren.appendChild(leaf.wrapper);
-            });
-
-            traditionWrapper.wrapper.appendChild(traditionChildren);
-            majorChildren.appendChild(traditionWrapper.wrapper);
-        });
-
-        majorWrapper.wrapper.appendChild(majorChildren);
-        container.appendChild(majorWrapper.wrapper);
-    });
-}
-
-function createAnalysisTreeNode(name, depth, isLeaf, color) {
-    const wrapper = document.createElement("div");
-    wrapper.className = `tree-node level-${depth}`;
-
-    const item = document.createElement("div");
-    item.className = `tree-item level-${depth} ${isLeaf ? "leaf" : ""}`;
-
-    if (depth === 1) {
-        const circle = document.createElement("span");
-        circle.className = "color-circle";
-        circle.style.backgroundColor = color || "#555";
-        item.appendChild(circle);
-    }
-
-    const textSpan = document.createElement("span");
-    textSpan.textContent = String(name || "").replace(/\.txt$/, "");
-    item.appendChild(textSpan);
-
-    if (!isLeaf) {
-        const toggle = document.createElement("span");
-        toggle.className = "folder-toggle";
-        toggle.textContent = "-";
-        item.appendChild(toggle);
-    }
-
-    wrapper.appendChild(item);
-    return {wrapper, item};
-}
-
-function attachTreeToggle(item, childContainer) {
-    item.addEventListener("click", (event) => {
-        event.stopPropagation();
-        const isHidden = childContainer.style.display === "none";
-        childContainer.style.display = isHidden ? "block" : "none";
-        const toggle = item.querySelector(".folder-toggle");
-        if (toggle) toggle.textContent = isHidden ? "-" : "+";
-    });
+    container.addEventListener("book-select", (e) => openBookReader(e.detail.doc));
+    await renderLibraryTree(container);
 }
 
 async function openBookReader(doc) {
