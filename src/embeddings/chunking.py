@@ -1,9 +1,12 @@
+SEPARATORS = ["\n\n", "\n", ". ", "! ", "? ", "。", "！", "？", "।", "; ", ", ", "、", " ", ""]
+
+
 def chunk_text(
     text: str, chunk_size: int, chunk_overlap: int,
     separators: list[str] | None = None,
 ) -> list[str]:
     if separators is None:
-        separators = ["\n\n", "\n", ". ", "! ", "? ", "。", "！", "？", "।", "; ", ", ", "、", " ", ""]
+        separators = SEPARATORS
 
     if not text:
         return []
@@ -14,7 +17,7 @@ def chunk_text(
         if overlap_size <= 0 or len(chunk) <= overlap_size:
             return ""
         tail_start = len(chunk) - overlap_size
-        priority_seps = ["\n\n", "\n", ". ", "! ", "? ", "。", "！", "？", "।", "; ", ", ", "、", " ", ""]
+        priority_seps = SEPARATORS
         for sep in priority_seps:
             if not sep:
                 continue
