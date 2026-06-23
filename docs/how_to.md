@@ -284,13 +284,22 @@ Caddy сам получит TLS-сертификат, настроит реди�
 
 ## server/web
 
-Современный SPA-фронтенд.
+Vanilla JS SPA на нативных ES-модулях (без бандлера и фреймворков).
 
-Основные файлы:
-- `index.html` подключает стили и JS.
-- `assets/app.js` содержит маршруты и экраны.
-- `assets/core.js` содержит API helpers и состояние.
-- `assets/app.css` содержит стили.
+Файлы:
+- `index.html` — точка входа, CDN-библиотеки (Plotly, Leaflet, Cytoscape), навигация.
+- `assets/app.js` — роутер и обработчик `hashchange`.
+- `assets/core.js` — общее состояние, API-хелперы, утилиты.
+- `assets/library-tree.js` — переиспользуемый компонент дерева документов (corpus, embeddings, graphs).
+- `assets/search-utils.js` — общие функции семантического поиска и рендеринга результатов.
+- `assets/page-home.js` — главная страница (вкладки Vision / Methodology / …).
+- `assets/page-corpus.js` — библиотека текстов, ридер, информация о книге.
+- `assets/page-geography.js` — карта Leaflet с традициями.
+- `assets/page-embeddings.js` — визуализация эмбеддингов, поиск, информация о точке.
+- `assets/page-graphs.js` — графы персонажей / мест / эпох (Cytoscape).
+- `assets/chart.js` — переключатель бэкенда графиков (re-export).
+- `assets/chart-plotly.js`, `chart-echarts.js`, `chart-regl.js` — три взаимозаменяемых бэкенда.
+- `assets/app.css` — все стили (с комментариями-разделителями по секциям).
 
 Запускается через:
 
