@@ -1,6 +1,6 @@
 // regl-scatterplot implementation (~30 KB, WebGL). Scatter only; heatmap and bar use Canvas fallback.
 // No CDN script tag needed — loads as ES module from https://esm.sh/regl-scatterplot@1.16.0
-// To activate: cp chart-regl.js chart.js  (and remove the Plotly/ECharts <script> from index.html)
+// To activate: change the import in chart.js to "./chart-regl.js" and remove the Plotly/ECharts <script> from index.html
 
 import { escapeHtml, normalizePreviewText } from "./core.js";
 

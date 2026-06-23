@@ -1,6 +1,6 @@
 // ECharts chart implementation (~1 MB, 10-17x smaller than Plotly).
 // CDN: <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.6.0/echarts.min.js"></script>
-// To activate: cp chart-echarts.js chart.js  (and update CDN in index.html)
+// To activate: change the import in chart.js to "./chart-echarts.js" and replace the CDN script in index.html
 
 import { escapeHtml, normalizePreviewText } from "./core.js";
 
