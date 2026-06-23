@@ -4,7 +4,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, ORJSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from server.api import corpus, geography, graphs, models, points, projections, search
+from server.api import corpus, graphs, similarity
 from settings import settings
 
 
@@ -17,13 +17,9 @@ def create_app() -> FastAPI:
     srv = settings.server
     app.add_middleware(GZipMiddleware, minimum_size=srv.gzip_minimum_size)
 
-    app.include_router(models.router)
     app.include_router(corpus.router)
-    app.include_router(geography.router)
     app.include_router(graphs.router)
-    app.include_router(projections.router)
-    app.include_router(points.router)
-    app.include_router(search.router)
+    app.include_router(similarity.router)
 
     assets_dir = settings.web_root / "assets"
     if assets_dir.exists():

@@ -135,7 +135,7 @@ export function persistSelectedModel(key) {
 
 export async function ensureModels() {
     if (!state.models.length) {
-        const data = await api("/api/models");
+        const data = await api("/api/similarity/models");
         state.models = Array.isArray(data.models) ? data.models : [];
     }
 

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import PlainTextResponse, StreamingResponse
 
-from corpus.utils import read_document
-from server.schemas import CatalogResponse
+from corpus.utils import read_document, read_traditions
+from server.schemas import CatalogResponse, TraditionsResponse
 from server.services.corpus import build_corpus_archive, get_catalog_documents
 from settings import settings
 
@@ -37,3 +37,16 @@ def archive() -> StreamingResponse:
         media_type="application/zip",
         headers={"Content-Disposition": 'attachment; filename="mythoscope_corpus.zip"'},
     )
+
+
+@router.get("/traditions", response_model=TraditionsResponse)
+def traditions() -> dict:
+    data = read_traditions(settings.corpus_dir)
+    books_by_tradition: dict[str, list[str]] = {}
+    for doc in get_catalog_documents():
+        trad = doc.get("tradition", "")
+        if trad:
+            books_by_tradition.setdefault(trad, []).append(doc.get("title", ""))
+    for trad, info in data.items():
+        info["books"] = sorted(books_by_tradition.get(trad, []))
+    return {"traditions": data, "total": len(data)}

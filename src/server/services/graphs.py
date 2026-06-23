@@ -7,10 +7,10 @@ from settings import settings
 GRAPH_TYPES = {"beings", "realms", "ages"}
 
 
-def get_graph_data(book_id: str, graph_type: str) -> dict | None:
+def get_graph_data(text_id: str, graph_type: str) -> dict | None:
     if graph_type not in GRAPH_TYPES:
         return None
-    book_dir = settings.graphs_dir / normalize_catalog_id(book_id)
+    book_dir = settings.graphs_dir / normalize_catalog_id(text_id)
     json_path = book_dir / f"{graph_type}.json"
     if not json_path.exists():
         return None

@@ -8,7 +8,7 @@ from model_registry import model_name_for_key
 logger = logging.getLogger(__name__)
 
 
-class EmbeddingIndexService:
+class SimilarityService:
     def __init__(self):
         self._encoder = None
 
@@ -59,4 +59,4 @@ class EmbeddingIndexService:
         return np.asarray(raw[0], dtype=np.float32)
 
 
-embedding_index_service = EmbeddingIndexService()
+similarity_service = SimilarityService()

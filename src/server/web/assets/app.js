@@ -383,7 +383,7 @@ async function loadTraditionInfo() {
     if (state.traditionInfo) return state.traditionInfo;
 
     try {
-        const data = await api("/api/geography/traditions");
+        const data = await api("/api/corpus/traditions");
         state.traditionInfo = data.traditions || {};
     } catch {
         state.traditionInfo = {};

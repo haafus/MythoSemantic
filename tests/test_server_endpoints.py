@@ -15,9 +15,9 @@ class TestModelsEndpoint:
     def test_list_models(self):
         from unittest.mock import patch
 
-        with patch("server.api.models.chroma_manager") as mock_cm:
+        with patch("server.api.similarity.chroma_manager") as mock_cm:
             mock_cm.get_available_models.return_value = []
-            response = client.get("/api/models")
+            response = client.get("/api/similarity/models")
         assert response.status_code == 200
         data = response.json()
         assert "models" in data
@@ -39,9 +39,9 @@ class TestCorpusCatalog:
         assert response.status_code == 200
 
 
-class TestGeographyEndpoint:
+class TestTraditionsEndpoint:
     def test_traditions(self):
-        response = client.get("/api/geography/traditions")
+        response = client.get("/api/corpus/traditions")
         assert response.status_code == 200
         data = response.json()
         assert "traditions" in data

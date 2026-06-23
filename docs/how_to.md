@@ -210,27 +210,22 @@ FastAPI-сервер и SPA-интерфейс.
 
 Основные файлы:
 - `src/server/run_server.py` создание приложения, middleware, статика.
-- `src/server/api/models.py` список доступных embedding-моделей.
-- `src/server/api/corpus.py` каталог текстов, чтение документов, скачивание архива.
-- `src/server/api/geography.py` традиции с географией.
+- `src/server/api/corpus.py` каталог текстов, чтение документов, архив, традиции.
 - `src/server/api/graphs.py` данные графов (персонажи, связи).
-- `src/server/api/projections.py` JSON-данные проекций.
-- `src/server/api/points.py` информация о точках эмбеддингов и соседи.
-- `src/server/api/search.py` семантический поиск.
+- `src/server/api/similarity.py` модели, семантический поиск, точки, проекции.
 - `src/server/schemas.py` Pydantic-схемы запросов и ответов.
-- `src/server/services/` сервисный слой (кэширование каталога, ZIP-архив, загрузка проекций и индексов).
+- `src/server/services/` сервисный слой (каталог, ZIP-архив, проекции, поиск).
 
 ### API эндпоинты
 
 | Метод | Путь | Описание |
 |-------|------|----------|
-| GET | `/api/models` | Список embedding-моделей |
 | GET | `/api/corpus/catalog` | Каталог текстов корпуса |
 | GET | `/api/corpus/documents` | Текст документа по title |
 | GET | `/api/corpus/archive` | ZIP-архив корпуса |
-| GET | `/api/geography/traditions` | Традиции с координатами |
-| GET | `/api/graphs/` | Список книг с доступными графами |
-| GET | `/api/graphs/{book_id}/{graph_type}` | JSON-данные графа (nodes + edges) |
+| GET | `/api/corpus/traditions` | Традиции с координатами |
+| GET | `/api/graphs/{text_id}/{graph_type}` | JSON-данные графа (nodes + edges) |
+| GET | `/api/similarity/models` | Список embedding-моделей |
 | GET | `/api/similarity/projections/{model}/{method}` | JSON-данные проекции |
 | GET | `/api/similarity/points/{model}/{text_id}` | Информация о точке (+ соседи через `?chunk_index=N&top_k=N`) |
 | POST | `/api/similarity/search` | Семантический поиск |
