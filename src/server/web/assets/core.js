@@ -178,6 +178,17 @@ export function corpusTraditionKey(major, tradition) {
     return `${major || "Other"}\u0000${tradition || "Unknown"}`;
 }
 
+export async function loadTraditionInfo() {
+    if (state.traditionInfo) return state.traditionInfo;
+    try {
+        const data = await api("/api/corpus/traditions");
+        state.traditionInfo = data.traditions || {};
+    } catch {
+        state.traditionInfo = {};
+    }
+    return state.traditionInfo;
+}
+
 export function groupDocuments(items) {
     const grouped = new Map();
 
