@@ -13,7 +13,6 @@ export const state = {
     pendingPoint: null,
     lastAnalysisSearchData: null,
     analysisSearchRequestId: 0,
-    searchPageRequestId: 0,
     keydownHandler: null,
     graphCy: null,
     similarityMethods: [],
@@ -43,7 +42,6 @@ function routeClass(path) {
     if (path === "/corpus") return "route-corpus";
     if (path === "/geography") return "route-geography";
     if (path === "/embeddings_analysis") return "route-embeddings";
-    if (path === "/searchSimilarities") return "route-search";
     if (["/ages", "/realms", "/beings"].includes(path)) return "route-graphs";
     return "route-corpus";
 }
@@ -53,7 +51,7 @@ export function setBodyClass(path) {
 }
 
 export function setActiveNav(path) {
-    const activePath = path === "/searchSimilarities" ? "/embeddings_analysis" : path;
+    const activePath = path;
     document.querySelectorAll(".nav-links a").forEach((link) => {
         const href = link.getAttribute("href") || "";
         const hashPath = normalizeRoute((href.split("#")[1] || "/").split("?")[0] || "/");

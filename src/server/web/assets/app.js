@@ -7,7 +7,6 @@ import { renderHome } from "./page-home.js";
 import { renderCorpus } from "./page-corpus.js";
 import { renderGeography } from "./page-geography.js";
 import { renderEmbeddingsAnalysis, displayPointInfo, triggerModelChange } from "./page-embeddings.js";
-import { renderSearchSimilarities } from "./page-search.js";
 import { renderGraphPage } from "./page-graphs.js";
 
 function render() {
@@ -29,7 +28,6 @@ function render() {
     if (path === "/corpus") return renderCorpus();
     if (path === "/geography") return renderGeography();
     if (path === "/embeddings_analysis") return renderEmbeddingsAnalysis();
-    if (path === "/searchSimilarities") return renderSearchSimilarities(parsed.params);
     const graphType = path.slice(1);
     if (["beings", "realms", "ages"].includes(graphType)) return renderGraphPage(graphType);
 
