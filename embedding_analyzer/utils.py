@@ -48,7 +48,7 @@ def reduce_dimensions(
             n_components=n_components,
             perplexity=kwargs.get('perplexity', min(30, len(embeddings) - 1)),
             random_state=kwargs.get('random_state', 42),
-            n_iter=kwargs.get('n_iter', 1000)
+            max_iter=kwargs.get('max_iter', kwargs.get('n_iter', 1000))
         )
         return reducer.fit_transform(embeddings)
 

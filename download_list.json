@@ -108,15 +108,6 @@
     "description": "An ancient Greek epic poem attributed to Homer, set during the Trojan War and focusing on the quarrel between King Agamemnon and the warrior Achilles."
   },
   {
-    "title": "The Poetic Edda",
-    "tradition": "Norse",
-    "major_tradition": "Indo-European",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/73533/pg73533.txt",
-    "description": "A collection of Old Norse mythological and heroic poems, preserving major stories about Odin, Thor, Loki, Ragnarok, and legendary heroes."
-  },
-  {
     "title": "Kalevala The Epic Poem of Finland",
     "tradition": "Finnish",
     "major_tradition": "Finno-Ugric",
