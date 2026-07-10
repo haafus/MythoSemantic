@@ -37,24 +37,6 @@
     "estimated_corpus_size": "1000+ texts"
   },
   {
-    "tradition": "Norse mythology",
-    "language_family": "Indo-European (Germanic)",
-    "approx_recorded": "c. 1200–1300 CE",
-    "location": "Reykjavik, Iceland",
-    "coordinates": "64.1466, -21.9426",
-    "major_texts": [
-      "Poetic Edda",
-      "Prose Edda",
-      "Volsunga Saga"
-    ],
-    "corpus_urls": [
-      "https://www.sacred-texts.com",
-      "https://www.gutenberg.org",
-      "https://archive.org"
-    ],
-    "estimated_corpus_size": "200–300 texts"
-  },
-  {
     "tradition": "Vedic mythology",
     "language_family": "Indo-European (Indo-Aryan)",
     "approx_recorded": "c. 1500–500 BCE",

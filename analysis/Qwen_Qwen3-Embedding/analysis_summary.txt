@@ -1,9 +1,9 @@
 Embedding Analysis Summary
 Model: Qwen/Qwen3-Embedding
-Total chunks in DB: 25673
-Chunks of selected model: 25673
+Total chunks in DB: 25671
+Chunks of selected model: 25671
 Embedding dimension: 2560
-Number of traditions: 23
+Number of traditions: 22
 
 DISTRIBUTION BY TRADITIONS
   Hinduism                      : 8102 ( 31.6%)
@@ -28,4 +28,3 @@ DISTRIBUTION BY TRADITIONS
   Australian                    :   82 (  0.3%)
   Germanic                      :   31 (  0.1%)
   Maori                         :   24 (  0.1%)
-  Norse                         :    2 (  0.0%)

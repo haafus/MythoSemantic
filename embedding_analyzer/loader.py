@@ -272,7 +272,7 @@ class EmbeddingDataLoader:
                 meta = metadatas[i] if i < len(metadatas) else {}
                 doc = documents[i] if i < len(documents) else ""
 
-                embedding = np.array(embeddings[i]) if isinstance(embeddings[i], list) else embeddings[i]
+                embedding = np.asarray(embeddings[i], dtype=np.float32)
 
                 batch_data.append({
                     "id": meta.get("text_id", doc_id),
