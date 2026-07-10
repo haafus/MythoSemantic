@@ -1,4 +1,5 @@
 import os
+import sys
 
 from clean_gutenberg import clean_gutenberg_texts
 from UI import start_home_page
@@ -17,10 +18,22 @@ app = create_app()
 if __name__ == "__main__":
     folder1 = 'chroma_db'
     folder2 = 'cache'
+
     if not os.path.exists(folder1) or not os.path.exists(folder2):
         print(f"Required folders ('{folder1}' or '{folder2}') are missing. Starting download...")
         GOOGLE_DRIVE_FILE_ID = '1VcqrqgKzENrxDqKqvP93JOUhfCPxMRWw'
-        download_and_extract_gdrive(GOOGLE_DRIVE_FILE_ID)
+
+        try:
+            download_and_extract_gdrive(
+                file_id=GOOGLE_DRIVE_FILE_ID,
+                extract_to='.',
+                folders_to_clean=[folder1, folder2]
+            )
+        except Exception:
+
+            print("Further execution is impossible. Terminating the script.")
+            sys.exit(1)
     else:
         print("Both folders already exist in the project root. Download skipped.")
+    print("Continuing program execution...")
     run_server()

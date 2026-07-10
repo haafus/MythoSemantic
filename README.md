@@ -1,66 +1,48 @@
-# Toward a Computational Framework for Comparative Mythology
+# Running Instructions
 
-### Basic Pipeline
+This script automatically sets up the working environment (downloads the necessary databases) and launches the user interface.
 
-1. Download and clean text corpora
-2. Build sentence and chunk embeddings
-3. Build vector index and retrieval
-4. Reduce embeddings dimensions with autoencoder and/or UMAP
-5. Display colored semantic space
-6. Extract ontology with Wikontic
+## 1. Preparation
 
-### Experiments / Roadmap / Backlog
+Make sure you have **Python** installed on your computer (version 3.8 or higher is recommended). 
 
-1. Relate unsupervised results to traditional motif indexes
-2. Query index by traditional motives and freeform text
-3. Research traditional motives operationalization
-4. Research traditions proximity / compound metrics and tools
-5. Build exploratory UI with clusters visualization, adaptable threshold and freeform proximity / parallels query
-6. Make the research UI publicly available online
-7. Integrate traditional indexes (ATU, Berezkin?) for interactive research and scaling?
-8. Initiate worldwide community corpora & computational methods project?
-9. Create and maintain **awesome-computational-mythology**?
-10. Try AE / VAE / SAE?
-11. Try hierarchical chunking / embeddings?
-12. Research narrative and network extraction methods?
-13. ...
+To avoid conflicts with other projects and system-wide packages, it is highly recommended to use a virtual environment. Open a terminal in the project root folder and follow these steps:
 
-### Potential Data Sources
+### Step 1: Create a virtual environment
+```bash
+python -m venv venv
+```
 
-1. Internet Sacred Text Archive: https://sacred-texts.com/index.htm
-2. The Database of Religious History (including corpora): https://religiondatabase.org/landing
-3. Seshat Global History Databank: https://seshatdatabank.info/
-4. Motif Indexes: https://ctsf.ru/ukazateli
-5. Re3Data, Ancient Cultures: https://www.re3data.org/search?query=&subjects%5B%5D=111
-6. eHRAF World Cultures (proprietary): https://ehrafworldcultures.yale.edu
-7. Multilingual Folk Tale Database: http://www.mftd.org
-8. Theoi Project: https://www.theoi.com/Library.html
+### Step 2: Activate the virtual environment
+* **Windows (Command Prompt / PowerShell):**
+  ```bash
+  venv\Scripts\activate
+  ```
+* **macOS / Linux:**
+  ```bash
+  source venv/bin/activate
+  ```
+*(You should see `(venv)` appear at the beginning of your terminal prompt, indicating that the environment is active).*
 
-### Potential Future Colabs & Benchmarks
+### Step 3: Install dependencies
+Once the virtual environment is activated, install the required project packages:
+```bash
+pip install -r requirements.txt
+```
 
-1. DeepMind, Aeneas / Ithaca: https://predictingthepast.com
-2. Max Planck Evo Anthro: https://www.eva.mpg.de/linguistic-and-cultural-evolution/index/
-3. Oxford - Institute of Cognitive & Evolutionary Anthropology (Harvey Whitehouse): https://www.anthro.ox.ac.uk/cognitive-evolutionary-anthropology-0
-4. Cambridge - DH / CST bridge: https://www.cdh.cam.ac.uk, https://www.cst.cam.ac.uk
-5. Durham University - Cultural evolution & folklore tradition (Jamshid Tehrani): https://www.durham.ac.uk/research/institutes-and-centres/cultural-evolution/
-6. Stanford - Literary Lab (Franco Moretti): https://litlab.stanford.edu
-7. Ecole Normale Superieure / CNRS - Structural mythology tradition (Julien d'Huy)
-8. IACM (Michael Witzel - Harvard, Natalya Yanchevskaya - Princeton, Steve Farmer): https://www.compmyth.org
-9. Лаборатория Ненужных Вещей (Брагинская, Александрова, Чегодаев, Березкин и др.): https://7seminarov.com
+## 2. Running the Application
 
-### Potential Submission Targets
+To launch the user interface, make sure your virtual environment is still active and run the main script:
 
-1. Journal/Conference: Computational Humanities Research (CHR): https://computational-humanities-research.org/
-2. Journal: Digital Scholarship in the Humanities (DSH): https://academic.oup.com/dsh
-3. Journal: Cultural Analytics (CA): https://culturalanalytics.org/
-4. Journal/Conference: Computational Literary Studies (JCLS): https://jcls.io
-5. Journal/Conference: International Association for Comparative Mythology (IACM): https://www.compmyth.org/conferences/
-6. Journal: Digital Humanities Quarterly (DHQ): https://dhq.digitalhumanities.org
-7. Workshop: ACL Natural Language Processing for Digital Humanities (NLP4DH): https://www.nlp4dh.com
-8. Workshop: ACL SIG on Humanities (SIGHUM): https://sighum.wordpress.com
-9. Workshop: Digital Methods For Mythological Research (dm4myth): https://dm4myth.github.io
+```bash
+python main.py
+```
 
-### Documentation
+### What happens next:
+1. The script will automatically check for the required folders (`chroma_db` and `cache`) in the project root.
+2. If they are missing, it will automatically download the necessary databases from Google Drive and extract them.
+3. Once the folders are ready, it will start the local UI server. 
+4. In your terminal, you will see a message indicating that the server is running (e.g., `Uvicorn running on http://127.0.0.1:8000`). **Click on this link** (or copy and paste it into your browser) to open the project interface.
 
-1. [Preliminary paper draft](DRAFT.rtf) ([overleaf](https://www.overleaf.com/3284195327nzmxtpqmsvwm#2b1a91))
-2. [Bibliography](LITERATURE.md)
+## 3. Stopping the Server
+To stop the server and exit the application, simply press **`CTRL+C`** in the terminal where the server is running.
