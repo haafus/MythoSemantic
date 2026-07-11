@@ -11,7 +11,7 @@ cd MythoSemantic
 
 ## 1. Preparation
 
-Make sure you have **Python** installed on your computer (version 3.8 or higher is recommended).
+Make sure you have **Python** installed on your computer (version 3.9 or higher is recommended).
 
 To avoid conflicts with other projects and system-wide packages, it is highly recommended to use a virtual environment. Run the following from inside the `MythoSemantic` folder you just entered:
 
